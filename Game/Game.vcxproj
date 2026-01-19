@@ -229,6 +229,7 @@
     <ClCompile Include="actor\BattleCharacter.cpp" />
     <ClCompile Include="actor\CharacterSteering.cpp" />
     <ClCompile Include="actor\EventCharacter.cpp" />
+    <ClCompile Include="core\ParameterManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="main.cpp" />
@@ -247,8 +248,10 @@
     <ClInclude Include="actor\BattleCharacter.h" />
     <ClInclude Include="actor\CharacterSteering.h" />
     <ClInclude Include="actor\EventCharacter.h" />
+    <ClInclude Include="core\ParameterManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
+    <ClInclude Include="json\json.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
     <ClInclude Include="Types.h" />

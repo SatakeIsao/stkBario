@@ -10,6 +10,12 @@
     <Filter Include="util">
       <UniqueIdentifier>{a0fdf1eb-e4c5-4c5d-a621-21d657f754b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{c7f8c877-8640-423f-ac6a-f73ed7150bce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{dadf44e3-5f18-4671-8760-9aceb018c239}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -39,6 +45,9 @@
     </ClCompile>
     <ClCompile Include="actor\CharacterSteering.cpp">
       <Filter>actor</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ParameterManager.cpp">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +81,12 @@
     <ClInclude Include="Types.h" />
     <ClInclude Include="actor\CharacterSteering.h">
       <Filter>actor</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ParameterManager.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="json\json.hpp">
+      <Filter>json</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
