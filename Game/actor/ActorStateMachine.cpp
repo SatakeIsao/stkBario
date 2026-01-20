@@ -89,9 +89,14 @@ void CharacterStateMachine::Move(const float deltaTime, const float moveSpeed)
 {
 	// TODO: 将来的にCharacterControllerを使って衝突判定をする
 	const Vector3 moveVector = ComputeCameraDirection(moveDirection_) * moveSpeed;
+	if(moveVector.LengthSq() > 0.001f)
+	{
+		moveSpeedVector_ = moveVector;
+	}
+	moveSpeedVector_ *= 0.8f; // 摩擦係数的な
 
 	// TODO: ただ座標移動させるだけ
-	transform.position.Add(moveVector);
+	transform.position.Add(moveSpeedVector_);
 }
 
 
@@ -140,8 +145,9 @@ void BattleCharacterStateMachine::UpdateState()
 	
 
 
-	const Vector3 direction = ComputeCameraDirection(moveDirection_);
-	if (direction.LengthSq() >= 0.001f) {
+	const Vector3 direction = moveSpeedVector_;
+	if (direction.LengthSq() >= 0.001f || moveDirection_.LengthSq() >= 0.001f)
+	{
 		RequestChangeState(RunCharacterState::ID());
 		return;
 	}

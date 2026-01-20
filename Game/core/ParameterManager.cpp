@@ -1,24 +1,32 @@
 #include "stdafx.h"
 #include "ParameterManager.h"
 
-ParameterManager* ParameterManager::m_instance = nullptr;	//初期化
 
-ParameterManager::ParameterManager()
+namespace app
 {
-
-}
-
-ParameterManager::~ParameterManager()
-{
-	//動的確保したパラメーターを全解放
-	for (auto& it : m_parameterMap)
+	namespace core
 	{
-		auto& parameters = it.second;
-		for (auto* parameter : parameters)
+		ParameterManager* ParameterManager::m_instance = nullptr;	//初期化
+
+		ParameterManager::ParameterManager()
 		{
-			delete parameter;
+
 		}
-		parameters.clear();
+
+		ParameterManager::~ParameterManager()
+		{
+			//動的確保したパラメーターを全解放
+			for (auto& it : m_parameterMap)
+			{
+				auto& parameters = it.second;
+				for (auto* parameter : parameters)
+				{
+					delete parameter;
+				}
+				parameters.clear();
+			}
+			m_parameterMap.clear();
+		}
+
 	}
-	m_parameterMap.clear();
 }

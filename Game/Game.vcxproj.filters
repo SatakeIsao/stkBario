@@ -16,6 +16,18 @@
     <Filter Include="json">
       <UniqueIdentifier>{dadf44e3-5f18-4671-8760-9aceb018c239}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{f5e1a2b7-7ca9-45fc-83a1-1f7e16d9f0bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sound">
+      <UniqueIdentifier>{5da1be6b-aa97-45aa-b8e9-3ba78500c43e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="effect">
+      <UniqueIdentifier>{53711676-78e3-4714-9620-e487e78c975b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="battle">
+      <UniqueIdentifier>{35583838-ebc8-4a83-9184-2e8e25cd5d47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -48,6 +60,36 @@
     </ClCompile>
     <ClCompile Include="core\ParameterManager.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneManager.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\IScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Fade.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\BootScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\StartupScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\DebugScene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sound\SoundManager.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="effect\EffectManager.cpp">
+      <Filter>effect</Filter>
+    </ClCompile>
+    <ClCompile Include="battle\BattleManager.cpp">
+      <Filter>battle</Filter>
+    </ClCompile>
+    <ClCompile Include="actor\ActorStatus.cpp">
+      <Filter>actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +129,48 @@
     </ClInclude>
     <ClInclude Include="json\json.hpp">
       <Filter>json</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ParallelFor.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ThreadPool.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\IScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneManager.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Fade.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\BootScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\StartupScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\DebugScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sound\SoundManager.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sound\Types.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="effect\EffectManager.h">
+      <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="effect\Types.h">
+      <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="battle\BattleManager.h">
+      <Filter>battle</Filter>
+    </ClInclude>
+    <ClInclude Include="actor\ActorStatus.h">
+      <Filter>actor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

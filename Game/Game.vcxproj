@@ -226,13 +226,23 @@
     <ClCompile Include="actor\Actor.cpp" />
     <ClCompile Include="actor\ActorState.cpp" />
     <ClCompile Include="actor\ActorStateMachine.cpp" />
+    <ClCompile Include="actor\ActorStatus.cpp" />
     <ClCompile Include="actor\BattleCharacter.cpp" />
     <ClCompile Include="actor\CharacterSteering.cpp" />
     <ClCompile Include="actor\EventCharacter.cpp" />
+    <ClCompile Include="battle\BattleManager.cpp" />
+    <ClCompile Include="core\Fade.cpp" />
     <ClCompile Include="core\ParameterManager.cpp" />
+    <ClCompile Include="effect\EffectManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scene\BootScene.cpp" />
+    <ClCompile Include="scene\DebugScene.cpp" />
+    <ClCompile Include="scene\IScene.cpp" />
+    <ClCompile Include="scene\SceneManager.cpp" />
+    <ClCompile Include="scene\StartupScene.cpp" />
+    <ClCompile Include="sound\SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -245,17 +255,31 @@
     <ClInclude Include="actor\Actor.h" />
     <ClInclude Include="actor\ActorState.h" />
     <ClInclude Include="actor\ActorStateMachine.h" />
+    <ClInclude Include="actor\ActorStatus.h" />
     <ClInclude Include="actor\BattleCharacter.h" />
     <ClInclude Include="actor\CharacterSteering.h" />
     <ClInclude Include="actor\EventCharacter.h" />
+    <ClInclude Include="battle\BattleManager.h" />
+    <ClInclude Include="core\Fade.h" />
     <ClInclude Include="core\ParameterManager.h" />
+    <ClInclude Include="effect\EffectManager.h" />
+    <ClInclude Include="effect\Types.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="json\json.hpp" />
+    <ClInclude Include="scene\BootScene.h" />
+    <ClInclude Include="scene\DebugScene.h" />
+    <ClInclude Include="scene\IScene.h" />
+    <ClInclude Include="scene\SceneManager.h" />
+    <ClInclude Include="scene\StartupScene.h" />
+    <ClInclude Include="sound\SoundManager.h" />
+    <ClInclude Include="sound\Types.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Util\CRC32.h" />
+    <ClInclude Include="util\ParallelFor.h" />
+    <ClInclude Include="util\ThreadPool.h" />
     <ClInclude Include="util\util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,22 +1,10 @@
 #include "stdafx.h"
 #include "Game.h"
 
-
-#include "actor/BattleCharacter.h"
-#include "actor/EventCharacter.h"
-#include "actor/ActorState.h"
-
-#include "actor/CharacterSteering.h"
-
-
-namespace
-{
-	// @todo for test
-	static BattleCharacter* battleCharacter = nullptr;
-	static EventCharacter* eventCharacter = nullptr;
-
-	static CharacterSteering* characterSteering = nullptr;
-}
+#include "core/Fade.h"
+#include "core/ParameterManager.h"
+#include "scene/SceneManager.h"
+#include "sound/SoundManager.h"
 
 
 Game::Game()
@@ -25,47 +13,34 @@ Game::Game()
 
 Game::~Game()
 {
+	DeleteGO(m_sceneManager);
+	DeleteGO(m_fadeObject);
+	app::SoundManager::Finalize();
+	app::core::ParameterManager::Finalize();
 }
 
 bool Game::Start()
 {
-	characterSteering = new CharacterSteering();
-
-	// マリオにしてみた
-	{
-		battleCharacter = new BattleCharacter();
-		battleCharacter->Initialize("Assets/ModelData/player/player.tkm");
-		{
-			battleCharacter->AddState<IdleCharacterState>();
-			battleCharacter->AddState<RunCharacterState>();
-			battleCharacter->AddState<JumpCharacterState>();
-		}
-	}
-
-	characterSteering->Initialize(battleCharacter, 0);
-
-
-	eventCharacter = new EventCharacter();
-	eventCharacter->Initialize("Assets/ModelData/enemy/slime/slime.tkm");
-
+	// パラメーター管理生成
+	app::core::ParameterManager::Initialize();
+	// サウンド管理生成
+	app::SoundManager::Initialize();
+	// Fade処理生成
+	m_fadeObject = NewGO<FadeObject>(static_cast<uint8_t>(ObjectPriority::Fade));
+	// シーン管理生成
+	m_sceneManager = NewGO<SceneManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
 
 	return true;
 }
 
 void Game::Update()
 {
-	battleCharacter->Update();
-
-	eventCharacter->Update();
-
-	characterSteering->Update();
+	
 }
 
 void Game::Render(RenderContext& rc)
 {
-	battleCharacter->Render(rc);
 
-	eventCharacter->Render(rc);
 }
 
 

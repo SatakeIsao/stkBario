@@ -3,11 +3,13 @@
  */
 #include "stdafx.h"
 #include "BattleCharacter.h"
+#include "ActorStatus.h"
 
 
 BattleCharacter::BattleCharacter()
 {
 	stateMachine_ = std::make_unique<BattleCharacterStateMachine>();
+	status_ = std::make_unique<app::actor::BattleCharacterStatus>();
 }
 
 
@@ -19,6 +21,7 @@ BattleCharacter::~BattleCharacter()
 bool BattleCharacter::Start()
 {
 	stateMachine_->Initialize();
+	status_->Setup();
 	return true;
 }
 

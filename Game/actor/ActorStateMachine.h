@@ -24,7 +24,7 @@ protected:
 	/** 移動関連 */
 	Vector3 moveDirection_ = Vector3::Front;
 
-	// @todo for あとでCharacterSたてMachine側にもっていこうかなぁ
+	// @todo for あとでCharacterStateMachine側にもっていこうかなぁ
 	bool isActionA_ = false;
 	bool isActionB_ = false;
 
@@ -122,6 +122,10 @@ public:
 
 class CharacterStateMachine : public IStateMachine
 {
+protected:
+	Vector3 moveSpeedVector_ = Vector3::Zero;
+
+
 public:
 	CharacterStateMachine();
 	virtual ~CharacterStateMachine();
