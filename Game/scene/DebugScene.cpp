@@ -45,9 +45,9 @@ void DebugScene::Render(RenderContext& rc)
 bool DebugScene::RequestScene(uint32_t& id, float& waitTime)
 {
 	if (g_pad[0]->IsTrigger(enButtonA)) {
-		id = DebugScene::ID();
-		waitTime = 3.0f;
-		return true;
+		//id = DebugScene::ID();
+		//waitTime = 3.0f;
+		//return true;
 	}
 
 	return false;

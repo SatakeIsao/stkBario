@@ -3,6 +3,8 @@
  */
 #include "stdafx.h"
 #include "ActorStateMachine.h"
+#include "Actor.h"
+#include "ActorStatus.h"
 
 
 namespace
@@ -89,15 +91,25 @@ void CharacterStateMachine::Move(const float deltaTime, const float moveSpeed)
 {
 	// TODO: 将来的にCharacterControllerを使って衝突判定をする
 	const Vector3 moveVector = ComputeCameraDirection(moveDirection_) * moveSpeed;
-	if(moveVector.LengthSq() > 0.001f)
+	if(inputPower_)
 	{
 		moveSpeedVector_ = moveVector;
 	}
-	moveSpeedVector_ *= 0.8f; // 摩擦係数的な
-
-	// TODO: ただ座標移動させるだけ
-	transform.position.Add(moveSpeedVector_);
+	moveSpeedVector_ *= GetStatus()->GetFriction(); // 摩擦係数的な
 }
+
+
+app::actor::CharacterStatus* CharacterStateMachine::GetStatus()
+{
+	return character_->GetStatus();
+}
+
+
+ModelRender* CharacterStateMachine::GetModelRender()
+{
+	return character_->GetModelRender();
+}
+
 
 
 
@@ -146,7 +158,7 @@ void BattleCharacterStateMachine::UpdateState()
 
 
 	const Vector3 direction = moveSpeedVector_;
-	if (direction.LengthSq() >= 0.001f || moveDirection_.LengthSq() >= 0.001f)
+	if (direction.LengthSq() >= MOVE_MIN_FLOAT || inputPower_ >= MOVE_MIN_FLOAT)
 	{
 		RequestChangeState(RunCharacterState::ID());
 		return;

@@ -6,6 +6,16 @@
 #include "ActorState.h"
 
 
+namespace app
+{
+	namespace actor
+	{
+		class CharacterStatus;
+	}
+}
+class Character;
+
+
 class IStateMachine : public Noncopyable
 {
 	/** 例外としてpublic */
@@ -18,16 +28,6 @@ private:
 	/** ステート関連 */
 	uint32_t currentStateId_ = INVALID_STATE_ID;
 	uint32_t nextStateId_ = INVALID_STATE_ID;
-
-
-protected:
-	/** 移動関連 */
-	Vector3 moveDirection_ = Vector3::Front;
-
-	// @todo for あとでCharacterStateMachine側にもっていこうかなぁ
-	bool isActionA_ = false;
-	bool isActionB_ = false;
-
 
 
 public:
@@ -99,22 +99,6 @@ private:
 		auto it = stateList_.find(stateId);
 		return it != stateList_.end();
 	}
-
-
-
-
-
-	/** 移動関連 */
-public:
-	void SetMoveDirection(const Vector3& direction) { moveDirection_ = direction; }
-	const Vector3& GetMoveDirection() const { return moveDirection_; }
-
-	/** 入力周り */
-public:
-	void SetActionA(const bool isAction) { isActionA_ = isAction; }
-	bool IsActionA() const { return isActionA_; }
-	void SetActionB(const bool isAction) { isActionB_ = isAction; }
-	bool IsActionB() const { return isActionB_; }
 };
 
 
@@ -123,7 +107,17 @@ public:
 class CharacterStateMachine : public IStateMachine
 {
 protected:
+	/** ステートマシンを持っているきゃらくたーの情報 */
+	Character* character_ = nullptr;
+
+	/** 移動関連 */
+	Vector3 moveDirection_ = Vector3::Front;
 	Vector3 moveSpeedVector_ = Vector3::Zero;
+	float inputPower_ = 1.0f;
+
+	/** ボタンを押したか */
+	bool isActionA_ = false;
+	bool isActionB_ = false;
 
 
 public:
@@ -134,6 +128,36 @@ public:
 	virtual void Update() override;
 
 	void Move(const float deltaTime, const float moveSpeed);
+	
+	void Setup(Character* character)
+	{
+		character_ = character;
+	}
+
+	app::actor::CharacterStatus* GetStatus();
+	ModelRender* GetModelRender();
+
+
+
+	/** 移動関連 */
+public:
+	void SetMoveDirection(const Vector3& direction) { moveDirection_ = direction; }
+	const Vector3& GetMoveDirection() const { return moveDirection_; }
+	
+	void SetInputPower(const float power) { inputPower_ = power; }
+	float GetInputPower() const { return inputPower_; }
+
+	const Vector3& GetMoveSpeedVector() const { return moveSpeedVector_; }
+	void SetMoveSpeedVector(const Vector3& speedVector) { moveSpeedVector_ = speedVector; }
+
+
+
+	/** 入力周り */
+public:
+	void SetActionA(const bool isAction) { isActionA_ = isAction; }
+	bool IsActionA() const { return isActionA_; }
+	void SetActionB(const bool isAction) { isActionB_ = isAction; }
+	bool IsActionB() const { return isActionB_; }
 };
 
 

@@ -21,9 +21,9 @@ namespace app
         {
         private:
             // @todo for test
-            BattleCharacter* battleCharacter = nullptr;
-            EventCharacter* eventCharacter = nullptr;
-            CharacterSteering* characterSteering = nullptr;
+            BattleCharacter* battleCharacter_ = nullptr;
+            EventCharacter* eventCharacter_ = nullptr;
+            std::unique_ptr<CharacterSteering> characterSteering_ = nullptr;
 
 
         private:
@@ -53,9 +53,9 @@ namespace app
              */
             static void Initialize()
             {
-                if (m_instance == nullptr)
+                if (instance_ == nullptr)
                 {
-                    m_instance = new BattleManager();
+                    instance_ = new BattleManager();
                 }
             }
 
@@ -65,7 +65,7 @@ namespace app
              */
             static BattleManager& Get()
             {
-                return *m_instance;
+                return *instance_;
             }
 
 
@@ -74,7 +74,7 @@ namespace app
              */
             static bool IsAvailable()
             {
-                return m_instance != nullptr;
+                return instance_ != nullptr;
 			}
 
 
@@ -83,16 +83,16 @@ namespace app
              */
             static void Finalize()
             {
-                if (m_instance != nullptr)
+                if (instance_ != nullptr)
                 {
-                    delete m_instance;
-                    m_instance = nullptr;
+                    delete instance_;
+                    instance_ = nullptr;
                 }
             }
 
         private:
             /** シングルトンインスタンス */
-            static BattleManager* m_instance;
+            static BattleManager* instance_;
         };
     }
 }

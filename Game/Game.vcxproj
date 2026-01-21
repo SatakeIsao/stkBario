@@ -237,11 +237,13 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="memory\Memory.cpp" />
     <ClCompile Include="scene\BootScene.cpp" />
     <ClCompile Include="scene\DebugScene.cpp" />
     <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
     <ClCompile Include="scene\StartupScene.cpp" />
+    <ClCompile Include="scene\TitleScene.cpp" />
     <ClCompile Include="sound\SoundManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -259,6 +261,7 @@
     <ClInclude Include="actor\BattleCharacter.h" />
     <ClInclude Include="actor\CharacterSteering.h" />
     <ClInclude Include="actor\EventCharacter.h" />
+    <ClInclude Include="actor\Types.h" />
     <ClInclude Include="battle\BattleManager.h" />
     <ClInclude Include="core\Fade.h" />
     <ClInclude Include="core\ParameterManager.h" />
@@ -267,11 +270,14 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="json\json.hpp" />
+    <ClInclude Include="memory\Memory.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="scene\BootScene.h" />
     <ClInclude Include="scene\DebugScene.h" />
     <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\SceneManager.h" />
     <ClInclude Include="scene\StartupScene.h" />
+    <ClInclude Include="scene\TitleScene.h" />
     <ClInclude Include="sound\SoundManager.h" />
     <ClInclude Include="sound\Types.h" />
     <ClInclude Include="stdafx.h" />
@@ -281,6 +287,12 @@
     <ClInclude Include="util\ParallelFor.h" />
     <ClInclude Include="util\ThreadPool.h" />
     <ClInclude Include="util\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\ui\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

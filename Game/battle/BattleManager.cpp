@@ -10,6 +10,7 @@
 #include "actor/ActorState.h"
 #include "actor/CharacterSteering.h"
 #include "actor/ActorStatus.h"
+#include "actor/Types.h"
 
 #include "core/ParameterManager.h"
 
@@ -19,6 +20,28 @@ namespace
 	constexpr const char* MASTER_BATTLE_PARAM_PATH = "Assets/master/battle/MasterBattleParameter.json";
 	constexpr const char* MASTER_STAGE_PARAM_PATH = "Assets/master/battle/MasterStageParameter.json";
 	constexpr const char* MASTER_BATTLE_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterBattleCharacterParameter.json";
+
+	// Player用
+	static CharacterInitializeParameter sPlayerInitializeParameter = CharacterInitializeParameter([](CharacterInitializeParameter* parameter)
+		{
+			parameter->modelName = "Assets/ModelData/player/player.tkm";
+			parameter->animationDataList.Create(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Max));
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Idle)].filename = "Assets/animData/player/playerIdle.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Idle)].loop = true;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run)].filename = "Assets/animData/player/playerRun.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run)].loop = true;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump)].filename = "Assets/animData/player/playerJump.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump)].loop = false;
+		});
+	// Enemy用
+	static CharacterInitializeParameter sEnemyInitializeParameter = CharacterInitializeParameter([](CharacterInitializeParameter* parameter)
+		{
+			parameter->modelName = "Assets/ModelData/enemy/slime/slime.tkm";
+		});
+
 }
 
 
@@ -26,7 +49,7 @@ namespace app
 {
 	namespace battle
 	{
-		BattleManager* BattleManager::m_instance = nullptr; //初期化
+		BattleManager* BattleManager::instance_ = nullptr; //初期化
 
 
 		BattleManager::BattleManager()
@@ -36,6 +59,9 @@ namespace app
 
 		BattleManager::~BattleManager()
 		{
+			DeleteGO(battleCharacter_);
+			DeleteGO(eventCharacter_);
+
 			// パラメーター解放
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterStageParameter>();
@@ -48,35 +74,37 @@ namespace app
 			LoadParameter();
 
 			{
-				characterSteering = new CharacterSteering();
+				characterSteering_ = std::make_unique<CharacterSteering>();
 				// マリオにしてみた
 				{
-					battleCharacter = NewGO<BattleCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "mario");
-					battleCharacter->Initialize("Assets/ModelData/player/player.tkm");
+					battleCharacter_ = NewGO<BattleCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "mario");
+					battleCharacter_->Initialize(sPlayerInitializeParameter);
 					{
-						battleCharacter->AddState<IdleCharacterState>();
-						battleCharacter->AddState<RunCharacterState>();
-						battleCharacter->AddState<JumpCharacterState>();
+						battleCharacter_->AddState<IdleCharacterState>();
+						battleCharacter_->AddState<RunCharacterState>();
+						battleCharacter_->AddState<JumpCharacterState>();
 					}
-					// TODO: 摩擦設定
-					// ステージによって変えたいので、ステージクラスが作られたら委嘱する
+					// TODO: ステージによって変えたいので、ステージクラスが作られたら委嘱する
 					{
 						auto parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterStageParameter>();
-						battleCharacter->GetStatus()->SetFriction(parameter->friction);
+						// 摩擦設定
+						battleCharacter_->GetStatus()->SetFriction(parameter->friction);
+						// 重力設定
+						battleCharacter_->GetStatus()->SetGravity(parameter->gravity);
 					}
 				}
-				characterSteering->Initialize(battleCharacter, 0);
+				characterSteering_->Initialize(battleCharacter_, 0);
 
 				// 敵キャラクター
-				eventCharacter = NewGO<EventCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "nokonoko");
-				eventCharacter->Initialize("Assets/ModelData/enemy/slime/slime.tkm");
+				eventCharacter_ = NewGO<EventCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "nokonoko");
+				eventCharacter_->Initialize(sEnemyInitializeParameter);
 			}
 		}
 
 
 		void BattleManager::Update()
 		{
-			characterSteering->Update();
+			characterSteering_->Update();
 		}
 
 
@@ -98,7 +126,10 @@ namespace app
 			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)
 				{
 					p.moveSpeed = json["moveSpeed"].get<float>();
+					p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
 					p.jumpPower = json["jumpPower"].get<float>();
+					p.radius = json["radius"].get<float>();
+					p.height = json["height"].get<float>();
 				});
 		}
 	}

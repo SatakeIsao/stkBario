@@ -28,6 +28,9 @@
     <Filter Include="battle">
       <UniqueIdentifier>{35583838-ebc8-4a83-9184-2e8e25cd5d47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{e3249197-1978-4575-ae9c-0c283c7c9727}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -90,6 +93,12 @@
     </ClCompile>
     <ClCompile Include="actor\ActorStatus.cpp">
       <Filter>actor</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\Memory.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\TitleScene.cpp">
+      <Filter>scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,5 +181,21 @@
     <ClInclude Include="actor\ActorStatus.h">
       <Filter>actor</Filter>
     </ClInclude>
+    <ClInclude Include="memory\Memory.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="actor\Types.h">
+      <Filter>actor</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="scene\TitleScene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\ui\icon.ico" />
   </ItemGroup>
 </Project>

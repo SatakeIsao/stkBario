@@ -30,15 +30,20 @@ void CharacterSteering::Update()
 	auto inputVector = Vector3(GetPad()->GetLStickXF(), 0.0f, GetPad()->GetLStickYF());
 	inputVector.Normalize();
 
-	const bool isPressA = GetPad()->IsPress(enButtonA);
+	const bool isPressA = GetPad()->IsTrigger(enButtonA);
 
 	// BattleCharacter
 	{
 		BattleCharacter* battleCharacter = dynamic_cast<BattleCharacter*>(target_);
 		if (battleCharacter != nullptr) {
 			auto* targetCharacterStateMachine = battleCharacter->GetStateMachine();
-			targetCharacterStateMachine->SetMoveDirection(inputVector);
 			targetCharacterStateMachine->SetActionA(isPressA);
+			const bool isInput = inputVector.LengthSq() > MOVE_MIN_FLOAT;
+			if(isInput)
+			{
+				targetCharacterStateMachine->SetMoveDirection(inputVector);
+			}
+			targetCharacterStateMachine->SetInputPower(isInput ? 1.0f : 0.0f);
 		}
 	}
 }

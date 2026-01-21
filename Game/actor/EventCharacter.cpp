@@ -35,13 +35,11 @@ void EventCharacter::Render(RenderContext& rc)
 }
 
 
-void EventCharacter::Initialize(const char* modelName)
+void EventCharacter::Initialize(const CharacterInitializeParameter& param)
 {
 	modelRender_ = std::make_unique<ModelRender>();
-	modelRender_->Init(modelName);
-	// TODO: アニメーションを後で設定しよう
-	// ルイージだしてー
-
+	modelRender_->Init(param.modelName);
+	
 
 	transform.position = Vector3::Zero;
 	transform.scale = Vector3::One;

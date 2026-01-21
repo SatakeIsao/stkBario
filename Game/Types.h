@@ -24,3 +24,6 @@ enum class ObjectPriority : uint8_t
 /** 画像サイズ */
 constexpr float MAX_SPRITE_WIDTH = 1920.0f;
 constexpr float MAX_SPRITE_HIGHT = 1080.0f;
+
+/** 移動で使用される最小値 */
+constexpr float MOVE_MIN_FLOAT = 0.001f;

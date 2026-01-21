@@ -1,8 +1,10 @@
 [
     {
         "comment": "キャラクター共通パラメーター",
-        "moveSpeed": 300,
+        "moveSpeed": 100,
         "jumpMoveSpeed": 100,
-        "jumpPower": 1
+        "jumpPower": 500,
+        "radius": 50,
+        "height": 100
     }
 ]

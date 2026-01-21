@@ -4,7 +4,7 @@
  */
 #include "stdafx.h"
 #include "StartupScene.h"
-//#include "TitleScene.h"
+#include "TitleScene.h"
 #include "sound/SoundManager.h"
 
 
@@ -12,7 +12,7 @@ namespace
 {
 	enum EnStartupKind
 	{
-		//enBootKind_Game,
+		enBootKind_Game,
 		enBootKind_LogoA,
 		enBootKind_LogoB,
 		enBootKind_Max,
@@ -36,6 +36,7 @@ namespace
 	static const StartupInformation sBootInfoList[] = {
 		//StartupInformation("Assets/ui/startup/notitle.dds", 2.5f, 0.5f, enSoundKind_None),
 		//StartupInformation("Assets/ui/startup/attension.dds", 2.5f, 0.5f, enSoundKind_None),
+		StartupInformation("Assets/ui/startup/StartupLogo.dds", 3.0f, 0.5f, static_cast<uint32_t>(app::SoundKind::None)),
 		StartupInformation("Assets/ui/startup/kawahara.dds", 3.0f, 0.5f, static_cast<uint32_t>(app::SoundKind::Startup00)),
 		StartupInformation("Assets/ui/startup/kbc_games.dds", 3.0f, 0.5f, static_cast<uint32_t>(app::SoundKind::Startup01)),
 	};
@@ -88,10 +89,10 @@ void StartupScene::Render(RenderContext& rc)
 bool StartupScene::RequestScene(uint32_t& id, float& waitTime)
 {
 	if (m_currentIndex >= enBootKind_Max) {
-		//if (CanChange()) {
-		//	id = TitleScene::ID();
-		//	return true;
-		//}
+		if (CanChange()) {
+			id = TitleScene::ID();
+			return true;
+		}
 	}
 	return false;
 }

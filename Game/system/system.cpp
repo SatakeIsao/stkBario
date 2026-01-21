@@ -2,6 +2,7 @@
 #include "system.h"
 #include "graphics/GraphicsEngine.h"
 #include "sound/SoundEngine.h"
+#include "resource.h"
 
 HWND			g_hWnd = NULL;				//ウィンドウハンドル。
 
@@ -44,12 +45,12 @@ void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, 
 		0,						//0でいい。
 		GetModuleHandle(NULL),	//このクラスのためのウインドウプロシージャがあるインスタンスハンドル。
 								//何も気にしなくてよい。
-		NULL,					//アイコンのハンドル。アイコンを変えたい場合ここを変更する。とりあえずこれでいい。
+		LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),//アイコンのハンドル。アイコンを変えたい場合ここを変更する。とりあえずこれでいい。
 		NULL,					//マウスカーソルのハンドル。NULLの場合はデフォルト。
 		NULL,					//ウィンドウの背景色。NULLの場合はデフォルト。
 		NULL,					//メニュー名。NULLでいい。
 		appName,				//ウィンドウクラスに付ける名前。
-		NULL					//NULLでいい。
+		LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)) //NULLでいい。
 	};
 	//ウィンドウクラスの登録。
 	RegisterClassEx(&wc);

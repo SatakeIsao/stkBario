@@ -20,6 +20,5 @@ public:
 
 
 public:
-	void Initialize(const char* modelName);
-
+	void Initialize(const CharacterInitializeParameter& param) override final;
 };

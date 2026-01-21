@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 
 #include "StartupScene.h"
+#include "TitleScene.h"
 
 #if defined(APP_DEBUG)
 #include "BootScene.h"
@@ -17,6 +18,7 @@ SceneManager* SceneManager::m_instance = nullptr;	// 初期化
 SceneManager::SceneManager()
 {
 	AddSceneMap<StartupScene>();
+	AddSceneMap<TitleScene>();
 
 #if defined(APP_DEBUG)
 	AddSceneMap<BootScene>();

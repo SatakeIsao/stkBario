@@ -11,3 +11,4 @@ extern K2EngineLow* g_k2EngineLow;
 // é©êMÇ≈í«â¡
 #include "Types.h"
 #include "util/util.h"
+#include "memory/Memory.h"
