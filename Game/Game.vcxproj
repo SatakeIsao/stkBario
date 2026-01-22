@@ -231,6 +231,7 @@
     <ClCompile Include="actor\CharacterSteering.cpp" />
     <ClCompile Include="actor\EventCharacter.cpp" />
     <ClCompile Include="battle\BattleManager.cpp" />
+    <ClCompile Include="collision\CharacterContoller.cpp" />
     <ClCompile Include="core\Fade.cpp" />
     <ClCompile Include="core\ParameterManager.cpp" />
     <ClCompile Include="effect\EffectManager.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="actor\EventCharacter.h" />
     <ClInclude Include="actor\Types.h" />
     <ClInclude Include="battle\BattleManager.h" />
+    <ClInclude Include="collision\CharacterContoller.h" />
     <ClInclude Include="core\Fade.h" />
     <ClInclude Include="core\ParameterManager.h" />
     <ClInclude Include="effect\EffectManager.h" />

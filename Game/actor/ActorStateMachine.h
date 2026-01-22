@@ -128,7 +128,8 @@ public:
 	virtual void Update() override;
 
 	void Move(const float deltaTime, const float moveSpeed);
-	
+	void Jump(const float jumoPower);
+
 	void Setup(Character* character)
 	{
 		character_ = character;
@@ -147,8 +148,6 @@ public:
 	void SetInputPower(const float power) { inputPower_ = power; }
 	float GetInputPower() const { return inputPower_; }
 
-	const Vector3& GetMoveSpeedVector() const { return moveSpeedVector_; }
-	void SetMoveSpeedVector(const Vector3& speedVector) { moveSpeedVector_ = speedVector; }
 
 
 

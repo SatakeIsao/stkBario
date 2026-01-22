@@ -8,7 +8,7 @@
 
 BattleCharacter::BattleCharacter()
 {
-	characterController_ = std::make_unique<CharacterController>();
+	characterController_ = std::make_unique<app::collision::CharacterController>();
 	stateMachine_ = std::make_unique<BattleCharacterStateMachine>();
 	status_ = new app::actor::BattleCharacterStatus();
 }
@@ -37,9 +37,7 @@ void BattleCharacter::Update()
 
 	stateMachine_->Update();
 
-	// transform = stateMachine_->transform;
-	Vector3 moveSpeed = stateMachine_->GetMoveSpeedVector();
-	auto nextPosition = characterController_->Execute(moveSpeed, deltaTime);
+	auto nextPosition = characterController_->Execute(stateMachine_->transform.position, deltaTime);
 
 	transform.position = nextPosition;
 	transform.rotation = stateMachine_->transform.rotation;

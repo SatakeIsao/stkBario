@@ -76,10 +76,6 @@ class JumpCharacterState : public ICharacterState
 	appState(JumpCharacterState);
 
 
-private:
-	float jumpAmount_ = 0.0f;
-
-
 public:
 	JumpCharacterState(IStateMachine* owner);
 	~JumpCharacterState();

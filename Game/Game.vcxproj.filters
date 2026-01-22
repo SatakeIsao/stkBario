@@ -31,6 +31,9 @@
     <Filter Include="memory">
       <UniqueIdentifier>{e3249197-1978-4575-ae9c-0c283c7c9727}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collision">
+      <UniqueIdentifier>{9b507665-3499-4e06-a281-a1b16001cd87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -99,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="scene\TitleScene.cpp">
       <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\CharacterContoller.cpp">
+      <Filter>collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +196,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="scene\TitleScene.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\CharacterContoller.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

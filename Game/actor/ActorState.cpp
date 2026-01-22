@@ -105,7 +105,7 @@ void JumpCharacterState::Enter()
 	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 	auto* characterStatus = characterStateMachine->GetStatus();
 
-	jumpAmount_ = characterStatus->GetJumpPower();
+	characterStateMachine->Jump(characterStatus->GetJumpPower());
 
 	characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump));
 }
@@ -117,16 +117,9 @@ void JumpCharacterState::Update()
 	auto* characterStatus = characterStateMachine->GetStatus();
 	characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetJumpMoveSpeed());
 	
-	Vector3 moveSpeedVector = characterStateMachine->GetMoveSpeedVector();
-	moveSpeedVector.y += jumpAmount_;
-	const float gravity = characterStatus->GetGravity();
-	jumpAmount_ -= gravity;
-
 	Quaternion rotation;
 	rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveDirection());
 	characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveDirection());
-
-	characterStateMachine->SetMoveSpeedVector(moveSpeedVector);
 }
 
 

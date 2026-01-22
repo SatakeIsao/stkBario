@@ -96,6 +96,13 @@ void CharacterStateMachine::Move(const float deltaTime, const float moveSpeed)
 		moveSpeedVector_ = moveVector;
 	}
 	moveSpeedVector_ *= GetStatus()->GetFriction(); // 摩擦係数的な
+	transform.position += moveSpeedVector_ * deltaTime;
+}
+
+
+void CharacterStateMachine::Jump(const float jumoPower)
+{
+	character_->GetCharacterController()->Jump(jumoPower);
 }
 
 
@@ -150,7 +157,7 @@ void BattleCharacterStateMachine::UpdateState()
 			return;
 		}
 		// 待機状態のものかをチェックする関数ほすぃ
-		if (transform.position.y > 0.0f) {
+		if (character_->GetCharacterController()->IsJump()) {
 			return;
 		}
 	}
