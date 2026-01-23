@@ -153,7 +153,8 @@ namespace nsAI {
 				float offset = agentHeight * 0.5f + agentRadius + agentHeight * 0.1f;
 				rayStartPos.y += offset;
 				rayEndPos.y += offset;
-				if (physicsWorld->ConvexSweepTest(collider, rayStartPos, rayEndPos)) {
+				SweepHit result;
+				if (physicsWorld->ConvexSweepTest(collider, rayStartPos, rayEndPos, result)) {
 					// 何かのオブジェクトとぶつかった。
 					// 始点から終点の間のセルは削除できない。
 					// 次のブロックを見ていく。

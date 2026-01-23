@@ -14,6 +14,7 @@ namespace app
 			Idle,
 			Run,
 			Jump,
+			Punch,
 			Max
 		};
 	}

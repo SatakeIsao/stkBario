@@ -8,7 +8,7 @@
 
 BattleCharacter::BattleCharacter()
 {
-	characterController_ = std::make_unique<app::collision::CharacterController>();
+	characterController_ = std::make_unique<CharacterController>();
 	stateMachine_ = std::make_unique<BattleCharacterStateMachine>();
 	status_ = new app::actor::BattleCharacterStatus();
 }
@@ -26,6 +26,7 @@ bool BattleCharacter::Start()
 	status_->Setup();
 
 	characterController_->Init(status_->GetRadius(), status_->GetHeight(), transform.position);
+	characterController_->SetGravity(status_->GetGravity());
 
 	return true;
 }

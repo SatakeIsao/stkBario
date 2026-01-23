@@ -126,3 +126,44 @@ void JumpCharacterState::Update()
 void JumpCharacterState::Exit()
 {
 }
+
+
+
+
+/*************************************/
+
+
+PunchCharacterState::PunchCharacterState(IStateMachine* owner)
+	: ICharacterState(owner)
+{
+}
+
+
+PunchCharacterState::~PunchCharacterState()
+{
+}
+
+
+void PunchCharacterState::Enter()
+{
+	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+	characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
+}
+
+
+void PunchCharacterState::Update()
+{
+}
+
+
+void PunchCharacterState::Exit()
+{
+}
+
+
+bool PunchCharacterState::CanChangeState() const
+{
+	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+	auto* modelRender = characterStateMachine->GetModelRender();
+	return !modelRender->IsPlayingAnimation();
+}

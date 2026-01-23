@@ -31,6 +31,7 @@ void CharacterSteering::Update()
 	inputVector.Normalize();
 
 	const bool isPressA = GetPad()->IsTrigger(enButtonA);
+	const bool isPressB = GetPad()->IsTrigger(enButtonB);
 
 	// BattleCharacter
 	{
@@ -38,6 +39,7 @@ void CharacterSteering::Update()
 		if (battleCharacter != nullptr) {
 			auto* targetCharacterStateMachine = battleCharacter->GetStateMachine();
 			targetCharacterStateMachine->SetActionA(isPressA);
+			targetCharacterStateMachine->SetActionB(isPressB);
 			const bool isInput = inputVector.LengthSq() > MOVE_MIN_FLOAT;
 			if(isInput)
 			{

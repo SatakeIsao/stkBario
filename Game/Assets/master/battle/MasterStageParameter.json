@@ -1,7 +1,7 @@
 [
     {
         "comment": "共通ステージパラメーター",
-        "gravity": 0.98,
+        "gravity": -98.0,
         "fallLimitY": -10.0,
         "friction": 0.7
     }

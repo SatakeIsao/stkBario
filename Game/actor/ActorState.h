@@ -32,6 +32,8 @@ public:
 	virtual void Enter() = 0;
 	virtual void Update() = 0;
 	virtual void Exit() = 0;
+
+	virtual bool CanChangeState() const { return false; }
 };
 
 
@@ -82,4 +84,22 @@ public:
 	void Enter() override;
 	void Update() override;
 	void Exit() override;
+};
+
+
+
+
+class PunchCharacterState : public ICharacterState
+{
+	appState(PunchCharacterState);
+
+
+public:
+	PunchCharacterState(IStateMachine* owner);
+	~PunchCharacterState();
+	void Enter() override;
+	void Update() override;
+	void Exit() override;
+
+	virtual bool CanChangeState() const;
 };

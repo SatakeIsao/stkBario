@@ -36,40 +36,40 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Preview|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Preview|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -230,8 +230,10 @@
     <ClCompile Include="actor\BattleCharacter.cpp" />
     <ClCompile Include="actor\CharacterSteering.cpp" />
     <ClCompile Include="actor\EventCharacter.cpp" />
+    <ClCompile Include="actor\Gimmick.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="battle\BattleManager.cpp" />
-    <ClCompile Include="collision\CharacterContoller.cpp" />
+    <ClCompile Include="collision\BoundingVolume.cpp" />
     <ClCompile Include="collision\PhysicalBody.cpp" />
     <ClCompile Include="core\Fade.cpp" />
     <ClCompile Include="core\ParameterManager.cpp" />
@@ -263,9 +265,11 @@
     <ClInclude Include="actor\BattleCharacter.h" />
     <ClInclude Include="actor\CharacterSteering.h" />
     <ClInclude Include="actor\EventCharacter.h" />
+    <ClInclude Include="actor\Gimmick.h" />
     <ClInclude Include="actor\Types.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="battle\BattleManager.h" />
-    <ClInclude Include="collision\CharacterContoller.h" />
+    <ClInclude Include="collision\BoundingVolume.h" />
     <ClInclude Include="collision\PhysicalBody.h" />
     <ClInclude Include="collision\Types.h" />
     <ClInclude Include="core\Fade.h" />

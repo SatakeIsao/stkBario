@@ -25,6 +25,8 @@ namespace app
 			moveSpeed_ = parameter->moveSpeed;
 			jumpMoveSpeed_ = parameter->jumpMoveSpeed;
 			jumpPower_ = parameter->jumpPower;
+			radius_ = parameter->radius;
+			height_ = parameter->height;
 		}
 
 

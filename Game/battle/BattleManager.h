@@ -8,6 +8,7 @@
 class BattleCharacter;
 class EventCharacter;
 class CharacterSteering;
+class StaticGimmick;
 
 
 namespace app
@@ -24,6 +25,8 @@ namespace app
             BattleCharacter* battleCharacter_ = nullptr;
             EventCharacter* eventCharacter_ = nullptr;
             std::unique_ptr<CharacterSteering> characterSteering_ = nullptr;
+
+			std::vector<StaticGimmick*> testGimmickList_;
 
 
         private:

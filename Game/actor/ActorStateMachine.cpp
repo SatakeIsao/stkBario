@@ -66,6 +66,16 @@ void IStateMachine::UpdateStateCore()
 	currentState->Update();
 }
 
+
+bool IStateMachine::CanChangeState() const
+{
+	const ICharacterState* currentState = stateList_.find(currentStateId_)->second.get();
+	return currentState->CanChangeState();
+}
+
+
+
+
 /************************************/
 
 
@@ -159,6 +169,21 @@ void BattleCharacterStateMachine::UpdateState()
 		// 待機状態のものかをチェックする関数ほすぃ
 		if (character_->GetCharacterController()->IsJump()) {
 			return;
+		}
+	}
+	// 攻撃
+	{
+		if (IsActionB()) {
+			RequestChangeState(PunchCharacterState::ID());
+			isActionB_ = false;
+			return;
+		}
+		// パンチ中は他の状態に遷移しない
+		if (IsEqualCurrentState(PunchCharacterState::ID()))
+		{
+			if (!CanChangeState()) {
+				return;
+			}
 		}
 	}
 	

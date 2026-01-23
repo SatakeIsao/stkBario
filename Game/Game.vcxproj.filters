@@ -103,12 +103,16 @@
     <ClCompile Include="scene\TitleScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="collision\CharacterContoller.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="collision\PhysicalBody.cpp">
       <Filter>collision</Filter>
     </ClCompile>
+    <ClCompile Include="actor\Gimmick.cpp">
+      <Filter>actor</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\BoundingVolume.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -200,15 +204,19 @@
     <ClInclude Include="scene\TitleScene.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="collision\CharacterContoller.h">
-      <Filter>collision</Filter>
-    </ClInclude>
     <ClInclude Include="collision\PhysicalBody.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="collision\Types.h">
       <Filter>collision</Filter>
     </ClInclude>
+    <ClInclude Include="actor\Gimmick.h">
+      <Filter>actor</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\BoundingVolume.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

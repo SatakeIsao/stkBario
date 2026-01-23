@@ -2,7 +2,6 @@
  * Actorファイル
  */
 #pragma once
-#include "collision/CharacterContoller.h"
 
 
 namespace app
@@ -10,10 +9,6 @@ namespace app
 	namespace actor
 	{
 		struct CharacterStatus;
-	}
-	namespace collision
-	{
-		class CharacterController;
 	}
 }
 
@@ -49,7 +44,7 @@ public:
 
 protected:
 	std::unique_ptr<ModelRender> modelRender_ = nullptr;
-	std::unique_ptr<app::collision::CharacterController> characterController_ = nullptr;
+	std::unique_ptr<CharacterController> characterController_ = nullptr;
 	app::memory::Array<AnimationClip> animationClips_;
 
 	app::actor::CharacterStatus* status_ = nullptr;
@@ -67,5 +62,5 @@ public:
 
 	app::actor::CharacterStatus* GetStatus() { return status_; }
 	ModelRender* GetModelRender() { return modelRender_.get(); }
-	app::collision::CharacterController* GetCharacterController() { return characterController_.get(); }
+	CharacterController* GetCharacterController() { return characterController_.get(); }
 };

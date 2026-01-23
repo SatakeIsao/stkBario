@@ -57,9 +57,16 @@ public:
 protected:
 	void UpdateStateCore();
 
+	bool CanChangeState() const;
+
 	void SetCurrentState(const uint32_t stateId)
 	{
 		currentStateId_ = stateId;
+	}
+
+	bool IsEqualCurrentState(const uint32_t stateId) const
+	{
+		return currentStateId_ == stateId;
 	}
 
 	void RequestChangeState(const uint32_t stateId)
