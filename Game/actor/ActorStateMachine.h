@@ -20,7 +20,7 @@ class IStateMachine : public Noncopyable
 {
 	/** 例外としてpublic */
 public:
-	Transform transform;
+	app::math::Transform transform;
 
 	/** 触らせない */
 private:

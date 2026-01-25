@@ -15,7 +15,7 @@ private:
 	SpriteRender m_iconRender;
 	bool isEnable = false;
 
-	ComputeRate m_iconConputeRate;
+	app::ComputeRate m_iconConputeRate;
 
 
 private:

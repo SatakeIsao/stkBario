@@ -34,6 +34,12 @@
     <Filter Include="collision">
       <UniqueIdentifier>{9b507665-3499-4e06-a281-a1b16001cd87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{5115d9c9-8484-4b84-989a-8384282eca99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{54048856-1add-4ebf-b8da-650d1e392936}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -113,6 +119,24 @@
       <Filter>collision</Filter>
     </ClCompile>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ui\Layout.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\Menu.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIParts.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Curve.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIAnimation.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Transform.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -217,6 +241,24 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="ui\Menu.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\Layout.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIParts.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Curve.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIAnimation.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Transform.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

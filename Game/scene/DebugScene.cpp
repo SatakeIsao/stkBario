@@ -8,6 +8,14 @@
 
 #include "DebugScene.h"
 #include "battle/BattleManager.h"
+#include "ui/Layout.h"
+
+
+namespace
+{
+	// @todo for test
+	static app::ui::Layout* testLayout;
+}
 
 
 DebugScene::DebugScene()
@@ -27,6 +35,9 @@ bool DebugScene::Start()
 
 	app::battle::BattleManager::Get().Start();
 
+	testLayout = new app::ui::Layout();
+	testLayout->Initialize<app::ui::MenuBase>("Assets/ui/layout/testLayout.json");
+
 	return true;
 }
 
@@ -34,11 +45,14 @@ bool DebugScene::Start()
 void DebugScene::Update()
 {
 	app::battle::BattleManager::Get().Update();
+
+	testLayout->Update();
 }
 
 
 void DebugScene::Render(RenderContext& rc)
 {
+	testLayout->Render(rc);
 }
 
 

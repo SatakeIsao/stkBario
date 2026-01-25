@@ -241,6 +241,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\Transform.cpp" />
     <ClCompile Include="memory\Memory.cpp" />
     <ClCompile Include="scene\BootScene.cpp" />
     <ClCompile Include="scene\DebugScene.cpp" />
@@ -255,6 +256,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Preview|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="system\system.cpp" />
+    <ClCompile Include="ui\Layout.cpp" />
+    <ClCompile Include="ui\Menu.cpp" />
+    <ClCompile Include="ui\UIAnimation.cpp" />
+    <ClCompile Include="ui\UIParts.cpp" />
+    <ClCompile Include="util\Curve.cpp" />
     <ClCompile Include="util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +285,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="json\json.hpp" />
+    <ClInclude Include="math\Transform.h" />
     <ClInclude Include="memory\Memory.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="scene\BootScene.h" />
@@ -292,7 +299,12 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="ui\Layout.h" />
+    <ClInclude Include="ui\Menu.h" />
+    <ClInclude Include="ui\UIAnimation.h" />
+    <ClInclude Include="ui\UIParts.h" />
     <ClInclude Include="Util\CRC32.h" />
+    <ClInclude Include="util\Curve.h" />
     <ClInclude Include="util\ParallelFor.h" />
     <ClInclude Include="util\ThreadPool.h" />
     <ClInclude Include="util\util.h" />

@@ -1,0 +1,17 @@
+{
+  "canvas": {
+    "elements": [
+      {
+        "type": "UIIcon",
+        "name": "Background",
+        "asset": "Assets/ui/LoadingIcon.DDS",
+        "width": 50,
+        "height": 50,
+        "position": [250, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [255, 255, 255, 255]
+      }
+    ]
+  }
+}

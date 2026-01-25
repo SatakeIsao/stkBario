@@ -9,7 +9,7 @@ class IGimmick : public IGameObject
 {
 	/** 例外としてpublic */
 public:
-	Transform transform;
+	app::math::Transform transform;
 
 
 protected:
