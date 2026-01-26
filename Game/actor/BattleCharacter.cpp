@@ -11,6 +11,7 @@ BattleCharacter::BattleCharacter()
 	characterController_ = std::make_unique<CharacterController>();
 	stateMachine_ = std::make_unique<BattleCharacterStateMachine>();
 	status_ = new app::actor::BattleCharacterStatus();
+	ghostBody_ = std::make_unique<app::collision::GhostBody>();
 }
 
 
@@ -43,6 +44,8 @@ void BattleCharacter::Update()
 	transform.position = nextPosition;
 	transform.rotation = stateMachine_->transform.rotation;
 
+	ghostBody_->SetPosition(transform.position);
+
 	SuperClass::Update();
 }
 
@@ -68,4 +71,6 @@ void BattleCharacter::Initialize(const CharacterInitializeParameter& param)
 	transform.position = Vector3::Zero;
 	transform.scale = Vector3::One;
 	transform.rotation = Quaternion::Identity;
+
+	ghostBody_->CreateCapsule(this, status_->GetRadius(), status_->GetHeight(), app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 }

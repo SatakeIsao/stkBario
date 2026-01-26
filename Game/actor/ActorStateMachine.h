@@ -143,6 +143,7 @@ public:
 	}
 
 	app::actor::CharacterStatus* GetStatus();
+	CharacterController* GetCharacterController();
 	ModelRender* GetModelRender();
 
 

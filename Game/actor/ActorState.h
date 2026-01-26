@@ -78,12 +78,27 @@ class JumpCharacterState : public ICharacterState
 	appState(JumpCharacterState);
 
 
+private:
+	enum class JumpPhase
+	{
+		Ascend,		// 上昇
+		Descend,	// 落下
+		Land		// 着地
+	};
+
+
+private:
+	JumpPhase jumpPhase_ = JumpPhase::Ascend;
+
+
 public:
 	JumpCharacterState(IStateMachine* owner);
 	~JumpCharacterState();
 	void Enter() override;
 	void Update() override;
 	void Exit() override;
+
+	virtual bool CanChangeState() const;
 };
 
 

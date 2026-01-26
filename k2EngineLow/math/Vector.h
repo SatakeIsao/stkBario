@@ -121,6 +121,20 @@ namespace nsK2EngineLow {
 		{
 			Set(x, y, z);
 		}
+
+		/// <summary>
+		/// 2つのVector3が指定された誤差範囲内で等しいかどうかを判定します。
+		/// </summary>
+		/// <param name="other">比較対象のVector3。</param>
+		/// <param name="epsilon">比較時の許容誤差（デフォルト: 1e-5f）。</param>
+		/// <returns>2つのベクトルが誤差範囲内で等しい場合はtrue、それ以外の場合はfalse。</returns>
+		bool IsEqual(const Vector3& other, float epsilon = 1e-5f) const
+		{
+			return (fabsf(x - other.x) <= epsilon)
+				&& (fabsf(y - other.y) <= epsilon)
+				&& (fabsf(z - other.z) <= epsilon);
+		}
+
 		/// <summary>
 		/// 線形補完
 		/// </summary>
@@ -707,6 +721,19 @@ namespace nsK2EngineLow {
 		Quaternion(float x, float y, float z, float w) :
 			Vector4(x, y, z, w)
 		{
+		}
+		/// <summary>
+		/// 2つのクォータニオンが誤差範囲内で等しいかどうかを判定します。
+		/// </summary>
+		/// <param name="other">比較対象のクォータニオン。</param>
+		/// <param name="epsilon">比較時の許容誤差。デフォルト値は1e-5f。</param>
+		/// <returns>2つのクォータニオンが誤差範囲内で等しい場合はtrue、そうでない場合はfalse。</returns>
+		bool IsEqual(const Quaternion& other, float epsilon = 1e-5f) const
+		{
+			return (fabsf(x - other.x) <= epsilon)
+				&& (fabsf(y - other.y) <= epsilon)
+				&& (fabsf(z - other.z) <= epsilon)
+				&& (fabsf(w - other.w) <= epsilon);
 		}
 		/// <summary>
 		/// X軸周りの回転クォータニオンを作成。

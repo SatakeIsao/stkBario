@@ -122,6 +122,12 @@ app::actor::CharacterStatus* CharacterStateMachine::GetStatus()
 }
 
 
+CharacterController* CharacterStateMachine::GetCharacterController()
+{
+	return character_->GetCharacterController();
+}
+
+
 ModelRender* CharacterStateMachine::GetModelRender()
 {
 	return character_->GetModelRender();
@@ -166,9 +172,11 @@ void BattleCharacterStateMachine::UpdateState()
 			isActionA_ = false;
 			return;
 		}
-		// 待機状態のものかをチェックする関数ほすぃ
-		if (character_->GetCharacterController()->IsJump()) {
-			return;
+		// パンチ中は他の状態に遷移しない
+		if (IsEqualCurrentState(JumpCharacterState::ID())) {
+			if (!CanChangeState()) {
+				return;
+			}
 		}
 	}
 	// 攻撃

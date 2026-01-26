@@ -19,7 +19,9 @@ namespace nsK2EngineLow
             float dist = FLT_MAX;
 
             virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) {
-                if (convexResult.m_hitCollisionObject == me) return 1.0f;
+                if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
+                    return 1.0f;
+                }
 
                 Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
                 float angle = acosf(hitNormalTmp.y); // ã(0,1,0)‚Æ‚ÌŠp“x
@@ -51,7 +53,9 @@ namespace nsK2EngineLow
             float dist = FLT_MAX;
 
             virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) {
-                if (convexResult.m_hitCollisionObject == me) return 1.0f;
+                if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
+                    return 1.0f;
+                }
 
                 Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
                 // •Ç”»’è (–@ü‚ª‰¡‚ðŒü‚¢‚Ä‚¢‚é = ã‚Æ‚ÌŠp“x‚ª‘å‚«‚¢)
@@ -83,8 +87,7 @@ namespace nsK2EngineLow
 
             virtual	btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace)
             {
-                if (convexResult.m_hitCollisionObject == me
-                    || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
+                if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
                     return 0.0f;
                 }
 
@@ -255,8 +258,9 @@ namespace nsK2EngineLow
                 callback.startPos = position_;
                 callback.startPos.y = checkY;
 
-                PhysicsWorld::Get().ConvexSweepTest(collider_, start, end, callback);
-
+                if ((start - end).LengthSq() >= 0.01f) {
+                    PhysicsWorld::Get().ConvexSweepTest(collider_, start, end, callback);
+                }
                 if (callback.isHit) {
                     verticalVelocity_ = 0.0f;
                     float dist = (callback.hitPos.y - checkY);

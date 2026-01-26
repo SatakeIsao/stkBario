@@ -16,7 +16,7 @@ namespace app
 		}
 
 
-		void PhysicalBody::CreateFromModel(Model& model, const Matrix& worldMatrix, const CollisionAttribute collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
+		void PhysicalBody::CreateFromModel(Model& model, const Matrix& worldMatrix, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
 		{
 			auto* meshCollider = new MeshCollider();
 			meshCollider->CreateFromModel(model, worldMatrix);
@@ -25,7 +25,7 @@ namespace app
 		}
 
 
-		void PhysicalBody::CreateCapsule(float radius, float height, const Vector3& position, const CollisionAttribute collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
+		void PhysicalBody::CreateCapsule(float radius, float height, const Vector3& position, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
 		{
 			auto* capsuleCollider = new CCapsuleCollider();
 			capsuleCollider->Init(radius, height);
@@ -38,7 +38,7 @@ namespace app
 		}
 
 
-		void PhysicalBody::CreateBox(const Vector3& size, const Vector3& position, const CollisionAttribute collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
+		void PhysicalBody::CreateBox(const Vector3& size, const Vector3& position, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
 		{
 			auto* boxCollider = new BoxCollider();
 			boxCollider->Create(size);
@@ -51,7 +51,7 @@ namespace app
 		}
 
 
-		void PhysicalBody::CreateSphere(float radius, const Vector3& position, const CollisionAttribute collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
+		void PhysicalBody::CreateSphere(float radius, const Vector3& position, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
 		{
 			auto* sphereCollider = new SphereCollider();
 			sphereCollider->Create(radius);
@@ -64,7 +64,7 @@ namespace app
 		}
 
 
-		void PhysicalBody::CreateCore(const std::function<void(RigidBodyInitData& data)>& func, const CollisionAttribute collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
+		void PhysicalBody::CreateCore(const std::function<void(RigidBodyInitData& data)>& func, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
 		{
 			RigidBodyInitData rbInfo;
 			rbInfo.collider = collider_.get();
@@ -74,7 +74,7 @@ namespace app
 			func(rbInfo);
 			rigidBody_.Init(rbInfo);
 
-			rigidBody_.GetBody()->setUserIndex(static_cast<uint32_t>(collisionAttribute));
+			rigidBody_.GetBody()->setUserIndex(collisionAttribute);
 			rigidBody_.GetBody()->setCollisionFlags(collisionFlags);
 		}
 

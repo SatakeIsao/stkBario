@@ -69,6 +69,7 @@ namespace nsK2EngineLow
 		const Vector3& GetPosition() const { return position_; }
 		const Vector3& GetPrevPosition() const { return prevPosition_; }
 		void SetPosition(const Vector3& position) { position_ = position; }
+		float GetVerticalVelocity() const { return verticalVelocity_; }
 		bool IsJump() const { return isJump_; }
 		bool IsOnGround() const { return isOnGround_; }
 		void Jump(float jumpPower);

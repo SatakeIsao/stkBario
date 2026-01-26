@@ -2,6 +2,7 @@
  * Actorファイル
  */
 #pragma once
+#include "collision/GhostBody.h"
 
 
 namespace app

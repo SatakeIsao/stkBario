@@ -102,18 +102,50 @@ JumpCharacterState::~JumpCharacterState()
 
 void JumpCharacterState::Enter()
 {
+	jumpPhase_ = JumpPhase::Ascend;
+
+
 	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 	auto* characterStatus = characterStateMachine->GetStatus();
 
 	characterStateMachine->Jump(characterStatus->GetJumpPower());
 
-	characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump));
+	characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend));
+
+	characterStateMachine->GetModelRender()->SetAnimationSpeed(2.5f);
 }
 
 
 void JumpCharacterState::Update()
 {
 	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+	
+	switch (jumpPhase_)
+	{
+		case JumpPhase::Ascend:
+		{
+			// 上昇が終わったら落下フェーズへ
+			if (characterStateMachine->GetCharacterController()->GetVerticalVelocity() < 0.0f) {
+				characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend));
+				jumpPhase_ = JumpPhase::Descend;
+			}
+			break;
+		}
+		case JumpPhase::Descend:
+		{
+			// 地面に着地したら着地フェーズへ
+			if (characterStateMachine->GetCharacterController()->IsOnGround()) {
+				characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand));
+				jumpPhase_ = JumpPhase::Land;
+			}
+			break;
+		}
+		case JumpPhase::Land:
+		{
+			break;
+		}
+	}
+
 	auto* characterStatus = characterStateMachine->GetStatus();
 	characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetJumpMoveSpeed());
 	
@@ -125,6 +157,24 @@ void JumpCharacterState::Update()
 
 void JumpCharacterState::Exit()
 {
+	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+	characterStateMachine->GetModelRender()->SetAnimationSpeed(1.0f);
+}
+
+
+bool JumpCharacterState::CanChangeState() const
+{
+	if (jumpPhase_ != JumpPhase::Land) {
+		return false;
+	}
+	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+	if (!characterStateMachine->GetCharacterController()->IsOnGround()) {
+		return false;
+	}
+	if(characterStateMachine->GetModelRender()->IsPlayingAnimation()) {
+		return false;
+	}
+	return true;
 }
 
 

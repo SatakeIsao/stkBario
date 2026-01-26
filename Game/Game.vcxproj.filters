@@ -137,6 +137,21 @@
     <ClCompile Include="math\Transform.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="collision\GhostPrimitive.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\BroadphaseInterface.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\GhostBody.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\GhostBodyManager.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\BroadphaseImpl.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -258,6 +273,21 @@
     </ClInclude>
     <ClInclude Include="math\Transform.h">
       <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\GhostPrimitive.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\BroadphaseInterface.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\GhostBody.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\GhostBodyManager.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\BroadphaseImpl.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

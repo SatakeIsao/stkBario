@@ -13,7 +13,9 @@ namespace app
 		{
 			Idle,
 			Run,
-			Jump,
+			JumpAscend,		// 上昇
+			JumpDescend,	// 落下
+			JumpLand,		// 着地
 			Punch,
 			Max
 		};

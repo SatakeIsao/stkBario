@@ -13,6 +13,7 @@ class BattleCharacter : public Character
 
 private:
 	std::unique_ptr<BattleCharacterStateMachine> stateMachine_ = nullptr;
+	std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 
 
 public:

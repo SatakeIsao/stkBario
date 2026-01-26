@@ -15,6 +15,8 @@
 
 #include "core/ParameterManager.h"
 
+#include "collision/GhostBodyManager.h"
+
 
 namespace
 {
@@ -34,8 +36,15 @@ namespace
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run)].filename = "Assets/animData/player/playerRun.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run)].loop = true;
 
-			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump)].filename = "Assets/animData/player/playerJump.tka";
-			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Jump)].loop = false;
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend)].filename = "Assets/animData/player/PlayerJump_Start.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend)].filename = "Assets/animData/player/PlayerJump_Loop.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].filename = "Assets/animData/player/PlayerJump_End.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].loop = false;
+
 
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch)].filename = "Assets/animData/player/playerPunch.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch)].loop = false;
@@ -58,6 +67,9 @@ namespace app
 
 		BattleManager::BattleManager()
 		{
+			PhysicsWorld::Get().EnableDrawDebugWireFrame();
+
+			app::collision::GhostBodyManager::Initialize();
 		}
 
 
@@ -70,13 +82,16 @@ namespace app
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterStageParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleCharacterParameter>();
+
+			if (app::collision::GhostBodyManager::IsAvailable()) {
+				app::collision::GhostBodyManager::Finalize();
+			}
 		}
 
 
 		void BattleManager::Start()
 		{
 			LoadParameter();
-
 			{
 				characterSteering_ = std::make_unique<CharacterSteering>();
 				// マリオにしてみた
@@ -112,7 +127,7 @@ namespace app
 					testGimmickList_.resize(gimmickNum);
 
 					for (int i = 0; i < testGimmickList_.size(); ++i) {
-						testGimmickList_[i] = NewGO<StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "testGimmick");
+						testGimmickList_[i] = NewGO<app::actor::StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "testGimmick");
 						// 配置
 						int row = i / gimmickColNum;
 						int col = i % gimmickColNum;
@@ -123,6 +138,15 @@ namespace app
 						testGimmickList_[i]->Initialize("Assets/ModelData/stage/GroundGreenBlock.tkm");
 					}
 				}
+				// 土管
+				{
+					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
+					pipeGimmick->transform.position = Vector3(100.0f, -50.0f, 0.0f);
+					pipeGimmick->transform.scale = Vector3(1.0f, 1.0f, 1.0f);
+					pipeGimmick->transform.UpdateTransform();
+					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm");
+					//testPipeGimmickList_.push_back(pipeGimmick);
+				}
 			}
 		}
 
@@ -130,6 +154,10 @@ namespace app
 		void BattleManager::Update()
 		{
 			characterSteering_->Update();
+
+			if (app::collision::GhostBodyManager::IsAvailable()) {
+				app::collision::GhostBodyManager::Get().Update();
+			}
 		}
 
 

@@ -234,6 +234,11 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="battle\BattleManager.cpp" />
     <ClCompile Include="collision\BoundingVolume.cpp" />
+    <ClCompile Include="collision\BroadphaseImpl.cpp" />
+    <ClCompile Include="collision\BroadphaseInterface.cpp" />
+    <ClCompile Include="collision\GhostBody.cpp" />
+    <ClCompile Include="collision\GhostBodyManager.cpp" />
+    <ClCompile Include="collision\GhostPrimitive.cpp" />
     <ClCompile Include="collision\PhysicalBody.cpp" />
     <ClCompile Include="core\Fade.cpp" />
     <ClCompile Include="core\ParameterManager.cpp" />
@@ -276,6 +281,11 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="battle\BattleManager.h" />
     <ClInclude Include="collision\BoundingVolume.h" />
+    <ClInclude Include="collision\BroadphaseImpl.h" />
+    <ClInclude Include="collision\BroadphaseInterface.h" />
+    <ClInclude Include="collision\GhostBody.h" />
+    <ClInclude Include="collision\GhostBodyManager.h" />
+    <ClInclude Include="collision\GhostPrimitive.h" />
     <ClInclude Include="collision\PhysicalBody.h" />
     <ClInclude Include="collision\Types.h" />
     <ClInclude Include="core\Fade.h" />
