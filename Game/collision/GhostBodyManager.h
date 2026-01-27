@@ -17,11 +17,18 @@ namespace app
 		class GhostBodyManager
 		{
 		private:
+			using RegisterPairCallback = std::function<void(GhostBody* a, GhostBody* b)>;
+
+
+		private:
 			/** Broadphaseアルゴリズム（抽象化） */
 			std::unique_ptr<IBroadphase> broadphase_;
 
 			/** 管理リスト（Dirtyチェック用） */
 			std::vector<GhostBody*> bodyList_;
+
+			/** 衝突ペア登録コールバック */
+			RegisterPairCallback registerPairCallback_ = nullptr;
 
 
 		private:
@@ -33,6 +40,8 @@ namespace app
 
 			void AddBody(GhostBody* body);
 			void RemoveBody(GhostBody* body);
+
+			void RegisterCallback(const RegisterPairCallback& callback) { registerPairCallback_ = std::move(callback); }
 
 		private:
 			/** 衝突ペアの処理 */

@@ -16,6 +16,7 @@
 #include "core/ParameterManager.h"
 
 #include "collision/GhostBodyManager.h"
+#include "collision/CollisionHitManager.h"
 
 
 namespace
@@ -67,9 +68,13 @@ namespace app
 
 		BattleManager::BattleManager()
 		{
-			PhysicsWorld::Get().EnableDrawDebugWireFrame();
-
+			app::collision::CollisionHitManager::Initialize();
 			app::collision::GhostBodyManager::Initialize();
+			app::collision::GhostBodyManager::Get().RegisterCallback([](app::collision::GhostBody* a, app::collision::GhostBody* b)
+				{
+					// 衝突ペア登録
+					app::collision::CollisionHitManager::Get().RegisterHitPair(a, b);
+				});
 		}
 
 
@@ -155,9 +160,12 @@ namespace app
 		{
 			characterSteering_->Update();
 
+			// 衝突判定更新
 			if (app::collision::GhostBodyManager::IsAvailable()) {
 				app::collision::GhostBodyManager::Get().Update();
 			}
+			// 衝突ヒット管理更新
+			app::collision::CollisionHitManager::Get().Update();
 		}
 
 

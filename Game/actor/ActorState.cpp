@@ -2,12 +2,15 @@
  * Actorファイル
  */
 #include "stdafx.h"
+#include "Actor.h"
 #include "ActorState.h"
 #include "ActorStateMachine.h"
 #include "ActorStatus.h"
 #include "actor/Types.h"
 
 #include "core/ParameterManager.h"
+
+#include "collision/GhostBody.h"
 
 
 namespace
@@ -196,18 +199,34 @@ PunchCharacterState::~PunchCharacterState()
 
 void PunchCharacterState::Enter()
 {
-	auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-	characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
+	attackScheduler_ = std::make_unique<app::core::TaskSchedulerSystem>();
+	attackScheduler_->AddTimer(0.1f, [&]()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
+			attackBody_ = new app::collision::GhostBody();
+			attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 10.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+			// @todo for test
+			const float radius = characterStateMachine->GetStatus()->GetRadius();
+			attackBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
+		}, false);
+	attackScheduler_->AddTimer(0.1f, [&]()
+		{
+			delete attackBody_;
+			attackBody_ = nullptr;
+		}, true);
 }
 
 
 void PunchCharacterState::Update()
 {
+	attackScheduler_->Update(g_gameTime->GetFrameDeltaTime());
 }
 
 
 void PunchCharacterState::Exit()
 {
+	attackScheduler_.reset(nullptr);
 }
 
 

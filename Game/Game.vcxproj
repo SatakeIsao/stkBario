@@ -236,12 +236,14 @@
     <ClCompile Include="collision\BoundingVolume.cpp" />
     <ClCompile Include="collision\BroadphaseImpl.cpp" />
     <ClCompile Include="collision\BroadphaseInterface.cpp" />
+    <ClCompile Include="collision\CollisionHitManager.cpp" />
     <ClCompile Include="collision\GhostBody.cpp" />
     <ClCompile Include="collision\GhostBodyManager.cpp" />
     <ClCompile Include="collision\GhostPrimitive.cpp" />
     <ClCompile Include="collision\PhysicalBody.cpp" />
     <ClCompile Include="core\Fade.cpp" />
     <ClCompile Include="core\ParameterManager.cpp" />
+    <ClCompile Include="core\TaskSchedulerSystem.cpp" />
     <ClCompile Include="effect\EffectManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
@@ -283,6 +285,7 @@
     <ClInclude Include="collision\BoundingVolume.h" />
     <ClInclude Include="collision\BroadphaseImpl.h" />
     <ClInclude Include="collision\BroadphaseInterface.h" />
+    <ClInclude Include="collision\CollisionHitManager.h" />
     <ClInclude Include="collision\GhostBody.h" />
     <ClInclude Include="collision\GhostBodyManager.h" />
     <ClInclude Include="collision\GhostPrimitive.h" />
@@ -290,6 +293,7 @@
     <ClInclude Include="collision\Types.h" />
     <ClInclude Include="core\Fade.h" />
     <ClInclude Include="core\ParameterManager.h" />
+    <ClInclude Include="core\TaskSchedulerSystem.h" />
     <ClInclude Include="effect\EffectManager.h" />
     <ClInclude Include="effect\Types.h" />
     <ClInclude Include="Game.h" />

@@ -4,10 +4,15 @@
 #pragma once
 #include "Actor.h"
 #include "ActorStateMachine.h"
+#include "actor/Types.h"
 
 
 class BattleCharacter : public Character
 {
+	appActor(BattleCharacter);
+
+
+private:
 	using SuperClass = Character;
 
 

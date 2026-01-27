@@ -20,44 +20,48 @@ namespace app
 		}
 
 
-		void GhostBody::CreateSphere(IGameObject* owner, const float radius, const uint32_t attr, const uint32_t mask)
+		void GhostBody::CreateSphere(IGameObject* owner, const uint32_t id, const float radius, const uint32_t attr, const uint32_t mask)
 		{
-			m_owner = owner;
-			m_shape = std::make_unique<GhostSphere>(radius);
-			m_attribute = attr; m_mask = mask;
-			RebuildBulletObject();
-			GhostBodyManager::Get().AddBody(this);
+			shape_ = std::make_unique<GhostSphere>(radius);
+			CreateCore(owner, id, attr, mask);
 		}
 
 
-		void GhostBody::CreateBox(IGameObject* owner, const Vector3& half, const uint32_t attr, const uint32_t mask)
+		void GhostBody::CreateBox(IGameObject* owner, const uint32_t id, const Vector3& half, const uint32_t attr, const uint32_t mask)
 		{
-			m_owner = owner;
-			m_shape = std::make_unique<GhostBox>(half);
-			m_attribute = attr; m_mask = mask;
-			RebuildBulletObject();
-			GhostBodyManager::Get().AddBody(this);
+			shape_ = std::make_unique<GhostBox>(half);
+			CreateCore(owner, id, attr, mask);
 		}
 
 
-		void GhostBody::CreateCapsule(IGameObject* owner, const float r, const float h, const uint32_t attr, const uint32_t mask)
+		void GhostBody::CreateCapsule(IGameObject* owner, const uint32_t id, const float r, const float h, const uint32_t attr, const uint32_t mask)
 		{
-			m_owner = owner;
-			m_shape = std::make_unique<GhostCapsule>(r, h);
-			m_attribute = attr; m_mask = mask;
+			shape_ = std::make_unique<GhostCapsule>(r, h);
+			CreateCore(owner, id, attr, mask);
+		}
+
+
+		void GhostBody::CreateCore(IGameObject* owner, const uint32_t id, const uint32_t attr, const uint32_t mask)
+		{
+			owner_ = owner;
+			attribute_ = attr;
+			mask_ = mask;
+			ownerId_ = id;
 			RebuildBulletObject();
-			GhostBodyManager::Get().AddBody(this);
+			if (GhostBodyManager::IsAvailable()) {
+				GhostBodyManager::Get().AddBody(this);
+			}
 		}
 
 
 		void GhostBody::SetPosition(const Vector3& pos)
 		{
-			if (!m_position.IsEqual(pos)) {
-				m_position = pos;
-				m_isDirty = true;
+			if (!position_.IsEqual(pos)) {
+				position_ = pos;
+				isDirty_ = true;
 				// BulletObjectも同期
-				if (m_bulletObject) {
-					m_bulletObject->setWorldTransform(GetBtTransform());
+				if (bulletObject_) {
+					bulletObject_->setWorldTransform(GetBtTransform());
 				}
 			}
 		}
@@ -65,11 +69,11 @@ namespace app
 
 		void GhostBody::SetRotation(const Quaternion& rot)
 		{
-			if (!m_rotation.IsEqual(rot)) {
-				m_rotation = rot;
-				m_isDirty = true;
-				if (m_bulletObject) {
-					m_bulletObject->setWorldTransform(GetBtTransform());
+			if (!rotation_.IsEqual(rot)) {
+				rotation_ = rot;
+				isDirty_ = true;
+				if (bulletObject_) {
+					bulletObject_->setWorldTransform(GetBtTransform());
 				}
 			}
 		}
@@ -77,8 +81,8 @@ namespace app
 
 		void GhostBody::ComputeAabb(btVector3& min, btVector3& max) const
 		{
-			if (m_shape) {
-				m_shape->GetAabb(GetBtTransform(), min, max);
+			if (shape_) {
+				shape_->GetAabb(GetBtTransform(), min, max);
 			}
 		}
 
@@ -87,18 +91,19 @@ namespace app
 		{
 			btTransform t;
 			t.setIdentity();
-			t.setOrigin(btVector3(m_position.x, m_position.y, m_position.z));
-			t.setRotation(btQuaternion(m_rotation.x, m_rotation.y, m_rotation.z, m_rotation.w));
+			t.setOrigin(btVector3(position_.x, position_.y, position_.z));
+			t.setRotation(btQuaternion(rotation_.x, rotation_.y, rotation_.z, rotation_.w));
 			return t;
 		}
 
 
 		void GhostBody::RebuildBulletObject()
 		{
-			m_bulletShape.reset(m_shape->CreateBulletShape());
-			m_bulletObject = std::make_unique<btGhostObject>();
-			m_bulletObject->setCollisionShape(m_bulletShape.get());
-			m_bulletObject->setWorldTransform(GetBtTransform());
+			bulletShape_.reset(shape_->CreateBulletShape());
+			bulletObject_ = std::make_unique<btGhostObject>();
+			bulletObject_->setCollisionShape(bulletShape_.get());
+			bulletObject_->setCollisionShape(bulletShape_.get());
+			bulletObject_->setWorldTransform(GetBtTransform());
 			// Bullet側でCollisionのフラグが必要ならここで設定
 			// m_bulletObject->setCollisionFlags(m_bulletObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		}

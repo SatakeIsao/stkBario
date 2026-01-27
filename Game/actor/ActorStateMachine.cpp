@@ -5,6 +5,7 @@
 #include "ActorStateMachine.h"
 #include "Actor.h"
 #include "ActorStatus.h"
+#include "BattleCharacter.h"
 
 
 namespace
@@ -48,7 +49,7 @@ namespace
 void IStateMachine::UpdateStateCore()
 {
 	ICharacterState* currentState = stateList_[currentStateId_].get();
-	if(nextStateId_ != INVALID_STATE_ID)
+	if(nextStateId_ != INVALID_STATE_ID && currentStateId_ != nextStateId_)
 	{
 		// ステート変更
 		// 現在のステートを抜ける
@@ -116,6 +117,12 @@ void CharacterStateMachine::Jump(const float jumoPower)
 }
 
 
+Character* CharacterStateMachine::GetCharacter()
+{
+	return character_;
+}
+
+
 app::actor::CharacterStatus* CharacterStateMachine::GetStatus()
 {
 	return character_->GetStatus();
@@ -160,6 +167,12 @@ void BattleCharacterStateMachine::Update()
 	UpdateState();
 
 	SuperClass::Update();
+}
+
+
+uint32_t BattleCharacterStateMachine::GetCharacterID() const
+{
+	return BattleCharacter::ID();
 }
 
 

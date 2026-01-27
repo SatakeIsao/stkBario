@@ -126,15 +126,20 @@ namespace app
 			modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
 			modelRender_->Update();
 
-			// 物理オブジェクト作成
-			physicalBody_.reset(new app::collision::PhysicalBody());
+			// バウンディングボックス計算
 			app::collision::Bounds bounds;
 			bounds.Compute(modelRender_->GetModel());
-			physicalBody_->CreateBox(bounds.maxPoint - bounds.minPoint, transform.position, app::collision::CollisionAttribute::Ground);
+			// サイズ計算
+			Vector3 size = bounds.maxPoint - bounds.minPoint;
+			Vector3 halfSize = size / 2.0f;
+
+			// 物理オブジェクト作成
+			physicalBody_.reset(new app::collision::PhysicalBody());
+			physicalBody_->CreateBox(size, transform.position, app::collision::CollisionAttribute::Ground);
 
 			// ゴーストボディ作成
 			ghostBody_.reset(new app::collision::GhostBody());
-			ghostBody_->CreateBox(this, (bounds.maxPoint - bounds.minPoint) / 2.0f, app::collision::ghost::CollisionAttribute::Pipe, app::collision::ghost::CollisionAttributeMask::Pipe);
+			ghostBody_->CreateBox(this, ID(), halfSize, app::collision::ghost::CollisionAttribute::Pipe, app::collision::ghost::CollisionAttributeMask::Pipe);
 			ghostBody_->SetPosition(transform.position);
 		}
 	}

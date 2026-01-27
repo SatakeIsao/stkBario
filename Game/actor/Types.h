@@ -5,6 +5,11 @@
 #include <cstdint>
 
 
+#define appActor(name)\
+public:\
+	static constexpr uint32_t ID() { return Hash32(#name); }
+
+
 namespace app
 {
 	namespace actor

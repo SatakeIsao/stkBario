@@ -56,8 +56,9 @@ namespace app
 			}
 
 			// 2. Broadphase実行 -> 衝突候補があればコールバック
-			broadphase_->Perform([this](GhostBody* a, GhostBody* b) {
-				this->ProcessCollisionPair(a, b);
+			broadphase_->Perform([this](GhostBody* a, GhostBody* b)
+				{
+					this->ProcessCollisionPair(a, b);
 				});
 		}
 
@@ -106,6 +107,9 @@ namespace app
 			}
 
 			if (isHit) {
+				if (registerPairCallback_) {
+					registerPairCallback_(a, b);
+				}
 				// 既存のマネージャーへ通知、あるいはイベント発火
 				// CollisionHitManager::Get().RegisterHitPair(a->GetOwner(), b->GetOwner());
 			}

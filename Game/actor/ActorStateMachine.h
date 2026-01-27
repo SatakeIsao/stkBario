@@ -142,6 +142,9 @@ public:
 		character_ = character;
 	}
 
+	virtual uint32_t GetCharacterID() const { return 0; }
+
+	Character* GetCharacter();
 	app::actor::CharacterStatus* GetStatus();
 	CharacterController* GetCharacterController();
 	ModelRender* GetModelRender();
@@ -182,6 +185,9 @@ public:
 
 	virtual void Initialize() override final;
 	virtual void Update() override final;
+
+	virtual uint32_t GetCharacterID() const override;
+
 
 private:
 	void UpdateState();

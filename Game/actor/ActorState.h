@@ -1,5 +1,6 @@
 /**
- * Actorファイル
+ * ActorState.h
+ * キャラクターステート関連
  */
 #pragma once
 
@@ -14,6 +15,15 @@
 public:\
 	static constexpr uint32_t ID() { return Hash32(#name); }
 
+
+
+namespace app
+{
+	namespace collision
+	{
+		class GhostBody;
+	}
+}
 
 
 class IStateMachine;
@@ -107,6 +117,11 @@ public:
 class PunchCharacterState : public ICharacterState
 {
 	appState(PunchCharacterState);
+
+
+private:
+	app::collision::GhostBody* attackBody_ = nullptr;
+	std::unique_ptr<app::core::TaskSchedulerSystem> attackScheduler_;
 
 
 public:

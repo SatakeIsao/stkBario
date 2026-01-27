@@ -26,25 +26,26 @@ namespace app
 		
 		
 		private:
-			IGameObject* m_owner = nullptr;
-			std::unique_ptr<IGhostShape> m_shape;
+			IGameObject* owner_ = nullptr;
+			uint32_t ownerId_ = 0;
+			std::unique_ptr<IGhostShape> shape_;
 
 			/** Broadphase用ハンドル */
-			void* m_broadphaseHandle = nullptr;
-			bool m_isDirty = true;
-			bool m_isActive = true;
+			void* broadphaseHandle_ = nullptr;
+			bool isDirty_ = true;
+			bool isActive_ = true;
 
 			/** 属性 */
-			uint32_t m_attribute = ghost::CollisionAttribute::None;
-			uint32_t m_mask = ghost::CollisionAttributeMask::All;
+			uint32_t attribute_ = ghost::CollisionAttribute::None;
+			uint32_t mask_ = ghost::CollisionAttributeMask::All;
 
 			/** 座標 */
-			Vector3 m_position = Vector3::Zero;
-			Quaternion m_rotation = Quaternion::Identity;
+			Vector3 position_ = Vector3::Zero;
+			Quaternion rotation_ = Quaternion::Identity;
 
 			/** 詳細判定用BulletObject */
-			std::unique_ptr<btGhostObject> m_bulletObject;
-			std::unique_ptr<btCollisionShape> m_bulletShape;
+			std::unique_ptr<btGhostObject> bulletObject_;
+			std::unique_ptr<btCollisionShape> bulletShape_;
 
 
 		public:
@@ -52,37 +53,39 @@ namespace app
 			~GhostBody();
 
 			/** 初期化 */
-			void CreateSphere(IGameObject* owner, const float radius, const uint32_t attr, const uint32_t mask);
-			void CreateBox(IGameObject* owner, const Vector3& half, const uint32_t attr, const uint32_t mask);
-			void CreateCapsule(IGameObject* owner, const float r, const float h, const uint32_t attr, const uint32_t mask);
+			void CreateSphere(IGameObject* owner, const uint32_t id, const float radius, const uint32_t attr, const uint32_t mask);
+			void CreateBox(IGameObject* owner, const uint32_t id, const Vector3& half, const uint32_t attr, const uint32_t mask);
+			void CreateCapsule(IGameObject* owner, const uint32_t id, const float r, const float h, const uint32_t attr, const uint32_t mask);
+			void CreateCore(IGameObject* owner, const uint32_t id, const uint32_t attr, const uint32_t mask);
 
 			
 			void SetPosition(const Vector3& pos);
 			void SetRotation(const Quaternion& rot);
 
 
-			const Vector3& GetPosition() const { return m_position; }
-			const Quaternion& GetRotation() const { return m_rotation; }
-			IGameObject* GetOwner() const { return m_owner; }
-			uint32_t GetAttribute() const { return m_attribute; }
-			uint32_t GetMask() const { return m_mask; }
-			bool IsActive() const { return m_isActive; }
-			void SetActive(bool active) { m_isActive = active; }
+			const Vector3& GetPosition() const { return position_; }
+			const Quaternion& GetRotation() const { return rotation_; }
+			IGameObject* GetOwner() const { return owner_; }
+			uint32_t GetOwnerId() const { return ownerId_; }
+			uint32_t GetAttribute() const { return attribute_; }
+			uint32_t GetMask() const { return mask_; }
+			bool IsActive() const { return isActive_; }
+			void SetActive(bool active) { isActive_ = active; }
 
-			GhostShapeType GetShapeType() const { return m_shape ? m_shape->GetType() : GhostShapeType::Sphere; }
-			float GetBoundingRadius() const { return m_shape ? m_shape->GetBoundingRadius() : 0.0f; }
+			GhostShapeType GetShapeType() const { return shape_ ? shape_->GetType() : GhostShapeType::Sphere; }
+			float GetBoundingRadius() const { return shape_ ? shape_->GetBoundingRadius() : 0.0f; }
 
 			
 			/** Broadphase連携用 */
-			void SetBroadphaseHandle(void* handle) { m_broadphaseHandle = handle; }
-			void* GetBroadphaseHandle() const { return m_broadphaseHandle; }
+			void SetBroadphaseHandle(void* handle) { broadphaseHandle_ = handle; }
+			void* GetBroadphaseHandle() const { return broadphaseHandle_; }
 			void ComputeAabb(btVector3& min, btVector3& max) const;
 
-			bool IsDirty() const { return m_isDirty; }
-			void ClearDirty() { m_isDirty = false; }
+			bool IsDirty() const { return isDirty_; }
+			void ClearDirty() { isDirty_ = false; }
 
 			/** 詳細判定用 */
-			btCollisionObject* GetBulletObject() { return m_bulletObject.get(); }
+			btCollisionObject* GetBulletObject() { return bulletObject_.get(); }
 
 		private:
 			void RebuildBulletObject();

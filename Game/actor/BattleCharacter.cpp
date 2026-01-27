@@ -44,6 +44,8 @@ void BattleCharacter::Update()
 	transform.position = nextPosition;
 	transform.rotation = stateMachine_->transform.rotation;
 
+	stateMachine_->transform.position = nextPosition;
+
 	ghostBody_->SetPosition(transform.position);
 
 	SuperClass::Update();
@@ -72,5 +74,5 @@ void BattleCharacter::Initialize(const CharacterInitializeParameter& param)
 	transform.scale = Vector3::One;
 	transform.rotation = Quaternion::Identity;
 
-	ghostBody_->CreateCapsule(this, status_->GetRadius(), status_->GetHeight(), app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+	ghostBody_->CreateCapsule(this, ID(), status_->GetRadius(), status_->GetHeight(), app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 }

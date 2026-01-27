@@ -124,7 +124,7 @@ namespace nsK2EngineLow
 		);
 		dynamicWorld_->setGravity(btVector3(0, -10, 0));
 
-#ifdef APP_DEBUG
+#ifdef K2_DEBUG
 		debugWireFrame_.Init();
 		dynamicWorld_->setDebugDrawer(&debugWireFrame_);
 #endif

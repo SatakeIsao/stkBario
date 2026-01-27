@@ -4,6 +4,7 @@
 #pragma once
 #include "collision/PhysicalBody.h"
 #include "collision/GhostBody.h"
+#include "actor/Types.h"
 
 
 namespace app
@@ -44,6 +45,9 @@ namespace app
 
 		class StaticGimmick : public IGimmick
 		{
+			appActor(StaticGimmick);
+
+
 		public:
 			StaticGimmick();
 			virtual ~StaticGimmick();
@@ -63,6 +67,9 @@ namespace app
 
 		class PipeGimmick : public IGimmick
 		{
+			appActor(PipeGimmick);
+
+
 		private:
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 
