@@ -3,7 +3,6 @@
  */
 #pragma once
 #include "collision/PhysicalBody.h"
-#include "collision/GhostBody.h"
 #include "actor/Types.h"
 
 
@@ -65,6 +64,13 @@ namespace app
 		/******************************************/
 
 
+		/** 土管の接続処理 */
+		struct PipeGimmickConnection : Noncopyable
+		{
+
+		};
+
+
 		class PipeGimmick : public IGimmick
 		{
 			appActor(PipeGimmick);
@@ -72,7 +78,11 @@ namespace app
 
 		private:
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
-
+			uint32_t endpointId_ = -1;
+			uint32_t targetEndpointId_ = -1;
+			app::collision::Bounds boudingVolume_;
+			/** 吸い込まれる方向 */
+			Vector3 forward_;
 
 		public:
 			PipeGimmick();
@@ -81,7 +91,18 @@ namespace app
 			void Update() override;
 			void Render(RenderContext& rc) override;
 
-			virtual void Initialize(const char* path) override;
+			virtual void Initialize(const char* path) override {}
+			virtual void Initialize(const char* path, int32_t myId, int32_t targetId, const Vector3& forward);
+
+
+		public:
+			uint32_t GetEndpointId() const { return endpointId_; }
+
+			/** Endpoint情報取得 */
+			Vector3 GetMouthPosition() const;
+			const Quaternion& GetRotation() const;
+			/** 土管の入り口方向（吸い込まれる方向） */
+			Vector3 GetForward() const;
 		};
 	}
 }

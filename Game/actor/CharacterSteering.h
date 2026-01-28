@@ -4,26 +4,32 @@
 #pragma once
 
 
-class Character;
-
-
-class CharacterSteering : public Noncopyable
+namespace app
 {
-private:
-	uint8_t padIndex_ = 0;
-
-	Character* target_ = nullptr;
-
+	namespace actor
+	{
+		class Character;
 
 
-public:
-	CharacterSteering() {}
-	virtual ~CharacterSteering() {}
+		class CharacterSteering : public Noncopyable
+		{
+		private:
+			uint8_t padIndex_ = 0;
 
-	void Initialize(Character* target, const uint8_t index);
-	void Update();
+			Character* target_ = nullptr;
 
 
-private:
-	inline GamePad* GetPad() { return g_pad[padIndex_]; }
-};
+
+		public:
+			CharacterSteering() {}
+			virtual ~CharacterSteering() {}
+
+			void Initialize(Character* target, const uint8_t index);
+			void Update();
+
+
+		private:
+			inline GamePad* GetPad() { return g_pad[padIndex_]; }
+		};
+	}
+}

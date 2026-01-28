@@ -12,6 +12,7 @@
 #include "actor/ActorStatus.h"
 #include "actor/Types.h"
 #include "actor/Gimmick.h"
+#include "gimmick/WarpSystem.h"
 
 #include "core/ParameterManager.h"
 
@@ -26,7 +27,7 @@ namespace
 	constexpr const char* MASTER_BATTLE_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterBattleCharacterParameter.json";
 
 	// Player用
-	static CharacterInitializeParameter sPlayerInitializeParameter = CharacterInitializeParameter([](CharacterInitializeParameter* parameter)
+	static app::actor::CharacterInitializeParameter sPlayerInitializeParameter = app::actor::CharacterInitializeParameter([](app::actor::CharacterInitializeParameter* parameter)
 		{
 			parameter->modelName = "Assets/ModelData/player/player.tkm";
 			parameter->animationDataList.Create(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Max));
@@ -51,7 +52,7 @@ namespace
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch)].loop = false;
 		});
 	// Enemy用
-	static CharacterInitializeParameter sEnemyInitializeParameter = CharacterInitializeParameter([](CharacterInitializeParameter* parameter)
+	static app::actor::CharacterInitializeParameter sEnemyInitializeParameter = app::actor::CharacterInitializeParameter([](app::actor::CharacterInitializeParameter* parameter)
 		{
 			parameter->modelName = "Assets/ModelData/enemy/slime/slime.tkm";
 		});
@@ -68,6 +69,7 @@ namespace app
 
 		BattleManager::BattleManager()
 		{
+			app::gimmick::WarpSystem::Initialize();
 			app::collision::CollisionHitManager::Initialize();
 			app::collision::GhostBodyManager::Initialize();
 			app::collision::GhostBodyManager::Get().RegisterCallback([](app::collision::GhostBody* a, app::collision::GhostBody* b)
@@ -91,6 +93,8 @@ namespace app
 			if (app::collision::GhostBodyManager::IsAvailable()) {
 				app::collision::GhostBodyManager::Finalize();
 			}
+			app::collision::CollisionHitManager::Finalize();
+			app::gimmick::WarpSystem::Finalize();
 		}
 
 
@@ -98,16 +102,16 @@ namespace app
 		{
 			LoadParameter();
 			{
-				characterSteering_ = std::make_unique<CharacterSteering>();
+				characterSteering_ = std::make_unique<app::actor::CharacterSteering>();
 				// マリオにしてみた
 				{
-					battleCharacter_ = NewGO<BattleCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "mario");
+					battleCharacter_ = NewGO<app::actor::BattleCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "mario");
 					battleCharacter_->Initialize(sPlayerInitializeParameter);
 					{
-						battleCharacter_->AddState<IdleCharacterState>();
-						battleCharacter_->AddState<RunCharacterState>();
-						battleCharacter_->AddState<JumpCharacterState>();
-						battleCharacter_->AddState<PunchCharacterState>();
+						battleCharacter_->AddState<app::actor::IdleCharacterState>();
+						battleCharacter_->AddState<app::actor::RunCharacterState>();
+						battleCharacter_->AddState<app::actor::JumpCharacterState>();
+						battleCharacter_->AddState<app::actor::PunchCharacterState>();
 					}
 					// TODO: ステージによって変えたいので、ステージクラスが作られたら委嘱する
 					{
@@ -121,7 +125,7 @@ namespace app
 				characterSteering_->Initialize(battleCharacter_, 0);
 
 				// 敵キャラクター
-				eventCharacter_ = NewGO<EventCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "nokonoko");
+				eventCharacter_ = NewGO<app::actor::EventCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "nokonoko");
 				eventCharacter_->Initialize(sEnemyInitializeParameter);
 
 				// ギミック設置（テスト用）
@@ -146,11 +150,16 @@ namespace app
 				// 土管
 				{
 					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
-					pipeGimmick->transform.position = Vector3(100.0f, -50.0f, 0.0f);
-					pipeGimmick->transform.scale = Vector3(1.0f, 1.0f, 1.0f);
+					pipeGimmick->transform.localPosition = Vector3(100.0f, 20.0f, 0.0f);
 					pipeGimmick->transform.UpdateTransform();
-					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm");
+					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 0, 1, Vector3::Down);
 					//testPipeGimmickList_.push_back(pipeGimmick);
+				}
+				{
+					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
+					pipeGimmick->transform.localPosition = Vector3(-100.0f, 20.0f, 0.0f);
+					pipeGimmick->transform.UpdateTransform();
+					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 1, 0, Vector3::Down);
 				}
 			}
 		}
@@ -166,6 +175,15 @@ namespace app
 			}
 			// 衝突ヒット管理更新
 			app::collision::CollisionHitManager::Get().Update();
+
+
+			// 衝突後の処理
+			{
+				for (auto& notify : notifyList_) {
+
+				}
+				notifyList_.clear();
+			}
 		}
 
 

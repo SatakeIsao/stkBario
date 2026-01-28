@@ -40,6 +40,9 @@
     <Filter Include="math">
       <UniqueIdentifier>{54048856-1add-4ebf-b8da-650d1e392936}</UniqueIdentifier>
     </Filter>
+    <Filter Include="gimmick">
+      <UniqueIdentifier>{6a6cd1f8-88de-425d-a11b-63e605bc9ab8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="core\TaskSchedulerSystem.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="gimmick\WarpSystem.cpp">
+      <Filter>gimmick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +306,9 @@
     </ClInclude>
     <ClInclude Include="core\TaskSchedulerSystem.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="gimmick\WarpSystem.h">
+      <Filter>gimmick</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

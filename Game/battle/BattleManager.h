@@ -5,16 +5,18 @@
 #pragma once
 
 
-class BattleCharacter;
-class EventCharacter;
-class CharacterSteering;
-
-
 namespace app
 {
     namespace actor
     {
+        class BattleCharacter;
+        class EventCharacter;
+        class CharacterSteering;
         class StaticGimmick;
+    }
+    namespace collision
+    {
+        class GhostBody;
     }
 }
 
@@ -28,13 +30,38 @@ namespace app
          */
         class BattleManager
         {
+        public:
+            /**
+             * 通知処理
+			 * NOTE: 単体テストをしやすいように分離している
+			 *       通信などで非同期に処理する場合にも対応しやすい
+             */
+            struct INotify : Noncopyable
+            {
+				app::collision::GhostBody* a = nullptr;
+				app::collision::GhostBody* b = nullptr;
+                //
+                virtual uint32_t ID() const = 0;
+            };
+
+
+            struct DamageNotify : public INotify
+            {
+				virtual uint32_t ID() const override { return 1; }
+            };
+
+
+
+
         private:
             // @todo for test
-            BattleCharacter* battleCharacter_ = nullptr;
-            EventCharacter* eventCharacter_ = nullptr;
-            std::unique_ptr<CharacterSteering> characterSteering_ = nullptr;
+            app::actor::BattleCharacter* battleCharacter_ = nullptr;
+            app::actor::EventCharacter* eventCharacter_ = nullptr;
+            std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
 
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
+
+			std::vector<std::unique_ptr<INotify>> notifyList_;
 
 
         private:
@@ -48,6 +75,10 @@ namespace app
             /** 更新処理 */
             void Update();
 
+            void AddNotify(INotify* notify)
+            {
+                notifyList_.push_back(std::move(std::unique_ptr<INotify>(notify)));
+			}
 
         private:
             void LoadParameter();

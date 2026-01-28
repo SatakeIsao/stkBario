@@ -5,43 +5,49 @@
 #include "EventCharacter.h"
 
 
-EventCharacter::EventCharacter()
+namespace app
 {
+	namespace actor
+	{
+		EventCharacter::EventCharacter()
+		{
 
-}
-
-
-EventCharacter::~EventCharacter()
-{
-
-}
+		}
 
 
-bool EventCharacter::Start()
-{
-	return true;
-}
+		EventCharacter::~EventCharacter()
+		{
+
+		}
 
 
-void EventCharacter::Update()
-{
-	SuperClass::Update();
-}
+		bool EventCharacter::Start()
+		{
+			return true;
+		}
 
 
-void EventCharacter::Render(RenderContext& rc)
-{
-	SuperClass::Render(rc);
-}
+		void EventCharacter::Update()
+		{
+			SuperClass::Update();
+		}
 
 
-void EventCharacter::Initialize(const CharacterInitializeParameter& param)
-{
-	modelRender_ = std::make_unique<ModelRender>();
-	modelRender_->Init(param.modelName);
-	
+		void EventCharacter::Render(RenderContext& rc)
+		{
+			SuperClass::Render(rc);
+		}
 
-	transform.position = Vector3::Zero;
-	transform.scale = Vector3::One;
-	transform.rotation = Quaternion::Identity;
+
+		void EventCharacter::Initialize(const CharacterInitializeParameter& param)
+		{
+			modelRender_ = std::make_unique<ModelRender>();
+			modelRender_->Init(param.modelName);
+
+
+			transform.position = Vector3::Zero;
+			transform.scale = Vector3::One;
+			transform.rotation = Quaternion::Identity;
+		}
+	}
 }

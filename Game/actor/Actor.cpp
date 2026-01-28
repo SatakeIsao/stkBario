@@ -5,25 +5,31 @@
 #include "Actor.h"
 
 
-Character::Character()
+namespace app
 {
-}
+	namespace actor
+	{
+		Character::Character()
+		{
+		}
 
 
-Character::~Character()
-{
-	delete status_;
-	status_ = nullptr;
-}
+		Character::~Character()
+		{
+			delete status_;
+			status_ = nullptr;
+		}
 
-void Character::Update()
-{
-	modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
-	modelRender_->Update();
-}
+		void Character::Update()
+		{
+			modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
+			modelRender_->Update();
+		}
 
 
-void Character::Render(RenderContext& rc)
-{
-	modelRender_->Draw(rc);
+		void Character::Render(RenderContext& rc)
+		{
+			modelRender_->Draw(rc);
+		}
+	}
 }

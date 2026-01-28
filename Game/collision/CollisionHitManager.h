@@ -32,7 +32,7 @@ namespace app
 
 		private:
 			std::vector<Pair> hitPairList_;
-
+			
 
 		private:
 			CollisionHitManager();
@@ -46,6 +46,11 @@ namespace app
 			/** 衝突ペア登録 */
 			void RegisterHitPair(app::collision::GhostBody* a, app::collision::GhostBody* b);
 
+
+		private:
+			/** 土管を含むペアか */
+			bool ContainsPipeGimmickPair(const Pair& hitPair);
+			void UpdatePipeGimmickPair(Pair& hitPair);
 
 
 

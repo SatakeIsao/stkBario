@@ -3,7 +3,6 @@
  * ゴーストボディ管理関連
  */
 #pragma once
-#include "GhostBody.h"
 #include "BroadphaseInterface.h"
 
 

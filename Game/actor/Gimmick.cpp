@@ -3,7 +3,7 @@
  */
 #include "stdafx.h"
 #include "Gimmick.h"
-#include "collision/BoundingVolume.h"
+#include "gimmick/WarpSystem.h"
 
 
 namespace app
@@ -94,12 +94,25 @@ namespace app
 
 		PipeGimmick::~PipeGimmick()
 		{
+			if (endpointId_ >= 0) {
+				app::gimmick::WarpSystem::Get().UnregisterPipe(endpointId_);
+			}
 		}
 
 
 		bool PipeGimmick::Start()
 		{
 			IGimmick::Start();
+
+			// システムへの登録
+			if (endpointId_ >= 0) {
+				app::gimmick::WarpSystem::Get().RegisterPipe(endpointId_, this);
+				// TODO: 簡易実装としてここでリンクも登録してしまう（本来はLevelLoaderなどがやるべき）
+				if (targetEndpointId_ >= 0) {
+					app::gimmick::WarpSystem::Get().AddLink(endpointId_, targetEndpointId_);
+				}
+			}
+
 			return true;
 		}
 
@@ -118,8 +131,15 @@ namespace app
 		}
 
 
-		void PipeGimmick::Initialize(const char* path)
+		void PipeGimmick::Initialize(const char* path, int32_t myId, int32_t targetId, const Vector3& forward)
 		{
+			// ID設定
+			endpointId_ = myId;
+			targetEndpointId_ = targetId;
+
+			// 方向設定
+			forward_ = forward;
+
 			// モデル読み込み
 			modelRender_ = std::make_unique<ModelRender>();
 			modelRender_->Init(path);
@@ -127,10 +147,9 @@ namespace app
 			modelRender_->Update();
 
 			// バウンディングボックス計算
-			app::collision::Bounds bounds;
-			bounds.Compute(modelRender_->GetModel());
+			boudingVolume_.Compute(modelRender_->GetModel());
 			// サイズ計算
-			Vector3 size = bounds.maxPoint - bounds.minPoint;
+			Vector3 size = boudingVolume_.maxPoint - boudingVolume_.minPoint;
 			Vector3 halfSize = size / 2.0f;
 
 			// 物理オブジェクト作成
@@ -141,6 +160,24 @@ namespace app
 			ghostBody_.reset(new app::collision::GhostBody());
 			ghostBody_->CreateBox(this, ID(), halfSize, app::collision::ghost::CollisionAttribute::Pipe, app::collision::ghost::CollisionAttributeMask::Pipe);
 			ghostBody_->SetPosition(transform.position);
+		}
+
+		
+		Vector3 PipeGimmick::GetMouthPosition() const
+		{
+			return Vector3(transform.position.x, boudingVolume_.maxPoint.y, transform.position.z);
+		}
+
+
+		const Quaternion& PipeGimmick::GetRotation() const
+		{
+			return transform.rotation;
+		}
+		
+
+		Vector3 PipeGimmick::GetForward() const
+		{
+			return forward_;
 		}
 	}
 }

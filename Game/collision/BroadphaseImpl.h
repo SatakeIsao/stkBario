@@ -4,7 +4,6 @@
  */
 #pragma once
 #include "BroadphaseInterface.h"
-#include "GhostBody.h"
 #include "btBulletDynamicsCommon.h"
 
 
