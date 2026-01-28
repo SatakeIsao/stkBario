@@ -86,6 +86,9 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 			float gravity;				// 重力
 			float fallLimitY;			// 落下リミットY座標
 			float friction;				// 摩擦係数
+			float warpStartScale;		// ワープ開始スケール
+			float warpEndScale;			// ワープ終了スケール
+			float warpTime;				// ワープ時間
 		};
 
 

@@ -36,6 +36,7 @@ namespace app
 
 			const bool isPressA = GetPad()->IsTrigger(enButtonA);
 			const bool isPressB = GetPad()->IsTrigger(enButtonB);
+			const bool isPressDown = GetPad()->IsTrigger(enButtonDown);
 
 			// BattleCharacter
 			{
@@ -44,6 +45,7 @@ namespace app
 					auto* targetCharacterStateMachine = battleCharacter->GetStateMachine();
 					targetCharacterStateMachine->SetActionA(isPressA);
 					targetCharacterStateMachine->SetActionB(isPressB);
+					targetCharacterStateMachine->SetActionDown(isPressDown);
 					const bool isInput = inputVector.LengthSq() > MOVE_MIN_FLOAT;
 					if (isInput)
 					{

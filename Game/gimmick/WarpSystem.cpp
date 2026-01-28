@@ -38,7 +38,7 @@ namespace app
         }
 
 
-        app::actor::PipeGimmick* WarpSystem::FindPipe(EndpointId id) const
+        const app::actor::PipeGimmick* WarpSystem::FindPipe(EndpointId id) const
         {
             auto it = registMap_.find(id);
             if (it != registMap_.end()) {

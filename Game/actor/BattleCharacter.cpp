@@ -45,9 +45,10 @@ namespace app
 
 			auto nextPosition = characterController_->Execute(stateMachine_->transform.position, deltaTime);
 
-			transform.position = nextPosition;
-			transform.rotation = stateMachine_->transform.rotation;
-
+			transform.localPosition = nextPosition;
+			transform.localScale = stateMachine_->transform.scale;
+			transform.localRotation = stateMachine_->transform.rotation;
+			transform.UpdateTransform();
 			stateMachine_->transform.position = nextPosition;
 
 			ghostBody_->SetPosition(transform.position);

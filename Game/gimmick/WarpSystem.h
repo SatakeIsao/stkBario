@@ -39,7 +39,7 @@ namespace app
 			/** Endpoint管理 */
 			void RegisterPipe(EndpointId id, app::actor::PipeGimmick* pipe);
 			void UnregisterPipe(EndpointId id);
-			app::actor::PipeGimmick* FindPipe(EndpointId id) const;
+			const app::actor::PipeGimmick* FindPipe(EndpointId id) const;
 
 			/**
 			 * Router (接続解決)

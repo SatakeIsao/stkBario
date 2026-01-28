@@ -228,5 +228,112 @@ namespace app
 			auto* modelRender = characterStateMachine->GetModelRender();
 			return !modelRender->IsPlayingAnimation();
 		}
+
+
+
+
+		/*************************************/
+
+
+		WarpInCharacterState::WarpInCharacterState(IStateMachine* owner)
+			: ICharacterState(owner)
+		{
+		}
+
+
+		WarpInCharacterState::~WarpInCharacterState()
+		{
+		}
+
+
+		void WarpInCharacterState::Enter()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend));
+			characterStateMachine->SetInputPower(0.0f);
+			characterStateMachine->ClearMomveSpeedVector();
+			auto* characterStatus = characterStateMachine->GetStatus();
+			scaleCurve_.Initialize(characterStatus->GetWarpStartScale(), characterStatus->GetWarpEndScale(), characterStatus->GetWarpTimeSeconds(), app::util::EasingType::Linear);
+			scaleCurve_.Play();
+		}
+
+
+		void WarpInCharacterState::Update()
+		{
+			scaleCurve_.Update(g_gameTime->GetFrameDeltaTime());
+
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetCharacterController()->RequestTeleport();
+			characterStateMachine->transform.scale = Vector3(scaleCurve_.GetCurrentValue());
+			characterStateMachine->transform.position.y -= 1.0f; // NOTE: 下に埋め込みたいので
+		}
+
+
+		void WarpInCharacterState::Exit()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetCharacterController()->RequestTeleport();
+			characterStateMachine->transform.position = characterStateMachine->GetWarpPosition();
+		}
+
+
+		bool WarpInCharacterState::CanChangeState() const
+		{
+			if (scaleCurve_.IsPlaying()) {
+				return false;
+			}
+			return true;
+		}
+
+
+
+
+		/*************************************/
+
+
+		WarpOutCharacterState::WarpOutCharacterState(IStateMachine* owner)
+			: ICharacterState(owner)
+		{
+		}
+
+
+		WarpOutCharacterState::~WarpOutCharacterState()
+		{
+		}
+
+
+		void WarpOutCharacterState::Enter()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Idle));
+			auto* characterStatus = characterStateMachine->GetStatus();
+			scaleCurve_.Initialize(characterStatus->GetWarpEndScale(), characterStatus->GetWarpStartScale(), characterStatus->GetWarpTimeSeconds(), app::util::EasingType::Linear);
+			scaleCurve_.Play();
+		}
+
+
+		void WarpOutCharacterState::Update()
+		{
+			scaleCurve_.Update(g_gameTime->GetFrameDeltaTime());
+
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetCharacterController()->RequestTeleport();
+
+			characterStateMachine->transform.scale = Vector3(scaleCurve_.GetCurrentValue());
+		}
+
+
+		void WarpOutCharacterState::Exit()
+		{
+		}
+
+
+		bool WarpOutCharacterState::CanChangeState() const
+		{
+			if (scaleCurve_.IsPlaying()) {
+				return false;
+			}
+			return true;
+		}
 	}
 }

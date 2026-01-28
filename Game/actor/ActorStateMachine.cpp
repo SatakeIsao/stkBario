@@ -182,6 +182,29 @@ namespace app
 
 		void BattleCharacterStateMachine::UpdateState()
 		{
+			// ワープ
+			{
+				if (IsRequestWarp()) {
+					RequestChangeState(WarpInCharacterState::ID());
+					ClearRequestWarp();
+					return;
+				}
+				if (IsEqualCurrentState(WarpInCharacterState::ID())) {
+					if (CanChangeState()) {
+						RequestChangeState(WarpOutCharacterState::ID());
+						return;
+					}
+					else {
+						return;
+					}
+				}
+				if (IsEqualCurrentState(WarpOutCharacterState::ID()))
+				{
+					if (!CanChangeState()) {
+						return;
+					}
+				}
+			}
 			// ジャンプ
 			{
 				if (IsActionA()) {
@@ -211,8 +234,6 @@ namespace app
 					}
 				}
 			}
-
-
 
 			const Vector3 direction = moveSpeedVector_;
 			if (direction.LengthSq() >= MOVE_MIN_FLOAT || inputPower_ >= MOVE_MIN_FLOAT)

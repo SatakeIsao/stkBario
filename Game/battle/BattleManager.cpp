@@ -112,6 +112,8 @@ namespace app
 						battleCharacter_->AddState<app::actor::RunCharacterState>();
 						battleCharacter_->AddState<app::actor::JumpCharacterState>();
 						battleCharacter_->AddState<app::actor::PunchCharacterState>();
+						battleCharacter_->AddState<app::actor::WarpInCharacterState>();
+						battleCharacter_->AddState<app::actor::WarpOutCharacterState>();
 					}
 					// TODO: ステージによって変えたいので、ステージクラスが作られたら委嘱する
 					{
@@ -120,6 +122,8 @@ namespace app
 						battleCharacter_->GetStatus()->SetFriction(parameter->friction);
 						// 重力設定
 						battleCharacter_->GetStatus()->SetGravity(parameter->gravity);
+						// ワープ設定
+						battleCharacter_->GetStatus()->SetWarpData(parameter->warpStartScale, parameter->warpEndScale, parameter->warpTime);
 					}
 				}
 				characterSteering_->Initialize(battleCharacter_, 0);
@@ -200,6 +204,9 @@ namespace app
 					p.gravity = json["gravity"].get<float>();
 					p.fallLimitY = json["fallLimitY"].get<float>();
 					p.friction = json["friction"].get<float>();
+					p.warpStartScale = json["warpStartScale"].get<float>();
+					p.warpEndScale = json["warpEndScale"].get<float>();
+					p.warpTime = json["warpTime"].get<float>();
 				});
 			// バトルキャラクターパラメーター読み込み
 			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)

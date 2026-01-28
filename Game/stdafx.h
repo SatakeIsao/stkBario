@@ -14,3 +14,4 @@ using namespace nsK2EngineLow;
 #include "math/Transform.h"
 #include "memory/Memory.h"
 #include "util/util.h"
+#include "util/Curve.h"

@@ -121,6 +121,10 @@ namespace nsK2EngineLow {
 		{
 			Set(x, y, z);
 		}
+		Vector3(float xyz)
+		{
+			Set(xyz, xyz, xyz);
+		}
 
 		/// <summary>
 		/// 2‚Â‚ÌVector3‚ªw’è‚³‚ê‚½Œë·”ÍˆÍ“à‚Å“™‚µ‚¢‚©‚Ç‚¤‚©‚ğ”»’è‚µ‚Ü‚·B

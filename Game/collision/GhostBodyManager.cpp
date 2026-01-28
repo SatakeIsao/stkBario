@@ -123,8 +123,8 @@ namespace app
 			if (!objA || !objB) return false;
 
 			// BulletのAlgorithm探索 (GJK/EPAなど適切なものを探す)
-			static btDefaultCollisionConfiguration collisionConfig;
-			static btCollisionDispatcher dispatcher(&collisionConfig);
+			auto* dispatcher = PhysicsWorld::Get().GetCollisionDispatcher();
+			auto& dispatchInfo = PhysicsWorld::Get().GetDispatchInfo();
 
 			// btCollisionObjectWrapperを作成
 			const btCollisionShape* shapeA = objA->getCollisionShape();
@@ -136,7 +136,7 @@ namespace app
 			btCollisionObjectWrapper objWrapB(nullptr, shapeB, objB, transB, -1, -1);
 
 			// アルゴリズム生成
-			btCollisionAlgorithm* algorithm = dispatcher.findAlgorithm(
+			btCollisionAlgorithm* algorithm = dispatcher->findAlgorithm(
 				&objWrapA, &objWrapB,
 				nullptr
 			);
@@ -144,7 +144,6 @@ namespace app
 			bool hasContact = false;
 			if (algorithm) {
 				btManifoldResult contactPointResult(&objWrapA, &objWrapB);
-				btDispatcherInfo dispatchInfo; // デフォルト構築でOK
 				algorithm->processCollision(&objWrapA, &objWrapB, dispatchInfo, &contactPointResult);
 
 				// マニフォールドに接触点が1つ以上あればヒット
@@ -153,7 +152,7 @@ namespace app
 				}
 
 				algorithm->~btCollisionAlgorithm();
-				dispatcher.freeCollisionAlgorithm(algorithm);
+				dispatcher->freeCollisionAlgorithm(algorithm);
 			}
 
 			return hasContact;

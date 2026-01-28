@@ -3,7 +3,6 @@
  * UI用のアニメーション処理群
  */
 #pragma once
-#include "util/Curve.h"
 
 
 namespace app

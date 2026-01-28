@@ -110,9 +110,13 @@ namespace app
 			Vector3 moveSpeedVector_ = Vector3::Zero;
 			float inputPower_ = 1.0f;
 
+			Vector3 warpPosition_ = Vector3::Zero;
+			bool isRequestWarp_ = false;
+
 			/** ボタンを押したか */
 			bool isActionA_ = false;
 			bool isActionB_ = false;
+			bool isActionDown_ = false;
 
 
 		public:
@@ -143,9 +147,20 @@ namespace app
 		public:
 			void SetMoveDirection(const Vector3& direction) { moveDirection_ = direction; }
 			const Vector3& GetMoveDirection() const { return moveDirection_; }
+			void ClearMomveSpeedVector() { moveSpeedVector_ = Vector3::Zero; }
 
 			void SetInputPower(const float power) { inputPower_ = power; }
 			float GetInputPower() const { return inputPower_; }
+
+
+			void SetWarpPosition(const Vector3& position)
+			{
+				warpPosition_ = position;
+				isRequestWarp_ = true;
+			}
+			const Vector3& GetWarpPosition() const { return warpPosition_; }
+			const bool IsRequestWarp() const { return isRequestWarp_; }
+			void ClearRequestWarp() { isRequestWarp_ = false; }
 
 
 
@@ -156,6 +171,8 @@ namespace app
 			bool IsActionA() const { return isActionA_; }
 			void SetActionB(const bool isAction) { isActionB_ = isAction; }
 			bool IsActionB() const { return isActionB_; }
+			void SetActionDown(const bool isAction) { isActionDown_ = isAction; }
+			bool IsActionDown() const { return isActionDown_; }
 		};
 
 

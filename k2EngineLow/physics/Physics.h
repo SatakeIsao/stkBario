@@ -178,6 +178,12 @@ namespace nsK2EngineLow {
 #endif 
 
 
+	public:
+		/** Bulletのコアメンバ取得用 */
+		btCollisionDispatcher* GetCollisionDispatcher() { return collisionDispatcher_.get(); }
+		btDispatcherInfo& GetDispatchInfo() { return dynamicWorld_->getDispatchInfo(); }
+
+
 
 
 		/**

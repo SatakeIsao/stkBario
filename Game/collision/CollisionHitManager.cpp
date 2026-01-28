@@ -98,7 +98,14 @@ namespace app
 			auto* battleCharacter = GetHitObject<app::actor::BattleCharacter>(hitPair);
 
 			app::gimmick::EndpointId targetEndpointId;
-			app::gimmick::WarpSystem::Get().TryResolve(pipeGimmick->GetEndpointId(), targetEndpointId);
+			if (!app::gimmick::WarpSystem::Get().TryResolve(pipeGimmick->GetEndpointId(), targetEndpointId)) {
+				return;
+			}
+
+			if (battleCharacter->GetStateMachine()->IsActionDown()) {
+				const Vector3 targetPosition = app::gimmick::WarpSystem::Get().FindPipe(targetEndpointId)->GetMouthPosition();
+				battleCharacter->GetStateMachine()->SetWarpPosition(targetPosition);
+			}
 
 			//if (app::battle::BattleManager::IsAvailable()) {
 			//	app::battle::BattleManager::DamageNotify* notify = new app::battle::BattleManager::DamageNotify();

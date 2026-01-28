@@ -134,5 +134,49 @@ namespace app
 
 			virtual bool CanChangeState() const;
 		};
+
+
+
+
+		class WarpInCharacterState : public ICharacterState
+		{
+			appState(WarpCharacterState);
+
+
+		private:
+			app::util::FloatCurve scaleCurve_;
+
+
+		public:
+			WarpInCharacterState(IStateMachine* owner);
+			~WarpInCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+		};
+
+
+
+
+		class WarpOutCharacterState : public ICharacterState
+		{
+			appState(WarpOutCharacterState);
+
+
+		private:
+			app::util::FloatCurve scaleCurve_;
+
+
+		public:
+			WarpOutCharacterState(IStateMachine* owner);
+			~WarpOutCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+		};
 	}
 }

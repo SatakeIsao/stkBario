@@ -52,6 +52,10 @@ namespace app
 			float radius_ = 0.0f;
 			float height_ = 0.0f;
 
+			float warpStartScale_ = 1.0f;
+			float warpEndScale_ = 0.3f;
+			float warpTimeSeconds_ = 1.0f;
+
 
 		public:
 			virtual ~CharacterStatus() {}
@@ -72,6 +76,17 @@ namespace app
 
 			inline float GetGravity() const { return gravity_; }
 			inline void SetGravity(const float gravity) { gravity_ = gravity; }
+
+
+			inline float GetWarpStartScale() const { return warpStartScale_; }
+			inline float GetWarpEndScale() const { return warpEndScale_; }
+			inline float GetWarpTimeSeconds() const { return warpTimeSeconds_; }
+			inline void SetWarpData(const float startScale, const float endScale, const float timeSeconds)
+			{
+				warpStartScale_ = startScale;
+				warpEndScale_ = endScale;
+				warpTimeSeconds_ = timeSeconds;
+			}
 		};
 
 
