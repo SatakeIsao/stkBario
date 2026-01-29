@@ -43,6 +43,9 @@
     <Filter Include="gimmick">
       <UniqueIdentifier>{6a6cd1f8-88de-425d-a11b-63e605bc9ab8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="camera">
+      <UniqueIdentifier>{6b5d0c9e-a322-4748-b8fc-3b39e9594a46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -51,7 +54,6 @@
       <Filter>system</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="actor\Actor.cpp">
       <Filter>actor</Filter>
     </ClCompile>
@@ -164,6 +166,18 @@
     <ClCompile Include="gimmick\WarpSystem.cpp">
       <Filter>gimmick</Filter>
     </ClCompile>
+    <ClCompile Include="camera\CameraCommon.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="camera\CameraManager.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="camera\CameraController.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="camera\CameraSteering.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -171,7 +185,6 @@
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GameCamera.h" />
     <ClInclude Include="actor\Actor.h">
       <Filter>actor</Filter>
     </ClInclude>
@@ -309,6 +322,18 @@
     </ClInclude>
     <ClInclude Include="gimmick\WarpSystem.h">
       <Filter>gimmick</Filter>
+    </ClInclude>
+    <ClInclude Include="camera\CameraCommon.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera\CameraManager.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera\CameraController.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="camera\CameraSteering.h">
+      <Filter>camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

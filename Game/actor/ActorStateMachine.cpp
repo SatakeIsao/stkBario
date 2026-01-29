@@ -105,10 +105,11 @@ namespace app
 		void CharacterStateMachine::Move(const float deltaTime, const float moveSpeed)
 		{
 			// TODO: 将来的にCharacterControllerを使って衝突判定をする
-			const Vector3 moveVector = ComputeCameraDirection(moveDirection_) * moveSpeed;
+			const Vector3 moveVector = ComputeCameraDirection(moveDirection_);
+			const Vector3 moveSpeedVector = moveVector * moveSpeed;
 			if (inputPower_)
 			{
-				moveSpeedVector_ = moveVector;
+				moveSpeedVector_ = moveSpeedVector;
 			}
 			moveSpeedVector_ *= GetStatus()->GetFriction(); // 摩擦係数的な
 			transform.position += moveSpeedVector_ * deltaTime;

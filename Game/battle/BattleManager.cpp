@@ -13,9 +13,9 @@
 #include "actor/Types.h"
 #include "actor/Gimmick.h"
 #include "gimmick/WarpSystem.h"
-
+#include "camera/CameraManager.h"
+#include "camera/CameraController.h"
 #include "core/ParameterManager.h"
-
 #include "collision/GhostBodyManager.h"
 #include "collision/CollisionHitManager.h"
 
@@ -24,6 +24,7 @@ namespace
 {
 	constexpr const char* MASTER_BATTLE_PARAM_PATH = "Assets/master/battle/MasterBattleParameter.json";
 	constexpr const char* MASTER_STAGE_PARAM_PATH = "Assets/master/battle/MasterStageParameter.json";
+	constexpr const char* MASTER_BATTLE_CAMERA_PARAM_PATH = "Assets/master/battle/MasterBattleCameraParameter.json";
 	constexpr const char* MASTER_BATTLE_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterBattleCharacterParameter.json";
 
 	// Player用
@@ -100,7 +101,9 @@ namespace app
 
 		void BattleManager::Start()
 		{
+			// パラメーター読み込み
 			LoadParameter();
+
 			{
 				characterSteering_ = std::make_unique<app::actor::CharacterSteering>();
 				// マリオにしてみた
@@ -144,8 +147,8 @@ namespace app
 						// 配置
 						int row = i / gimmickColNum;
 						int col = i % gimmickColNum;
-						float x = (static_cast<float>(col) - (gimmickColNum / 2.0f)) * 50.0f;
-						float z = (static_cast<float>(row) - (gimmickRowNum / 2.0f)) * 50.0f;
+						float x = (static_cast<float>(col) - (gimmickColNum / 2.0f)) * 100.0f;
+						float z = (static_cast<float>(row) - (gimmickRowNum / 2.0f)) * 100.0f;
 						testGimmickList_[i]->transform.position = Vector3(x, -50.0f, z);
 						testGimmickList_[i]->transform.scale = Vector3(1.0f, 1.0f, 1.0f);
 						testGimmickList_[i]->Initialize("Assets/ModelData/stage/GroundGreenBlock.tkm");
@@ -164,6 +167,28 @@ namespace app
 					pipeGimmick->transform.localPosition = Vector3(-100.0f, 20.0f, 0.0f);
 					pipeGimmick->transform.UpdateTransform();
 					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 1, 0, Vector3::Down);
+				}
+				// カメラ初期化
+				{
+					auto parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterBattleCameraParameter>();
+					cameraSteering_ = std::make_unique<app::camera::CameraSteering>();
+
+					app::camera::CameraSteering::Config initConfig;
+					initConfig.distance = parameter->distance;
+					initConfig.height = parameter->height;
+					initConfig.rotationSpeedX = parameter->rotationX;
+					initConfig.rotationSpeedY = parameter->rotationY;
+					app::camera::CameraData initData;
+					initData.fov = Math::DegToRad(parameter->fov);
+					initData.farClip = parameter->farClip;
+					cameraSteering_->SetConfig(initConfig);
+					cameraSteering_->SetTargetCharacter(battleCharacter_);
+
+					auto gameCamera = std::make_shared<app::camera::GameCamera>();
+					gameCamera->SetState(initData);
+					gameCameraController_ = gameCamera;
+					app::camera::CameraManager::Get().Register(app::camera::GameCamera::ID(), gameCameraController_);
+					app::camera::CameraManager::Get().SwitchCamera(gameCameraController_);
 				}
 			}
 		}
@@ -188,6 +213,11 @@ namespace app
 				}
 				notifyList_.clear();
 			}
+
+			auto gameCamera = gameCameraController_->As<app::camera::GameCamera>();
+			auto cameraData = gameCamera->GetCameraData();
+			cameraSteering_->Update(cameraData, g_gameTime->GetFrameDeltaTime());
+			gameCamera->SetState(cameraData);
 		}
 
 
@@ -207,6 +237,17 @@ namespace app
 					p.warpStartScale = json["warpStartScale"].get<float>();
 					p.warpEndScale = json["warpEndScale"].get<float>();
 					p.warpTime = json["warpTime"].get<float>();
+				});
+			// バトルカメラパラメーター読み込み
+			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCameraParameter>(MASTER_BATTLE_CAMERA_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCameraParameter& p)
+				{
+					p.distance = json["distance"].get<float>();
+					p.height = json["height"].get<float>();
+					p.fov = json["fov"].get<float>();
+					p.nearClip = json["nearClip"].get<float>();
+					p.farClip = json["farClip"].get<float>();
+					p.rotationX = json["rotationX"].get<float>();
+					p.rotationY = json["rotationY"].get<float>();
 				});
 			// バトルキャラクターパラメーター読み込み
 			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)

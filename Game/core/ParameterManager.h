@@ -92,6 +92,21 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
+		/** バトルカメラ */
+		struct MasterBattleCameraParameter : public IParameter
+		{
+			appParameter(MasterBattleCameraParameter);
+			
+			float distance;		// カメラ距離
+			float height;			// カメラ高さ
+			float fov;			// カメラFOV
+			float nearClip;		// ニアクリップ
+			float farClip;		// ファークリップ
+			float rotationX;	// 回転X
+			float rotationY;	// 回転Y
+		};
+
+
 		#undef appParameter
 
 		/**

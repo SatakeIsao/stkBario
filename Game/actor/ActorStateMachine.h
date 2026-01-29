@@ -147,6 +147,7 @@ namespace app
 		public:
 			void SetMoveDirection(const Vector3& direction) { moveDirection_ = direction; }
 			const Vector3& GetMoveDirection() const { return moveDirection_; }
+			const Vector3& GetMoveSpeedVector() const { return moveSpeedVector_; }
 			void ClearMomveSpeedVector() { moveSpeedVector_ = Vector3::Zero; }
 
 			void SetInputPower(const float power) { inputPower_ = power; }

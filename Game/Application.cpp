@@ -6,7 +6,8 @@
 #include "stdafx.h"
 #include "Application.h"
 #include "Game.h"
-
+#include "camera/CameraManager.h"
+#include "camera/CameraController.h"
 
 namespace app
 {
@@ -42,6 +43,10 @@ namespace app
 		CollisionObjectManager m_collisionObjectManager;
 		g_collisionObjectManager = &m_collisionObjectManager;
 
+		// カメラマネージャー初期化
+		app::camera::CameraManager::Initialize();
+		app::camera::CameraManager::Get().Setup(g_camera3D);
+
 		// ここから下でゲーム固有の初期化処理を行う。
 		game_ = NewGO<Game>(static_cast<uint8_t>(ObjectPriority::Default));
 	}
@@ -62,11 +67,28 @@ namespace app
 		
 		GameObjectManager::GetInstance()->ExecuteUpdate();
 		
+		// カメラマネージャーの更新。
+		app::camera::CameraManager::Get().Update(g_gameTime->GetFrameDeltaTime());
+
 		//物理エンジンのアップデートを呼び出す。
 		PhysicsWorld::Get().Update(1.0f / 60.0f);	// 固定値で更新
 
 		// エフェクトエンジンの更新。
 		EffectEngine::GetInstance()->Update(g_gameTime->GetFrameDeltaTime());
+
+
+#if defined(APP_DEBUG)
+		if (GetAsyncKeyState(VK_F2)) {
+			static bool isUseDebugCamera = false;
+			if (!isUseDebugCamera) {
+				app::camera::RefCameraController debugCamera = std::make_shared<app::camera::DebugCamera>();
+				app::camera::CameraManager::Get().SwitchCamera(debugCamera);
+			} else {
+				app::camera::CameraManager::Get().SwitchPrevCamera();
+			}
+			isUseDebugCamera = !isUseDebugCamera;
+		}
+#endif// APP_DEBUG
 	}
 
 

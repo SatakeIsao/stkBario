@@ -73,7 +73,7 @@ namespace app
 			auto* characterStatus = characterStateMachine->GetStatus();
 			characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetMoveSpeed());
 
-			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveDirection());
+			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveSpeedVector());
 		}
 
 
@@ -143,10 +143,7 @@ namespace app
 
 			auto* characterStatus = characterStateMachine->GetStatus();
 			characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetJumpMoveSpeed());
-
-			Quaternion rotation;
-			rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveDirection());
-			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveDirection());
+			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveSpeedVector());
 		}
 
 

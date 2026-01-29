@@ -3,6 +3,8 @@
  * バトル管理
  */
 #pragma once
+#include "camera/CameraCommon.h"
+#include "camera/CameraSteering.h"
 
 
 namespace app
@@ -57,10 +59,12 @@ namespace app
             // @todo for test
             app::actor::BattleCharacter* battleCharacter_ = nullptr;
             app::actor::EventCharacter* eventCharacter_ = nullptr;
-            std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
-
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
-
+            
+            std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
+			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
+			app::camera::RefCameraController gameCameraController_ = nullptr;
+            /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
 
 

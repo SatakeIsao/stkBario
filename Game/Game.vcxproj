@@ -233,6 +233,10 @@
     <ClCompile Include="actor\Gimmick.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="battle\BattleManager.cpp" />
+    <ClCompile Include="camera\CameraCommon.cpp" />
+    <ClCompile Include="camera\CameraController.cpp" />
+    <ClCompile Include="camera\CameraManager.cpp" />
+    <ClCompile Include="camera\CameraSteering.cpp" />
     <ClCompile Include="collision\BoundingVolume.cpp" />
     <ClCompile Include="collision\BroadphaseImpl.cpp" />
     <ClCompile Include="collision\BroadphaseInterface.cpp" />
@@ -246,7 +250,6 @@
     <ClCompile Include="core\TaskSchedulerSystem.cpp" />
     <ClCompile Include="effect\EffectManager.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="gimmick\WarpSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Transform.cpp" />
@@ -283,6 +286,10 @@
     <ClInclude Include="actor\Types.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="battle\BattleManager.h" />
+    <ClInclude Include="camera\CameraCommon.h" />
+    <ClInclude Include="camera\CameraController.h" />
+    <ClInclude Include="camera\CameraManager.h" />
+    <ClInclude Include="camera\CameraSteering.h" />
     <ClInclude Include="collision\BoundingVolume.h" />
     <ClInclude Include="collision\BroadphaseImpl.h" />
     <ClInclude Include="collision\BroadphaseInterface.h" />
@@ -298,7 +305,6 @@
     <ClInclude Include="effect\EffectManager.h" />
     <ClInclude Include="effect\Types.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GameCamera.h" />
     <ClInclude Include="gimmick\WarpSystem.h" />
     <ClInclude Include="json\json.hpp" />
     <ClInclude Include="math\Transform.h" />
