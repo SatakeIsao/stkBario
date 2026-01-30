@@ -53,7 +53,6 @@
     <ClCompile Include="system\system.cpp">
       <Filter>system</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="actor\Actor.cpp">
       <Filter>actor</Filter>
     </ClCompile>
@@ -178,13 +177,15 @@
     <ClCompile Include="camera\CameraSteering.cpp">
       <Filter>camera</Filter>
     </ClCompile>
+    <ClCompile Include="memory\Allocator.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h">
       <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h" />
     <ClInclude Include="actor\Actor.h">
       <Filter>actor</Filter>
     </ClInclude>
@@ -334,6 +335,9 @@
     </ClInclude>
     <ClInclude Include="camera\CameraSteering.h">
       <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\Allocator.h">
+      <Filter>memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

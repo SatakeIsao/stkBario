@@ -30,8 +30,8 @@ public:
 };
 
 
-class Game;
-
+class SceneManagerObject;
+class FadeObject;
 
 namespace app
 {
@@ -42,7 +42,8 @@ namespace app
 		SceneLight sceneLight_;
 		RenderingEngine renderingEngine_;
 
-		Game* game_ = nullptr;
+		SceneManagerObject* m_sceneManager = nullptr;
+		FadeObject* m_fadeObject = nullptr;
 
 
 	public:

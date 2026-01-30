@@ -63,6 +63,9 @@ namespace app
 
         void CameraManager::SwitchCamera(RefCameraController controller, const float blendTime)
         {
+#if defined(APP_DEBUG)
+            prev_ = current_;
+#endif
             if (!current_ || blendTime <= 0.0f) {
                 // ‘¦ŽžØ‚è‘Ö‚¦
                 current_ = controller;

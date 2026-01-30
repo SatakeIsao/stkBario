@@ -249,10 +249,10 @@
     <ClCompile Include="core\ParameterManager.cpp" />
     <ClCompile Include="core\TaskSchedulerSystem.cpp" />
     <ClCompile Include="effect\EffectManager.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="gimmick\WarpSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Transform.cpp" />
+    <ClCompile Include="memory\Allocator.cpp" />
     <ClCompile Include="memory\Memory.cpp" />
     <ClCompile Include="scene\BootScene.cpp" />
     <ClCompile Include="scene\DebugScene.cpp" />
@@ -304,10 +304,10 @@
     <ClInclude Include="core\TaskSchedulerSystem.h" />
     <ClInclude Include="effect\EffectManager.h" />
     <ClInclude Include="effect\Types.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="gimmick\WarpSystem.h" />
     <ClInclude Include="json\json.hpp" />
     <ClInclude Include="math\Transform.h" />
+    <ClInclude Include="memory\Allocator.h" />
     <ClInclude Include="memory\Memory.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="scene\BootScene.h" />

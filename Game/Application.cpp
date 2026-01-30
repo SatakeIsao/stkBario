@@ -5,19 +5,31 @@
  */
 #include "stdafx.h"
 #include "Application.h"
-#include "Game.h"
+#include "core/Fade.h"
+#include "core/ParameterManager.h"
 #include "camera/CameraManager.h"
 #include "camera/CameraController.h"
+#include "scene/SceneManager.h"
+#include "sound/SoundManager.h"
+
 
 namespace app
 {
 	Application::Application()
 	{
+		constexpr size_t HEAP_ALLOCATOR_SIZE = static_cast<size_t>(1024) * 1024 * 1024 * 2; // 2GB
+		app::memory::Allocator::Get().Initialize(HEAP_ALLOCATOR_SIZE);
 	}
 
 
 	Application::~Application()
 	{
+		DeleteGO(m_sceneManager);
+		DeleteGO(m_fadeObject);
+		app::SoundManager::Finalize();
+		app::core::ParameterManager::Finalize();
+
+		app::memory::Allocator::Get().Shutdown();
 	}
 
 
@@ -26,10 +38,8 @@ namespace app
 		// k2EngineLowの初期化。
 		k2EngineLow_ = new K2EngineLow();
 		k2EngineLow_->Init(hwnd, FRAME_BUFFER_W, FRAME_BUFFER_H);
-		g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f });
-		g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });
-
-		PhysicsWorld::Initialize();
+		g_camera3D->SetPosition(Vector3(0.0f, 100.0f, -200.0f));
+		g_camera3D->SetTarget(Vector3(0.0f, 50.0f, 0.0f));
 
 		//シーンライト初期化
 		sceneLight_.Init();
@@ -38,17 +48,24 @@ namespace app
 		renderingEngine_.Init();
 		g_renderingEngine = &renderingEngine_;
 
-		// コリジョンオブジェクトマネージャー
-		// TODO: あとで消す
-		CollisionObjectManager m_collisionObjectManager;
-		g_collisionObjectManager = &m_collisionObjectManager;
+		PhysicsWorld::Initialize();
 
+		// ===========================================================
+		// ここから下でゲーム固有の初期化処理を行う。
+		// ===========================================================
+		
 		// カメラマネージャー初期化
 		app::camera::CameraManager::Initialize();
 		app::camera::CameraManager::Get().Setup(g_camera3D);
 
-		// ここから下でゲーム固有の初期化処理を行う。
-		game_ = NewGO<Game>(static_cast<uint8_t>(ObjectPriority::Default));
+		// パラメーター管理生成
+		app::core::ParameterManager::Initialize();
+		// サウンド管理生成
+		app::SoundManager::Initialize();
+		// Fade処理生成
+		m_fadeObject = NewGO<FadeObject>(static_cast<uint8_t>(ObjectPriority::Fade));
+		// シーン管理生成
+		m_sceneManager = NewGO<SceneManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
 	}
 
 
@@ -78,15 +95,23 @@ namespace app
 
 
 #if defined(APP_DEBUG)
+		static bool isTriggerDebugCameraKey = false;
 		if (GetAsyncKeyState(VK_F2)) {
-			static bool isUseDebugCamera = false;
-			if (!isUseDebugCamera) {
-				app::camera::RefCameraController debugCamera = std::make_shared<app::camera::DebugCamera>();
-				app::camera::CameraManager::Get().SwitchCamera(debugCamera);
-			} else {
-				app::camera::CameraManager::Get().SwitchPrevCamera();
+			if (!isTriggerDebugCameraKey) {
+				static bool isUseDebugCamera = false;
+				if (!isUseDebugCamera) {
+					app::camera::RefCameraController debugCamera = std::make_shared<app::camera::DebugCamera>();
+					app::camera::CameraManager::Get().SwitchCamera(debugCamera);
+				}
+				else {
+					app::camera::CameraManager::Get().SwitchPrevCamera();
+				}
+				isUseDebugCamera = !isUseDebugCamera;
+				isTriggerDebugCameraKey = true;
 			}
-			isUseDebugCamera = !isUseDebugCamera;
+		}
+		else {
+			isTriggerDebugCameraKey = false;
 		}
 #endif// APP_DEBUG
 	}
@@ -124,8 +149,6 @@ namespace app
 
 	void Application::Finalize()
 	{
-		DeleteGO(game_);
-
 		PhysicsWorld::Finalize();
 
 		delete k2EngineLow_;

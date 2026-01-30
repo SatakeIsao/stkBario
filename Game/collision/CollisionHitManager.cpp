@@ -57,16 +57,21 @@ namespace app
 		{
 			// GhostBodyのヒット処理で得たペアをもとに処理
 			{
-				std::vector<Pair*> pipeHitPairList;
-				for (auto& hitPair : hitPairList_) {
-					// 土管のペアか
-					if (ContainsPipeGimmickPair(hitPair)) {
-						pipeHitPairList.push_back(&hitPair);
-					}
-				}
+				app::memory::StackAllocatorMarker marker;
+				{
+					app::memory::StackVector<Pair*>  pipeHitPairList(marker);
 
-				for (auto* pair : pipeHitPairList) {
-					UpdatePipeGimmickPair(*pair);
+					//std::vector<Pair*> pipeHitPairList;
+					for (auto& hitPair : hitPairList_) {
+						// 土管のペアか
+						if (ContainsPipeGimmickPair(hitPair)) {
+							pipeHitPairList.push_back(&hitPair);
+						}
+					}
+
+					for (auto* pair : pipeHitPairList) {
+						UpdatePipeGimmickPair(*pair);
+					}
 				}
 			}
 			hitPairList_.clear();
