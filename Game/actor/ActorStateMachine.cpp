@@ -235,6 +235,15 @@ namespace app
 					}
 				}
 			}
+			// 落下
+			{
+				if (!GetCharacterController()->IsOnGround()) {
+					if (!IsEqualCurrentState(FallingCharacterState::ID())) {
+						RequestChangeState(FallingCharacterState::ID());
+					}
+					return;
+				}
+			}
 
 			const Vector3 direction = moveSpeedVector_;
 			if (direction.LengthSq() >= MOVE_MIN_FLOAT || inputPower_ >= MOVE_MIN_FLOAT)

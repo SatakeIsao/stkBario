@@ -63,8 +63,10 @@ namespace app
 		}
 
 
-		void BattleCharacter::Initialize(const CharacterInitializeParameter& param)
+		void BattleCharacter::Initialize(CharacterInitializeParameter& param)
 		{
+			param.Load();
+
 			const uint32_t animationCount = static_cast<uint32_t>(param.animationDataList.size());
 			animationClips_.Create(animationCount);
 			for (uint32_t i = 0; i < animationCount; ++i) {

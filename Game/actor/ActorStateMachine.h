@@ -110,7 +110,8 @@ namespace app
 			Vector3 moveSpeedVector_ = Vector3::Zero;
 			float inputPower_ = 1.0f;
 
-			Vector3 warpPosition_ = Vector3::Zero;
+			Vector3 warpStartPosition_ = Vector3::Zero;
+			Vector3 warpEndPosition_ = Vector3::Zero;
 			bool isRequestWarp_ = false;
 
 			/** ボタンを押したか */
@@ -154,12 +155,14 @@ namespace app
 			float GetInputPower() const { return inputPower_; }
 
 
-			void SetWarpPosition(const Vector3& position)
+			void SetWarpPosition(const Vector3& start, const Vector3& end)
 			{
-				warpPosition_ = position;
+				warpStartPosition_ = start;
+				warpEndPosition_ = end;
 				isRequestWarp_ = true;
 			}
-			const Vector3& GetWarpPosition() const { return warpPosition_; }
+			const Vector3& GetWarpStartPosition() const { return warpStartPosition_; }
+			const Vector3& GetWarpEndPosition() const { return warpEndPosition_; }
 			const bool IsRequestWarp() const { return isRequestWarp_; }
 			void ClearRequestWarp() { isRequestWarp_ = false; }
 

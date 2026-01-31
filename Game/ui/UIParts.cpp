@@ -116,17 +116,66 @@ namespace app
 		}
 
 
-		void UIIcon::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
+		void UIIcon::Initialize(const char* assetName, const float width, const float height)
 		{
-			transform.localPosition = position;
-			transform.localScale = scale;
-			transform.localRotation = rotation;
-
 			spriteRender_.Init(assetName, width, height);
-			spriteRender_.SetPosition(position);
-			spriteRender_.SetScale(scale);
-			spriteRender_.SetRotation(rotation);
-			spriteRender_.Update();
+		}
+
+
+
+
+		/********************************/
+
+
+		UIText::UIText()
+		{
+		}
+
+
+		UIText::~UIText()
+		{
+		}
+
+
+		void UIText::Update()
+		{
+			UpdateAnimation();
+
+			transform.UpdateTransform();
+			fontRender_.SetPosition(transform.position);
+			fontRender_.SetScale(transform.scale.x);
+			fontRender_.SetColor(color);
+		}
+
+
+		void UIText::Render(RenderContext& rc)
+		{
+			fontRender_.Draw(rc);
+		}
+
+
+
+
+		/********************************/
+
+
+		UIButton::UIButton()
+		{
+		}
+
+
+		UIButton::~UIButton()
+		{
+		}
+
+
+		void UIButton::Update()
+		{
+		}
+
+
+		void UIButton::Render(RenderContext& rc)
+		{
 		}
 
 

@@ -19,7 +19,7 @@ namespace app
 			Idle,
 			Run,
 			JumpAscend,		// 上昇
-			JumpDescend,	// 落下
+			JumpFalling,	// 落下
 			JumpLand,		// 着地
 			Punch,
 			Max

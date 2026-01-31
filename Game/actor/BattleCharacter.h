@@ -35,7 +35,7 @@ namespace app
 
 
 		public:
-			void Initialize(const CharacterInitializeParameter& param) override final;
+			void Initialize(CharacterInitializeParameter& param) override final;
 
 
 		public:

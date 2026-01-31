@@ -17,6 +17,8 @@ namespace app
 		 */
 		struct CharacterInitializeParameter
 		{
+			using LoaderFunc = std::function<void(CharacterInitializeParameter* parameter)>;
+
 			struct AnimationData
 			{
 				const char* filename;
@@ -25,10 +27,15 @@ namespace app
 
 			const char* modelName = nullptr;
 			app::memory::Array<AnimationData> animationDataList;
+			LoaderFunc loaderFunc = nullptr;
 			//
-			CharacterInitializeParameter(const std::function<void(CharacterInitializeParameter* parameter)>& func)
+			CharacterInitializeParameter(const LoaderFunc& func)
 			{
-				func(this);
+				loaderFunc = std::move(func);
+			}
+			void Load()
+			{
+				loaderFunc(this);
 			}
 		};
 
@@ -56,7 +63,7 @@ namespace app
 			void Update() override;
 			void Render(RenderContext& rc) override;
 
-			virtual void Initialize(const CharacterInitializeParameter& param) = 0;
+			virtual void Initialize(CharacterInitializeParameter& param) = 0;
 
 			app::actor::CharacterStatus* GetStatus() { return status_; }
 			ModelRender* GetModelRender() { return modelRender_.get(); }

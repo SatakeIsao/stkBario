@@ -121,12 +121,12 @@ namespace app
 			{
 				// 上昇が終わったら落下フェーズへ
 				if (characterStateMachine->GetCharacterController()->GetVerticalVelocity() < 0.0f) {
-					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend));
-					jumpPhase_ = JumpPhase::Descend;
+					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling));
+					jumpPhase_ = JumpPhase::Falling;
 				}
 				break;
 			}
-			case JumpPhase::Descend:
+			case JumpPhase::Falling:
 			{
 				// 地面に着地したら着地フェーズへ
 				if (characterStateMachine->GetCharacterController()->IsOnGround()) {
@@ -167,6 +167,43 @@ namespace app
 				return false;
 			}
 			return true;
+		}
+
+
+
+
+		/*************************************/
+
+
+		FallingCharacterState::FallingCharacterState(IStateMachine* owner)
+			: ICharacterState(owner)
+		{
+		}
+
+
+		FallingCharacterState::~FallingCharacterState()
+		{
+		}
+
+
+		void FallingCharacterState::Enter()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling));
+		}
+
+
+		void FallingCharacterState::Update()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			auto* characterStatus = characterStateMachine->GetStatus();
+			characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetJumpMoveSpeed());
+			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveSpeedVector());
+		}
+
+
+		void FallingCharacterState::Exit()
+		{
 		}
 
 
@@ -246,23 +283,30 @@ namespace app
 		void WarpInCharacterState::Enter()
 		{
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend));
+			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling));
 			characterStateMachine->SetInputPower(0.0f);
 			characterStateMachine->ClearMomveSpeedVector();
 			auto* characterStatus = characterStateMachine->GetStatus();
 			scaleCurve_.Initialize(characterStatus->GetWarpStartScale(), characterStatus->GetWarpEndScale(), characterStatus->GetWarpTimeSeconds(), app::util::EasingType::Linear);
 			scaleCurve_.Play();
+			translateCurve_.Initialize(characterStateMachine->transform.position, characterStateMachine->GetWarpStartPosition(), characterStatus->GetWarpTimeSeconds() * 0.3f, app::util::EasingType::Linear);
+			translateCurve_.Play();
 		}
 
 
 		void WarpInCharacterState::Update()
 		{
-			scaleCurve_.Update(g_gameTime->GetFrameDeltaTime());
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			scaleCurve_.Update(deltaTime);
+			translateCurve_.Update(deltaTime);
 
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->GetCharacterController()->RequestTeleport();
 			characterStateMachine->transform.scale = Vector3(scaleCurve_.GetCurrentValue());
+			Vector3 newPosition = translateCurve_.GetCurrentValue();
+			characterStateMachine->transform.position.x = newPosition.x;
 			characterStateMachine->transform.position.y -= 1.0f; // NOTE: 下に埋め込みたいので
+			characterStateMachine->transform.position.z = newPosition.z;
 		}
 
 
@@ -270,7 +314,7 @@ namespace app
 		{
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->GetCharacterController()->RequestTeleport();
-			characterStateMachine->transform.position = characterStateMachine->GetWarpPosition();
+			characterStateMachine->transform.position = characterStateMachine->GetWarpEndPosition();
 		}
 
 

@@ -16,6 +16,7 @@ namespace app
 		public:
 			app::math::Transform transform;
 			Vector4 color = Vector4::White;
+			Vector2 pivot = Vector2(0.5f, 0.5f);
 
 			bool isDraw = true;
 
@@ -138,11 +139,12 @@ namespace app
 			virtual void Update() override;
 			virtual void Render(RenderContext& rc) override;
 
-		public:
-			/** スプライトレンダーの取得 */
-			SpriteRender* GetSpriteRender() { return &spriteRender_; }
+			void SetPivot(const Vector2& pivot)
+			{
+				this->pivot = pivot;
+				spriteRender_.SetPivot(pivot);
+			}
 		};
-
 
 
 		/**
@@ -180,7 +182,7 @@ namespace app
 
 
 		public:
-			void Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation);
+			void Initialize(const char* assetName, const float width, const float height);
 		};
 
 
@@ -205,6 +207,19 @@ namespace app
 		public:
 			virtual void Update() override;
 			virtual void Render(RenderContext& rc) override;
+
+
+			void SetPivot(const Vector2& pivot)
+			{
+				this->pivot = pivot;
+				fontRender_.SetPivot(pivot);
+			}
+
+
+			void SetText(const wchar_t* text)
+			{
+				fontRender_.SetText(text);
+			}
 		};
 
 
@@ -220,13 +235,13 @@ namespace app
 
 
 		public:
-			UIButton() {}
-			~UIButton() {}
+			UIButton();
+			~UIButton();
 
 
 		public:
-			virtual void Update() override {}
-			virtual void Render(RenderContext& rc) override {}
+			virtual void Update() override;
+			virtual void Render(RenderContext& rc) override;
 		};
 
 

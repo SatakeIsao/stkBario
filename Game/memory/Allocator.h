@@ -44,10 +44,10 @@ namespace app
 		private:
 			struct alignas(ALIGNMENT) BlockHeader
 			{
-				size_t size;             // データ部のサイズ
-				bool isUsed;             // 使用中フラグ
-				BlockHeader* prevPhys;   // 物理的な前のブロック(結合用)
-				BlockHeader* nextPhys;   // 物理的な次のブロック(結合用)
+				size_t size = 0;					// データ部のサイズ
+				bool isUsed = false;				// 使用中フラグ
+				BlockHeader* prevPhys = nullptr;	// 物理的な前のブロック(結合用)
+				BlockHeader* nextPhys = nullptr;	// 物理的な次のブロック(結合用)
 
 #if defined(APP_ENABLE_DEBUG_ALLOCATOR)
 				// デバッグ情報
@@ -178,7 +178,7 @@ namespace app
 
 				header->isUsed = false;
 
-				// 結合(Coalescing) - 前後が空いていればくっつける
+				// 結合。前後が空いていればくっつける
 				if (header->nextPhys && !header->nextPhys->isUsed) Coalesce(header, header->nextPhys);
 				if (header->prevPhys && !header->prevPhys->isUsed) Coalesce(header->prevPhys, header);
 

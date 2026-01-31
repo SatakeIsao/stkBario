@@ -93,7 +93,7 @@ namespace app
 			enum class JumpPhase
 			{
 				Ascend,		// 上昇
-				Descend,	// 落下
+				Falling,	// 落下
 				Land		// 着地
 			};
 
@@ -110,6 +110,22 @@ namespace app
 			void Exit() override;
 
 			virtual bool CanChangeState() const;
+		};
+
+
+
+
+		class FallingCharacterState : public ICharacterState
+		{
+			appState(FallingCharacterState);
+
+
+		public:
+			FallingCharacterState(IStateMachine* owner);
+			~FallingCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
 		};
 
 
@@ -144,6 +160,7 @@ namespace app
 
 
 		private:
+			app::util::Vector3Curve translateCurve_;
 			app::util::FloatCurve scaleCurve_;
 
 

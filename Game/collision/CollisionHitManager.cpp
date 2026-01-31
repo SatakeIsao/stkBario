@@ -58,20 +58,16 @@ namespace app
 			// GhostBodyのヒット処理で得たペアをもとに処理
 			{
 				app::memory::StackAllocatorMarker marker;
-				{
-					app::memory::StackVector<Pair*>  pipeHitPairList(marker);
-
-					//std::vector<Pair*> pipeHitPairList;
-					for (auto& hitPair : hitPairList_) {
-						// 土管のペアか
-						if (ContainsPipeGimmickPair(hitPair)) {
-							pipeHitPairList.push_back(&hitPair);
-						}
+				app::memory::StackVector<Pair*>  pipeHitPairList(marker);
+				for (auto& hitPair : hitPairList_) {
+					// 土管のペアか
+					if (ContainsPipeGimmickPair(hitPair)) {
+						pipeHitPairList.push_back(&hitPair);
 					}
+				}
 
-					for (auto* pair : pipeHitPairList) {
-						UpdatePipeGimmickPair(*pair);
-					}
+				for (auto* pair : pipeHitPairList) {
+					UpdatePipeGimmickPair(*pair);
 				}
 			}
 			hitPairList_.clear();
@@ -108,8 +104,9 @@ namespace app
 			}
 
 			if (battleCharacter->GetStateMachine()->IsActionDown()) {
-				const Vector3 targetPosition = app::gimmick::WarpSystem::Get().FindPipe(targetEndpointId)->GetMouthPosition();
-				battleCharacter->GetStateMachine()->SetWarpPosition(targetPosition);
+				const Vector3 startPosition = pipeGimmick->GetMouthPosition();
+				const Vector3 endPosition = app::gimmick::WarpSystem::Get().FindPipe(targetEndpointId)->GetMouthPosition();
+				battleCharacter->GetStateMachine()->SetWarpPosition(startPosition, endPosition);
 			}
 
 			//if (app::battle::BattleManager::IsAvailable()) {

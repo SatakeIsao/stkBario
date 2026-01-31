@@ -39,8 +39,10 @@ namespace app
 		}
 
 
-		void EventCharacter::Initialize(const CharacterInitializeParameter& param)
+		void EventCharacter::Initialize(CharacterInitializeParameter& param)
 		{
+			param.Load();
+
 			modelRender_ = std::make_unique<ModelRender>();
 			modelRender_->Init(param.modelName);
 

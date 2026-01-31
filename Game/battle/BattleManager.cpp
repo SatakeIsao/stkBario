@@ -42,8 +42,8 @@ namespace
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend)].filename = "Assets/animData/player/PlayerJump_Start.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend)].loop = false;
 
-			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend)].filename = "Assets/animData/player/PlayerJump_Loop.tka";
-			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpDescend)].loop = false;
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling)].filename = "Assets/animData/player/PlayerJump_Loop.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling)].loop = false;
 
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].filename = "Assets/animData/player/PlayerJump_End.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].loop = false;
@@ -114,6 +114,7 @@ namespace app
 						battleCharacter_->AddState<app::actor::IdleCharacterState>();
 						battleCharacter_->AddState<app::actor::RunCharacterState>();
 						battleCharacter_->AddState<app::actor::JumpCharacterState>();
+						battleCharacter_->AddState<app::actor::FallingCharacterState>();
 						battleCharacter_->AddState<app::actor::PunchCharacterState>();
 						battleCharacter_->AddState<app::actor::WarpInCharacterState>();
 						battleCharacter_->AddState<app::actor::WarpOutCharacterState>();
