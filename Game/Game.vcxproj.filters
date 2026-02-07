@@ -339,6 +339,12 @@
     <ClInclude Include="memory\Allocator.h">
       <Filter>memory</Filter>
     </ClInclude>
+    <ClInclude Include="util\JobSystem.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Users\t-sugahara\Desktop\ParallelFor\ParallelFor\GameTask.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

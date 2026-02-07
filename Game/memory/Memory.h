@@ -43,9 +43,9 @@ namespace app
 #else
 #define appNew(Type, ...) New<Type>(##__VA_ARGS__)
 #endif // APP_ENABLE_DEBUG_ALLOCATOR
-#define appDELETE(Ptr)    Delete(Ptr)
-#define appALLOC(Size)    Allocator::Get().Allocate(Size, __FILE__, __LINE__, "RawBlock")
-#define appFREE(Ptr)      Allocator::Get().Free(Ptr)
+#define appDelete(Ptr)    Delete(Ptr)
+#define appAlloc(Size)    Allocator::Get().Allocate(Size, __FILE__, __LINE__, "RawBlock")
+#define appFree(Ptr)      Allocator::Get().Free(Ptr)
 
 
 		/** 固定配列を扱いやすくしたクラス */

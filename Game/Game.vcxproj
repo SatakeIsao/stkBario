@@ -275,6 +275,7 @@
     <ClCompile Include="util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Users\t-sugahara\Desktop\ParallelFor\ParallelFor\GameTask.h" />
     <ClInclude Include="actor\Actor.h" />
     <ClInclude Include="actor\ActorState.h" />
     <ClInclude Include="actor\ActorStateMachine.h" />
@@ -327,6 +328,7 @@
     <ClInclude Include="ui\UIParts.h" />
     <ClInclude Include="Util\CRC32.h" />
     <ClInclude Include="util\Curve.h" />
+    <ClInclude Include="util\JobSystem.h" />
     <ClInclude Include="util\ParallelFor.h" />
     <ClInclude Include="util\ThreadPool.h" />
     <ClInclude Include="util\util.h" />

@@ -4,6 +4,7 @@
 #include "actor/Gimmick.h"
 #include "battle/BattleManager.h"
 #include "gimmick/WarpSystem.h"
+#include "util/ParallelFor.h"
 
 
 namespace

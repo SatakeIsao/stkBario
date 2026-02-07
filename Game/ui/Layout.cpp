@@ -92,9 +92,9 @@ namespace
         const Vector4 color = ParseVector3(item["color"]);
 
         image->Initialize(assetName.c_str(), w, h);
-        image->transform.position = position;
-		image->transform.scale = scale;
-		image->transform.rotation = rotation;
+        image->transform.localPosition = position;
+		image->transform.localScale = scale;
+		image->transform.localRotation = rotation;
 		image->color = color;
     }
     void InitializeUIParts(app::ui::UIText* text, const nlohmann::json& item)
