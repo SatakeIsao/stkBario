@@ -114,6 +114,9 @@ namespace app
 			Vector3 warpEndPosition_ = Vector3::Zero;
 			bool isRequestWarp_ = false;
 
+			/** 移動にカメラの向きを考慮するか */
+			bool isUseCameraDirection_ = true;
+
 			/** ボタンを押したか */
 			bool isActionA_ = false;
 			bool isActionB_ = false;
@@ -126,6 +129,19 @@ namespace app
 
 			virtual void Initialize() override {}
 			virtual void Update() override;
+
+			/** 攻撃ステートに入った時の固有処理 */
+			virtual void OnEnterAttack() {}
+			/** 攻撃ステートから抜ける時の固有処理 */
+			virtual void OnExitAttack() {}
+			/** ノックバックステートに入った時の固有処理 */
+			virtual void OnEnterKnockBack() {}
+			/** ノックバックステートから抜ける時の固有処理 */
+			virtual void OnExitKnockBack() {}
+			/** 死んだステートに入った時の固有処理 */
+			virtual void OnEnterDead() {}
+			/** 死んだステートから抜ける時の固有処理 */
+			virtual void OnExitDead() {}
 
 			void Move(const float deltaTime, const float moveSpeed);
 			void Jump(const float jumoPower);
@@ -186,8 +202,16 @@ namespace app
 		{
 		private:
 			using SuperClass = CharacterStateMachine;
-
-
+			/** AI用のタイマー */
+			float aiTimer_ = 0.0f;
+			/** 最初の待機時間 */
+			const float WAIT_TIME = 1.0f;
+			/** 死んだか */
+			bool isDead_ = false;
+			/** ノックバックしたか */
+			bool isKnockBack_ = false;
+			/** パンチしたか */
+			bool isPunched_ = false;
 		public:
 			BattleCharacterStateMachine();
 			virtual ~BattleCharacterStateMachine();
@@ -197,9 +221,143 @@ namespace app
 
 			virtual uint32_t GetCharacterID() const override;
 
+			virtual void OnEnterKnockBack() override;
+			virtual void OnExitKnockBack() override;
+
+			virtual void OnEnterDead() override;
+			virtual void OnExitDead() override;
 
 		private:
 			void UpdateState();
+
+		public:
+			/** 死んだことを教える */
+			void OnDead()
+			{
+				isDead_ = true;
+			}
+			/** ノックバックしたことを教える */
+			void OnKnockBack()
+			{
+				if (IsEqualCurrentState(KnockBackCharacterState::ID())){
+					return;
+				}
+				isKnockBack_ = true;
+			}
+
+			//TODO: Isに変更
+			/** ノックバックしたことを取得 */
+			bool GetKnockBack()
+			{
+				return isKnockBack_;
+			}
+			/** パンチしたことを取得 */
+			bool IsPunched()
+			{
+				return isPunched_;
+			}
+		};
+
+
+
+
+		class EventCharacterStateMachine : public CharacterStateMachine
+		{
+		private:
+			using SuperClass = CharacterStateMachine;
+			app::collision::GhostBody* attackBody_ = nullptr;
+			std::unique_ptr<app::core::TaskSchedulerSystem> attackScheduler_;
+
+			Vector3 targetPosition_ = Vector3::Zero;
+			Vector3 chaseDirection_ = Vector3::Zero;
+			Vector3 knockBackDirection_ = Vector3::Zero;
+			/** AI用のタイマー */
+			float aiTimer_ = 0.0f;
+			/** 最初の待機時間 */
+			const float WAIT_TIME = 1.0f;
+			/** 踏まれたか */
+			bool isSquashed_ = false;
+			/** 視野角に入ったか */
+			bool isViewAngle_ = false;
+			/** 追いかけているか */
+			bool isChasing_ = false;
+			/** パンチされたか */
+			bool isKnockBack_ = false;
+
+			bool isAttackGhostCreated_ = false;
+
+		public:
+			EventCharacterStateMachine();
+			virtual ~EventCharacterStateMachine();
+
+			virtual void Initialize() override final;
+			virtual void Update() override final;
+
+			virtual uint32_t GetCharacterID() const override;
+
+			virtual void OnEnterAttack() override;
+			virtual void OnExitAttack() override;
+			virtual void OnEnterDead() override;
+			virtual void OnExitDead() override;
+			virtual void OnEnterKnockBack() override;
+			virtual void OnExitKnockBack() override;
+
+		private:
+			void UpdateState();
+
+		public:
+			/** 外から踏まれたことを教える */
+			void OnSquashed() 
+			{ 
+				isSquashed_ = true;
+				aiTimer_ = 0.0f;
+			}
+			bool IsSquashed() const { return isSquashed_; }
+
+			/** 視野角に入ったことを教える */
+			void OnViewAngle(const Vector3& targetPos) {
+				isViewAngle_ = true;
+				targetPosition_ = targetPos;
+			}
+
+			bool IsViewAngle() const {return isViewAngle_;}
+
+			/** 追跡開始を教える */
+			void OnChase(const Vector3& direction,const Vector3& targetPos) {
+				isChasing_ = true;
+				chaseDirection_ = direction;
+				targetPosition_ = targetPos;
+			}
+
+			/**
+			 * DEBUG: 書く場所変更予定だが一旦ここで実装
+			 * パンチ食らったことを教える⇒ノックバックに変更したい
+			 */
+			void OnKnockBack(const Vector3& direction)
+			{
+				isKnockBack_ = true;
+				knockBackDirection_ = direction;
+			}
+			bool IsKnockBack()
+			{
+				return isKnockBack_;
+			}
+
+			//ゴーストが生成されたことを通知
+			void NontifyAttackGhostCreated()
+			{
+				isAttackGhostCreated_ = true;
+			}
+
+
+			bool CheckAndConsumeAttackGhostCreated()
+			{
+				if (isAttackGhostCreated_) {
+					isAttackGhostCreated_ = false;
+					return true;
+				}
+				return false;
+			}
 		};
 	}
 }

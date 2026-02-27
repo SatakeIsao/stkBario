@@ -84,6 +84,36 @@ namespace app
 
 
 
+		class AttackCharacterState :public ICharacterState
+		{
+			appState(AttackCharacterState);
+
+
+		private:
+			app::collision::GhostBody* attackBody_ = nullptr;
+			std::unique_ptr<app::core::TaskSchedulerSystem> attackScheduler_;
+			float stateTimer_ = 0.0f;
+			bool isAttackBody_ = false;
+
+		public:
+			AttackCharacterState(IStateMachine* owner);
+			~AttackCharacterState();
+
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+
+			bool IsAttackBody() const
+			{
+				return isAttackBody_;
+			}
+		};
+
+
+
+
 		class JumpCharacterState : public ICharacterState
 		{
 			appState(JumpCharacterState);
@@ -189,6 +219,48 @@ namespace app
 		public:
 			WarpOutCharacterState(IStateMachine* owner);
 			~WarpOutCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+		};
+
+
+
+
+		class DeadCharacterState : public ICharacterState
+		{
+			appState(DeadCharacterState);
+
+
+		private:
+			float timer_ = 0.0f;
+
+		public:
+			DeadCharacterState(IStateMachine* owner);
+			~DeadCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+		};
+
+
+
+
+		class KnockBackCharacterState : public ICharacterState
+		{
+			appState(KnockBackCharacterState);
+
+
+		private:
+			float timer_ = 0.0f;
+
+		public:
+			KnockBackCharacterState(IStateMachine* owner);
+			~KnockBackCharacterState();
 			void Enter() override;
 			void Update() override;
 			void Exit() override;
