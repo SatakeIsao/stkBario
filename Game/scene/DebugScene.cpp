@@ -14,7 +14,7 @@
 namespace
 {
 	// @todo for test
-	static app::ui::Layout* testLayout;
+	//static app::ui::Layout* testLayout;
 }
 
 
@@ -35,8 +35,8 @@ bool DebugScene::Start()
 
 	app::battle::BattleManager::Get().Start();
 
-	testLayout = new app::ui::Layout();
-	testLayout->Initialize<app::ui::MenuBase>("Assets/ui/layout/testLayout.json");
+	//testLayout = new app::ui::Layout();
+	//testLayout->Initialize<app::ui::MenuBase>("Assets/ui/layout/testLayout.json");
 
 	return true;
 }
@@ -46,13 +46,14 @@ void DebugScene::Update()
 {
 	app::battle::BattleManager::Get().Update();
 
-	testLayout->Update();
+	//testLayout->Update();
 }
 
 
 void DebugScene::Render(RenderContext& rc)
 {
-	testLayout->Render(rc);
+	/** DEBUG: テキストが表示されるか */
+	//testLayout->Render(rc);
 }
 
 
