@@ -18,6 +18,8 @@
 #include "core/ParameterManager.h"
 #include "collision/GhostBodyManager.h"
 #include "collision/CollisionHitManager.h"
+#include "ui/HPBar.h"
+#include "effect/EffectManager.h"
 
 
 namespace
@@ -26,6 +28,9 @@ namespace
 	constexpr const char* MASTER_STAGE_PARAM_PATH = "Assets/master/battle/MasterStageParameter.json";
 	constexpr const char* MASTER_BATTLE_CAMERA_PARAM_PATH = "Assets/master/battle/MasterBattleCameraParameter.json";
 	constexpr const char* MASTER_BATTLE_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterBattleCharacterParameter.json";
+	constexpr const char* MASTER_EVENT_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterEventCharacterParameter.json";
+
+	static const int MAX_HP = 8;
 
 	// Player用
 	static app::actor::CharacterInitializeParameter sPlayerInitializeParameter = app::actor::CharacterInitializeParameter([](app::actor::CharacterInitializeParameter* parameter)
@@ -48,14 +53,36 @@ namespace
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].filename = "Assets/animData/player/PlayerJump_End.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand)].loop = false;
 
-
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch)].filename = "Assets/animData/player/playerPunch.tka";
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::KnockBack)].filename = "Assets/animData/player/playerKnockBack.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::KnockBack)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Dead)].filename = "Assets/animData/player/playerDead.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::PlayerAnimationKind::Dead)].loop = false;
 		});
 	// Enemy用
 	static app::actor::CharacterInitializeParameter sEnemyInitializeParameter = app::actor::CharacterInitializeParameter([](app::actor::CharacterInitializeParameter* parameter)
 		{
 			parameter->modelName = "Assets/ModelData/enemy/slime/slime.tkm";
+			parameter->animationDataList.Create(static_cast<uint8_t>(app::actor::SlimeAnimationKind::Max));
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Idle)].filename = "Assets/animData/enemy/slime/slime_Idle.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Idle)].loop = true;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Run)].filename = "Assets/animData/enemy/slime/slime_Run.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Run)].loop = true;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Attack)].filename = "Assets/animData/enemy/slime/slime_Attack.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Attack)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Dead)].filename = "Assets/animData/enemy/slime/slime_Dead.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::Dead)].loop = false;
+
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::knockBack)].filename = "Assets/animData/enemy/slime/slime_KnockBack.tka";
+			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::knockBack)].loop = false;
+
 		});
 
 }
@@ -85,6 +112,7 @@ namespace app
 		{
 			DeleteGO(battleCharacter_);
 			DeleteGO(eventCharacter_);
+			DeleteGO(hpBarObject_);
 
 			// パラメーター解放
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleParameter>();
@@ -118,6 +146,8 @@ namespace app
 						battleCharacter_->AddState<app::actor::PunchCharacterState>();
 						battleCharacter_->AddState<app::actor::WarpInCharacterState>();
 						battleCharacter_->AddState<app::actor::WarpOutCharacterState>();
+						battleCharacter_->AddState<app::actor::KnockBackCharacterState>();
+						battleCharacter_->AddState<app::actor::DeadCharacterState>();
 					}
 					// TODO: ステージによって変えたいので、ステージクラスが作られたら委嘱する
 					{
@@ -135,6 +165,20 @@ namespace app
 				// 敵キャラクター
 				eventCharacter_ = NewGO<app::actor::EventCharacter>(static_cast<uint8_t>(ObjectPriority::Default), "nokonoko");
 				eventCharacter_->Initialize(sEnemyInitializeParameter);
+				{
+					eventCharacter_->AddState <app::actor::IdleCharacterState>();
+					eventCharacter_->AddState<app::actor::RunCharacterState>();
+					eventCharacter_->AddState<app::actor::AttackCharacterState>();
+					eventCharacter_->AddState<app::actor::PunchCharacterState>();
+					eventCharacter_->AddState<app::actor::DeadCharacterState>();
+					eventCharacter_->AddState <app::actor::KnockBackCharacterState>();
+				}
+				/** 敵に重力付与のテスト */
+				{
+					auto stageParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterStageParameter>();
+					eventCharacter_->GetStatus()->SetFriction(stageParam->friction);
+					eventCharacter_->GetStatus()->SetGravity(stageParam->gravity);
+				}
 
 				// ギミック設置（テスト用）
 				{
@@ -191,6 +235,15 @@ namespace app
 					app::camera::CameraManager::Get().Register(app::camera::GameCamera::ID(), gameCameraController_);
 					app::camera::CameraManager::Get().SwitchCamera(gameCameraController_);
 				}
+				//HPバー
+				{
+					// HPバー生成
+					hpBarObject_ = NewGO<HPBarObject>(static_cast<uint8_t>(ObjectPriority::Default));
+				}
+				//エフェクトマネージャーオブジェクト
+				{
+					effectManagerObject_ = NewGO<EffectManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
+				}
 			}
 		}
 
@@ -206,6 +259,121 @@ namespace app
 			// 衝突ヒット管理更新
 			app::collision::CollisionHitManager::Get().Update();
 
+			// デバッグテスト: 追従の処理
+			Vector3 playerPosition = battleCharacter_->transform.position;
+			Vector3 slimePosition = eventCharacter_->transform.position;
+			//XとZのベクトルを長さに変換
+			Vector3 diffXZ(playerPosition.x - slimePosition.x, 0.0f, playerPosition.z - slimePosition.z);
+			float diff = diffXZ.Length();
+			
+			if (diff < 200.0f) {
+				//向きだけのベクトル
+				Vector3 DirectionToPlayer = diffXZ;
+				DirectionToPlayer.Normalize();
+				
+				Vector3 slimeForward = Vector3(0.0f, 0.0f, 1.0f);
+				eventCharacter_->transform.localRotation.Apply(slimeForward);
+				
+				//スライムの前方向
+				Vector3 forwardXZ(slimeForward.x, 0.0f, slimeForward.z);
+				forwardXZ.Normalize();
+				
+				//向きだけのベクトルとスライムの前方向で内積
+				float dot = forwardXZ.Dot(DirectionToPlayer);
+
+				//角度のしきい値と計算
+				float halfFovDegree = 60.0f;
+
+				float halfFovRadians = halfFovDegree * (Math::PI / 180);
+
+				//判定用のしきい値となるコサイン値
+				float threshold = std::cos(halfFovRadians);
+
+				if (dot > threshold)
+				{
+					// 視野角内に入った
+					eventCharacter_->GetStateMachine()->OnChase(DirectionToPlayer,playerPosition);
+				}
+			}
+
+			//プレイヤーの攻撃アクション
+			//TODO: Player攻撃エフェクトの修正
+			{
+				if(battleCharacter_->GetStateMachine()->IsPunched())
+				{
+					effectManagerObject_->PlayEffect(
+						enEffectKind_SlimeAttack,
+						battleCharacter_->transform.position + (battleCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f),
+						Quaternion::Identity,
+						Vector3::One
+					);
+				}
+			}
+
+			//スライムの攻撃アクション
+			{
+				if (eventCharacter_->GetStateMachine()->CheckAndConsumeAttackGhostCreated()
+					&& battleCharacter_->GetCurrentHP() > 0)
+				{
+					effectManagerObject_->PlayEffect(
+						enEffectKind_SlimeAttack,
+						eventCharacter_->transform.position + (eventCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f) + Vector3(0.0f,30.0f,0.0f),
+						Quaternion::Identity,
+						Vector3(3.0f,3.0f,3.0f)
+					);
+				}
+			}
+
+			//スライムのノックバック
+			{
+				if (eventCharacter_->GetStateMachine()->IsKnockBack()
+					|| eventCharacter_->GetStateMachine()->IsSquashed())
+				{
+					if (!hasPlayedPunchEffect)
+					{
+						effectManagerObject_->PlayEffect(
+							enEffectKind_SlimeKnockBack,
+							eventCharacter_->transform.position,
+							Quaternion::Identity,
+							Vector3::One
+						);
+						hasPlayedPunchEffect = true;
+					}
+				}
+				else{
+					hasPlayedPunchEffect = false;
+				}
+			}
+			
+
+			//HPバー
+			{
+				const int AMOUNT_HP = 1;
+				bool isKnockBack = battleCharacter_->GetStateMachine()->GetKnockBack();
+
+				if (isKnockBack
+					&&battleCharacter_->GetCurrentHP() > 0) 
+				{
+					battleCharacter_->TakeDamage(AMOUNT_HP);
+					//HPバーの現在HPの設定
+					hpBarObject_->SetCurrentHP(battleCharacter_->GetCurrentHP());
+					//エフェクト
+					effectManagerObject_->PlayEffect(
+						enEffectKind_PlayerKnockBack,
+						battleCharacter_->transform.position,
+						Quaternion::Identity,
+						Vector3::One
+						);
+				}
+
+				/************************************************************************/
+
+				/** 死亡処理 */
+				if (battleCharacter_->GetCurrentHP() <= 0)
+				{
+					battleCharacter_->GetStateMachine()->OnDead();
+				}
+			}
 
 			// 衝突後の処理
 			{
@@ -252,6 +420,15 @@ namespace app
 				});
 			// バトルキャラクターパラメーター読み込み
 			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)
+				{
+					p.moveSpeed = json["moveSpeed"].get<float>();
+					p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
+					p.jumpPower = json["jumpPower"].get<float>();
+					p.radius = json["radius"].get<float>();
+					p.height = json["height"].get<float>();
+				});
+			// イベントキャラクターパラメーター読み込み
+			app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterParameter>(MASTER_EVENT_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterParameter& p)
 				{
 					p.moveSpeed = json["moveSpeed"].get<float>();
 					p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();

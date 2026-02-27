@@ -5,7 +5,9 @@
 #pragma once
 #include "camera/CameraCommon.h"
 #include "camera/CameraSteering.h"
-
+#include "ui/HPBar.h"
+#include "ui/Layout.h"
+#include "effect/EffectManager.h"
 
 namespace app
 {
@@ -15,10 +17,15 @@ namespace app
         class EventCharacter;
         class CharacterSteering;
         class StaticGimmick;
+        class HPBarObject;
     }
     namespace collision
     {
         class GhostBody;
+    }
+    namespace effect
+    {
+        class EffectManagerObject;
     }
 }
 
@@ -64,9 +71,14 @@ namespace app
             std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
 			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
 			app::camera::RefCameraController gameCameraController_ = nullptr;
+
+            HPBarObject* hpBarObject_ = nullptr;
+            EffectManagerObject* effectManagerObject_ = nullptr;
+
             /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
 
+            bool hasPlayedPunchEffect = false;
 
         private:
             BattleManager();

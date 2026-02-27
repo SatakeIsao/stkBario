@@ -78,6 +78,19 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
+		/** イベントキャラクター */
+		struct MasterEventCharacterParameter : public IParameter
+		{
+			appParameter(MasterEventCharacterParameter);
+
+			float moveSpeed;			// 移動速度
+			float jumpMoveSpeed;		// ジャンプ中の移動速度
+			float jumpPower;			// ジャンプ力
+			float radius;				// 半径
+			float height;				// 高さ
+		};
+
+
 		/** ステージ全般 */
 		struct MasterStageParameter : public IParameter
 		{

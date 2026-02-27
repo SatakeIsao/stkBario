@@ -24,6 +24,7 @@ namespace app
 			std::unique_ptr<BattleCharacterStateMachine> stateMachine_ = nullptr;
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 
+			int currentHP_ = 8;
 
 		public:
 			BattleCharacter();
@@ -49,6 +50,28 @@ namespace app
 			BattleCharacterStateMachine* GetStateMachine()
 			{
 				return stateMachine_.get();
+			}
+
+
+			app::collision::GhostBody* GetGhostBody() const
+			{
+				return ghostBody_.get();
+			}
+
+
+			int GetCurrentHP() const
+			{
+				return currentHP_;
+			}
+
+
+			void TakeDamage(int damegeHP)
+			{
+				currentHP_ -= damegeHP;
+				if (currentHP_ < 0)
+				{
+					currentHP_ = 0;
+				}
 			}
 		};
 	}

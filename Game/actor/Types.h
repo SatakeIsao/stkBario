@@ -22,6 +22,17 @@ namespace app
 			JumpFalling,	// 落下
 			JumpLand,		// 着地
 			Punch,
+			KnockBack,
+			Dead,
+			Max
+		};
+		enum class SlimeAnimationKind : uint8_t
+		{
+			Idle,
+			Run,
+			Attack,
+			Dead,
+			knockBack,
 			Max
 		};
 	}
