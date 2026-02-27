@@ -11,6 +11,7 @@
 #include "camera/CameraController.h"
 #include "scene/SceneManager.h"
 #include "sound/SoundManager.h"
+#include "ui/HPBar.h"
 
 
 namespace app

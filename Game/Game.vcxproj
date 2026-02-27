@@ -250,6 +250,7 @@
     <ClCompile Include="core\TaskSchedulerSystem.cpp" />
     <ClCompile Include="effect\EffectManager.cpp" />
     <ClCompile Include="gimmick\WarpSystem.cpp" />
+    <ClCompile Include="ui\HPBar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Transform.cpp" />
     <ClCompile Include="memory\Allocator.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="effect\EffectManager.h" />
     <ClInclude Include="effect\Types.h" />
     <ClInclude Include="gimmick\WarpSystem.h" />
+    <ClInclude Include="ui\HPBar.h" />
     <ClInclude Include="json\json.hpp" />
     <ClInclude Include="math\Transform.h" />
     <ClInclude Include="memory\Allocator.h" />

@@ -180,6 +180,7 @@
     <ClCompile Include="memory\Allocator.cpp">
       <Filter>memory</Filter>
     </ClCompile>
+    <ClCompile Include="ui\HPBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -345,6 +346,7 @@
     <ClInclude Include="..\..\..\Users\t-sugahara\Desktop\ParallelFor\ParallelFor\GameTask.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="ui\HPBar.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
