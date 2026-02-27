@@ -71,6 +71,9 @@ namespace app
 			inline float GetRadius() const { return radius_; }
 			inline float GetHeight() const { return height_; }
 
+			inline void SetRadius(const float radius) { radius_ = radius; }
+			inline void SetHeight(const float height) { height_ = height; }
+
 			inline float GetFriction() const { return friction_; }
 			inline void SetFriction(const float friction) { friction_ = friction; }
 
@@ -100,6 +103,21 @@ namespace app
 
 		public:
 			virtual ~BattleCharacterStatus() {}
+			virtual void LoadParameter(const char* path) override;
+			virtual void Setup() override;
+		};
+
+
+
+
+		/** イベントキャラクター用 */
+		struct EventCharacterStatus : public CharacterStatus
+		{
+		protected:
+
+
+		public:
+			virtual ~EventCharacterStatus() {}
 			virtual void LoadParameter(const char* path) override;
 			virtual void Setup() override;
 		};
