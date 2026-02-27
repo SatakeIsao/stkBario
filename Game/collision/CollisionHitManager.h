@@ -51,6 +51,9 @@ namespace app
 			/** 土管を含むペアか */
 			bool ContainsPipeGimmickPair(const Pair& hitPair);
 			void UpdatePipeGimmickPair(Pair& hitPair);
+			/** スライムを含むペアか */
+			bool ContainsEventCharacterPair(const Pair& hitPair);
+			void UpdateEventCharacterPair(Pair& hitPair);
 
 
 

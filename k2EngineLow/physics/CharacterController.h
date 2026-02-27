@@ -77,5 +77,12 @@ namespace nsK2EngineLow
 		CCapsuleCollider* GetCollider() { return &collider_; }
 		RigidBody* GetRigidBody() { return &rigidBody_; }
 		void RemoveRigidBoby();
+
+		void Bounce(const float power)
+		{
+			// 地面にいるかどうかの判定を無視して、強制的に上方向の速度を上書きする！
+			verticalVelocity_ = power;
+			isOnGround_ = false; // 地面から離れたことにする
+		}
 	};
 }
