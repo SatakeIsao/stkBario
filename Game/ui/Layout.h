@@ -38,6 +38,8 @@ namespace app
                 Reload();
             }
 
+            MenuBase* GetMenu() const { return menu_.get(); }
+
             void Update();
             void Render(RenderContext& rc);
 
