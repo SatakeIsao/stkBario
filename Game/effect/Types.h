@@ -10,7 +10,10 @@
 enum enEffectKind
 {
 	enEffectKind= 0,
-	enEffectKind_Dash = enEffectKind,
+	enEffectKind_PlayerKnockBack = enEffectKind,
+	enEffectKind_SlimeKnockBack,
+	enEffectKind_PlayerAttack,
+	enEffectKind_SlimeAttack,
 	enEffectKind_Max,
 	enEffectKind_None = enEffectKind_Max,
 };
@@ -28,6 +31,10 @@ struct EffectInformation
 /** 情報を保持 */
 static EffectInformation effectInformation[enEffectKind_Max] =
 {
-	EffectInformation(u"Assets/effect/09.efkefc"),
+	EffectInformation(u"Assets/effect/player_knockback.efk"),
+	EffectInformation(u"Assets/effect/slime_knockback.efk"),
+	EffectInformation(u"Assets/effect/player_attack.efk"),
+	EffectInformation(u"Assets/effect/slime_attack.efk"),
+
 };
 

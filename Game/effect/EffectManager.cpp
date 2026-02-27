@@ -93,3 +93,17 @@ void EffectManagerObject::Update()
 void EffectManagerObject::Render(RenderContext& rc)
 {
 }
+
+
+EffectHandle EffectManagerObject::PlayEffect(const int kind, const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+{
+	/** 処理はEffectManagerに任せる */
+	return EffectManager::Get().PlayEffect(kind, position, rotation, scale);
+}
+
+
+void EffectManagerObject::StopEffect(const EffectHandle handle)
+{
+	/** 処理はEffectManagerに任せる */
+	EffectManager::Get().StopEffect(handle);
+}

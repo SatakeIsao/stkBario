@@ -132,4 +132,8 @@ public:
     void Update() override;
     void Render(RenderContext& rc);
 
+    /** エフェクト再生をEffectManagerに委譲 */
+    EffectHandle PlayEffect(const int kind, const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /** エフェクト停止をEffectMangerに委譲 */
+    void StopEffect(const EffectHandle handle);
 };
