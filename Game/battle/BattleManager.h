@@ -8,6 +8,7 @@
 #include "ui/HPBar.h"
 #include "ui/Layout.h"
 #include "effect/EffectManager.h"
+#include "core/PauseManagerObject.h"
 
 namespace app
 {
@@ -18,10 +19,15 @@ namespace app
         class CharacterSteering;
         class StaticGimmick;
         class HPBarObject;
+        class PipeGimmick;
     }
     namespace collision
     {
         class GhostBody;
+    }
+    namespace core
+    {
+        class PauseManagerObject;
     }
     namespace effect
     {
@@ -67,6 +73,7 @@ namespace app
             app::actor::BattleCharacter* battleCharacter_ = nullptr;
             app::actor::EventCharacter* eventCharacter_ = nullptr;
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
+            std::vector<app::actor::PipeGimmick*> pipeGimmickList_;
             
             std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
 			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
@@ -74,11 +81,14 @@ namespace app
 
             HPBarObject* hpBarObject_ = nullptr;
             EffectManagerObject* effectManagerObject_ = nullptr;
+            app::core::PauseManagerObject* pauseManagerObject_ = nullptr;
 
             /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
 
-            bool hasPlayedPunchEffect = false;
+            bool hasPlayedPunchEffect_ = false;
+            bool deadTest_ = false;
+            bool isPause_ = false;
 
         private:
             BattleManager();
@@ -91,10 +101,20 @@ namespace app
             /** 更新処理 */
             void Update();
 
+
             void AddNotify(INotify* notify)
             {
                 notifyList_.push_back(std::move(std::unique_ptr<INotify>(notify)));
 			}
+
+            /** DEBUG:あとで書き換える */
+            bool GetDeadTest()
+            {
+                return deadTest_;
+            }
+
+
+            void SetPause(bool isPause);
 
         private:
             void LoadParameter();
@@ -152,5 +172,32 @@ namespace app
             /** シングルトンインスタンス */
             static BattleManager* instance_;
         };
+
+
+        //class IPauseMenu : Noncopyable
+        //{
+        //public:
+        //    IPauseMenu() {}
+        //    virtual ~IPauseMenu() {}
+        //
+        //    virtual bool Start() = 0;
+        //    virtual void Update() = 0;
+        //    virtual void Render(RenderContext& rc) = 0;
+        //    virtual void CanChange(int& request) = 0;
+        //};
+        //
+        //
+        //
+        ///** ポーズメニュー表示 */
+        //class BattlePauseMenu : IPauseMenu
+        //{
+        //public:
+        //    enum EnPauseMenuType
+        //    {
+        //        enPauseMenuType_ReGame,
+        //        enPauseMenuType_Volume,
+        //
+        //    };
+        //};
     }
 }

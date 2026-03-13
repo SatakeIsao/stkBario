@@ -120,6 +120,22 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
+
+		struct MasterSoundOptionMenuParameter : public IParameter
+		{
+			appParameter(MasterSoundOptionMenuParameter);
+			//
+			float gaugeBarX[11];
+			float gaugeBarY[3];
+
+			//
+			float gaugeBarScaleX[11];
+
+			float knobX[11];
+		};
+
+
+
 		#undef appParameter
 
 		/**

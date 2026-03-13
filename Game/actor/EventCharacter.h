@@ -22,6 +22,7 @@ namespace app
 			std::unique_ptr<EventCharacterStateMachine> stateMachine_ = nullptr;
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 			Vector3 forward_ = g_vec3Front;
+			bool isPause_ = false;
 
 		public:
 			EventCharacter();
@@ -50,6 +51,11 @@ namespace app
 			EventCharacterStateMachine* GetStateMachine()
 			{
 				return stateMachine_.get();
+			}
+
+			void SetPause(bool isPause)
+			{
+				isPause_ = isPause;
 			}
 		};
 	}

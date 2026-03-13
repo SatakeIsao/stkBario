@@ -12,6 +12,7 @@ constexpr uint32_t INVALID_STATE_ID = 0xFFFFFFFF;
 enum class ObjectPriority : uint8_t
 {
 	Default = 0,
+	Pause = 200,
 	Fade = 250,
 };
 

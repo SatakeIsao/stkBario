@@ -39,6 +39,8 @@ namespace app
 
 		void BattleCharacter::Update()
 		{
+			if (isPause_) {	return; }
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			stateMachine_->Update();

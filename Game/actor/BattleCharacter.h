@@ -25,6 +25,7 @@ namespace app
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 
 			int currentHP_ = 8;
+			bool isPause_ = false;
 
 		public:
 			BattleCharacter();
@@ -72,6 +73,12 @@ namespace app
 				{
 					currentHP_ = 0;
 				}
+			}
+
+
+			void SetPouse(bool isPause)
+			{
+				isPause_ = isPause;
 			}
 		};
 	}

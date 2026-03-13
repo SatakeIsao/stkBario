@@ -20,6 +20,8 @@
 #include "collision/CollisionHitManager.h"
 #include "ui/HPBar.h"
 #include "effect/EffectManager.h"
+#include "core/PauseManager.h"
+#include "sound/SoundManager.h"
 
 
 namespace
@@ -99,7 +101,6 @@ namespace app
 		{
 			app::gimmick::WarpSystem::Initialize();
 			app::collision::CollisionHitManager::Initialize();
-			app::collision::GhostBodyManager::Initialize();
 			app::collision::GhostBodyManager::Get().RegisterCallback([](app::collision::GhostBody* a, app::collision::GhostBody* b)
 				{
 					// 衝突ペア登録
@@ -113,15 +114,20 @@ namespace app
 			DeleteGO(battleCharacter_);
 			DeleteGO(eventCharacter_);
 			DeleteGO(hpBarObject_);
+			for (auto& test : testGimmickList_)
+			{
+				DeleteGO(test);
+			}
+			for (auto& pipe : pipeGimmickList_)
+			{
+				DeleteGO(pipe);
+			}
 
 			// パラメーター解放
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterStageParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleCharacterParameter>();
-
-			if (app::collision::GhostBodyManager::IsAvailable()) {
-				app::collision::GhostBodyManager::Finalize();
-			}
+			app::collision::GhostBodyManager::Get().ClearCallback();
 			app::collision::CollisionHitManager::Finalize();
 			app::gimmick::WarpSystem::Finalize();
 		}
@@ -201,17 +207,18 @@ namespace app
 				}
 				// 土管
 				{
-					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
+					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default),"pipeGimmick");
 					pipeGimmick->transform.localPosition = Vector3(100.0f, 20.0f, 0.0f);
 					pipeGimmick->transform.UpdateTransform();
 					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 0, 1, Vector3::Down);
-					//testPipeGimmickList_.push_back(pipeGimmick);
+					pipeGimmickList_.push_back(pipeGimmick);
 				}
 				{
 					app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
 					pipeGimmick->transform.localPosition = Vector3(-100.0f, 20.0f, 0.0f);
 					pipeGimmick->transform.UpdateTransform();
 					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 1, 0, Vector3::Down);
+					pipeGimmickList_.push_back(pipeGimmick);
 				}
 				// カメラ初期化
 				{
@@ -244,12 +251,48 @@ namespace app
 				{
 					effectManagerObject_ = NewGO<EffectManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
 				}
+				//ポーズマネージャーオブジェクト
+				{
+					pauseManagerObject_ = NewGO<app::core::PauseManagerObject>(static_cast<uint8_t>(ObjectPriority::Pause));
+				}
+				//BGM再生
+				{
+					app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
+				}
 			}
 		}
 
 
 		void BattleManager::Update()
 		{
+			bool currentPause = app::core::PauseManager::Get().IsPause();
+
+			if (isPause_ != currentPause)
+			{
+				SetPause(currentPause);
+			}
+			
+			if(currentPause)
+			{
+				return;
+			}
+
+			// 上記が問題なかったら、消す
+			//if (app::core::PauseManager::Get().IsPauseTrigger()) {
+			//	if (app::core::PauseManager::Get().IsPause()) {
+			//		// ここでGameObject止める
+			//		SetPause(true);
+			//	} else {
+			//		// ここでGameObject動かす
+			//		SetPause(false);
+			//	}
+			//}
+			//
+			//
+			//if (app::core::PauseManager::Get().IsPause()) {
+			//	return;
+			//}
+
 			characterSteering_->Update();
 
 			// 衝突判定更新
@@ -329,7 +372,7 @@ namespace app
 				if (eventCharacter_->GetStateMachine()->IsKnockBack()
 					|| eventCharacter_->GetStateMachine()->IsSquashed())
 				{
-					if (!hasPlayedPunchEffect)
+					if (!hasPlayedPunchEffect_)
 					{
 						effectManagerObject_->PlayEffect(
 							enEffectKind_SlimeKnockBack,
@@ -337,11 +380,11 @@ namespace app
 							Quaternion::Identity,
 							Vector3::One
 						);
-						hasPlayedPunchEffect = true;
+						hasPlayedPunchEffect_ = true;
 					}
 				}
 				else{
-					hasPlayedPunchEffect = false;
+					hasPlayedPunchEffect_ = false;
 				}
 			}
 			
@@ -372,6 +415,8 @@ namespace app
 				if (battleCharacter_->GetCurrentHP() <= 0)
 				{
 					battleCharacter_->GetStateMachine()->OnDead();
+					/** DEBUG: 後で書き換える */
+					deadTest_ = true;
 				}
 			}
 
@@ -387,6 +432,14 @@ namespace app
 			auto cameraData = gameCamera->GetCameraData();
 			cameraSteering_->Update(cameraData, g_gameTime->GetFrameDeltaTime());
 			gameCamera->SetState(cameraData);
+		}
+
+
+		void BattleManager::SetPause(bool isPause)
+		{
+			isPause_ = isPause;
+			if (battleCharacter_) battleCharacter_->SetPouse(isPause_);
+			if (eventCharacter_)eventCharacter_->SetPause(isPause_);
 		}
 
 

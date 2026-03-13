@@ -40,6 +40,8 @@ namespace app
 
 		void EventCharacter::Update()
 		{
+			if (isPause_) { return; }
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 			stateMachine_->Update();
 			auto nextPosition = characterController_->Execute(stateMachine_->transform.position, deltaTime);

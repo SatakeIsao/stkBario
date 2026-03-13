@@ -95,9 +95,6 @@
     <ClCompile Include="scene\DebugScene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="sound\SoundManager.cpp">
-      <Filter>sound</Filter>
-    </ClCompile>
     <ClCompile Include="effect\EffectManager.cpp">
       <Filter>effect</Filter>
     </ClCompile>
@@ -181,6 +178,14 @@
       <Filter>memory</Filter>
     </ClCompile>
     <ClCompile Include="ui\HPBar.cpp" />
+    <ClCompile Include="scene\GameOverScene.cpp" />
+    <ClCompile Include="scene\GameClearScene.cpp" />
+    <ClCompile Include="scene\LoadingScene.cpp" />
+    <ClCompile Include="scene\BattleScene.cpp" />
+    <ClCompile Include="sound\SoundManager.cpp" />
+    <ClCompile Include="ui\SoundOptionMenu.cpp" />
+    <ClCompile Include="core\PauseManager.cpp" />
+    <ClCompile Include="core\PauseManagerObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -241,9 +246,6 @@
     </ClInclude>
     <ClInclude Include="scene\DebugScene.h">
       <Filter>scene</Filter>
-    </ClInclude>
-    <ClInclude Include="sound\SoundManager.h">
-      <Filter>sound</Filter>
     </ClInclude>
     <ClInclude Include="sound\Types.h">
       <Filter>sound</Filter>
@@ -347,6 +349,16 @@
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="ui\HPBar.h" />
+    <ClInclude Include="scene\GameOverScene.h" />
+    <ClInclude Include="scene\GameClearScene.h" />
+    <ClInclude Include="scene\LoadingScene.h" />
+    <ClInclude Include="scene\BattleScene.h" />
+    <ClInclude Include="sound\SoundManager.h" />
+    <ClInclude Include="ui\SoundOptionMenu.h" />
+    <ClInclude Include="ui\UIAnimationParameter.h" />
+    <ClInclude Include="ui\UIAnimationFactory.h" />
+    <ClInclude Include="core\PauseManager.h" />
+    <ClInclude Include="core\PauseManagerObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

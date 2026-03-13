@@ -11,7 +11,17 @@
 #include "camera/CameraController.h"
 #include "scene/SceneManager.h"
 #include "sound/SoundManager.h"
-#include "ui/HPBar.h"
+#include "collision/GhostBodyManager.h"
+
+// @todo for test
+#include "ui/UIAnimationParameter.h"
+
+
+namespace
+{
+	//static app::ui::Layout* layout = nullptr;
+	//static app::ui::SoundOptionMenu* menu = nullptr;
+}
 
 
 namespace app
@@ -20,6 +30,8 @@ namespace app
 	{
 		constexpr size_t HEAP_ALLOCATOR_SIZE = static_cast<size_t>(1024) * 1024 * 1024 * 2; // 2GB
 		app::memory::Allocator::Get().Initialize(HEAP_ALLOCATOR_SIZE);
+
+		app::collision::GhostBodyManager::Initialize();
 	}
 
 
@@ -27,8 +39,10 @@ namespace app
 	{
 		DeleteGO(m_sceneManager);
 		DeleteGO(m_fadeObject);
+		app::collision::GhostBodyManager::Finalize();
 		app::SoundManager::Finalize();
 		app::core::ParameterManager::Finalize();
+		
 
 		app::memory::Allocator::Get().Shutdown();
 	}
@@ -67,6 +81,9 @@ namespace app
 		m_fadeObject = NewGO<FadeObject>(static_cast<uint8_t>(ObjectPriority::Fade));
 		// シーン管理生成
 		m_sceneManager = NewGO<SceneManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
+
+		//UIアニメーションのJSONファイル読み込み
+		app::ui::UIAnimationParameter::Get().Load("Assets/master/ui_animation.json");
 	}
 
 
@@ -85,6 +102,7 @@ namespace app
 		
 		GameObjectManager::GetInstance()->ExecuteUpdate();
 		
+
 		// カメラマネージャーの更新。
 		app::camera::CameraManager::Get().Update(g_gameTime->GetFrameDeltaTime());
 
@@ -93,6 +111,12 @@ namespace app
 
 		// エフェクトエンジンの更新。
 		EffectEngine::GetInstance()->Update(g_gameTime->GetFrameDeltaTime());
+
+		SoundManager::Get().Update();
+
+#ifdef APP_ENABLE_PARAM_HOT_RELOAD
+		app::core::ParameterManager::Get().Update();
+#endif
 
 
 #if defined(APP_DEBUG)
@@ -123,10 +147,8 @@ namespace app
 		// ゲームオブジェクトマネージャーの描画処理を実行。
 		GameObjectManager::GetInstance()->ExecuteRender(rc);
 
-
 		//ライトの更新処理(この間でする)
 		g_sceneLight->Update();
-
 		
 		//レンダリングエンジンの描画処理
 		g_renderingEngine->Execute(rc);
