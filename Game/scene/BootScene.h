@@ -13,6 +13,8 @@ enum class SceneKind : uint8_t
 	Default,
 	Debug = Default,
 	Startup,
+	GameClear,
+	//GameOver,
 	Max,
 };
 

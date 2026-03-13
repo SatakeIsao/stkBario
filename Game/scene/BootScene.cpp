@@ -9,6 +9,7 @@
 
 #include "StartupScene.h"
 #include "DebugScene.h"
+#include "GameOverScene.h"
 
 
 namespace
@@ -32,13 +33,15 @@ namespace
 	{
 		SelectSceneInformation(L"デバッグ", Vector3(0.0f, 100.0f, 0.0f), DebugScene::ID()),
 		SelectSceneInformation(L"スタートアップ", Vector3(0.0f, 200.0f, 0.0f), StartupScene::ID()),
+		SelectSceneInformation(L"ゲームオーバー",Vector3(0.0f,300.0f,0.0f),GameOverScene::ID()),
 	};
 
 
 	static const Vector3 SELECTOR_POSITON_LIST[static_cast<uint8_t>(SceneKind::Max)] =
 	{
 		Vector3(-50.0f, 190.0f, 0.0f),
-		Vector3(-50.0f, 80.0f, 0.0f)
+		Vector3(-50.0f, 80.0f, 0.0f),
+		Vector3(-50.0f, -30.0f,0.0f)
 	};
 }
 
