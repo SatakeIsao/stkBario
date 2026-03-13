@@ -41,6 +41,7 @@ namespace app
 			void RemoveBody(GhostBody* body);
 
 			void RegisterCallback(const RegisterPairCallback& callback) { registerPairCallback_ = std::move(callback); }
+			void ClearCallback() { registerPairCallback_ = nullptr; }
 
 		private:
 			/** 衝突ペアの処理 */

@@ -3,11 +3,10 @@
 
 #include "StartupScene.h"
 #include "TitleScene.h"
-
-#if defined(APP_DEBUG)
 #include "BootScene.h"
-#include "DebugScene.h"
-#endif // APP_DEBUG
+#include "BattleScene.h"
+#include "GameOverScene.h"
+#include "GameClearScene.h"
 
 #include "core/Fade.h"
 
@@ -19,11 +18,10 @@ SceneManager::SceneManager()
 {
 	AddSceneMap<StartupScene>();
 	AddSceneMap<TitleScene>();
-
-#if defined(APP_DEBUG)
 	AddSceneMap<BootScene>();
-	AddSceneMap<DebugScene>();
-#endif // APP_DEBUG
+	AddSceneMap<BattleScene>();
+	AddSceneMap<GameOverScene>();
+	AddSceneMap<GameClearScene>();
 }
 
 
@@ -36,7 +34,7 @@ void SceneManager::Update()
 {
 	if (m_currentScene) {
 		m_currentScene->Update();
-		if (m_currentScene->RequestScene(m_nextSceneId, m_waitTime)) {
+		if (m_currentScene->RequestScene(nextSceneId_, m_waitTime)) {
 			delete m_currentScene;
 			m_currentScene = nullptr;
 
@@ -44,13 +42,13 @@ void SceneManager::Update()
 		}
 	}
 
-	if (m_nextSceneId != INVALID_SCENE_ID) {
+	if (nextSceneId_ != INVALID_SCENE_ID) {
 		m_elapsedTime += g_gameTime->GetFrameDeltaTime();
 		if (m_elapsedTime >= m_waitTime) {
-			CreateScene(m_nextSceneId);
+			CreateScene(nextSceneId_);
 			m_waitTime = 0.0f;
 			m_elapsedTime = 0.0f;
-			m_nextSceneId = INVALID_SCENE_ID;
+			nextSceneId_ = INVALID_SCENE_ID;
 
 			Fade::Get().Disable();
 		}
@@ -98,11 +96,15 @@ SceneManagerObject::~SceneManagerObject()
 bool SceneManagerObject::Start()
 {
 	// 最初のシーンを設定
-#if defined(APP_DEBUG)
-	SceneManager::Get().CreateScene(DebugScene::ID());
-#else
-	SceneManager::Get().CreateScene(StartupScene::ID());
-#endif // APP_DEBUG
+//#if defined(APP_DEBUG)
+//	SceneManager::Get().CreateScene(DebugScene::ID());
+//#else
+	//SceneManager::Get().CreateScene(StartupScene::ID());
+//#endif // APP_DEBUG
+
+	/** デバックテスト */
+	SceneManager::Get().CreateScene(BattleScene::ID());
+
 	return true;
 }
 

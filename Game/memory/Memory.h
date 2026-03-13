@@ -79,9 +79,7 @@ namespace app
 			/** デストラクタ(生ポインタなので明示的にdelete[]が必要) */
 			~Array()
 			{
-				if (m_data) {
-					delete[] m_data;
-				}
+				Release();
 			}
 
 			/**

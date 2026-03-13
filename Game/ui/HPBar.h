@@ -4,7 +4,6 @@
  */
 #pragma once
 #include "Layout.h"
-#include "actor/BattleCharacter.h"
 
 class HPBarObject : public IGameObject
 {

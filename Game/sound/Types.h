@@ -15,9 +15,10 @@ namespace app
 		Button = SE,
 		SEMax,
 		BGM = SEMax,
-		//Game = BGM,
+		Game = BGM,
+		BGMMax,
 		//Title,
-		Voice = BGM,
+		Voice = BGMMax,
 		Startup00 = Voice,
 		Startup01,
 		VoiceMax,
@@ -41,6 +42,7 @@ namespace app
 		// SE
 		SoundInformation("Assets/sound/se/button.wav"),
 		// BGM
+		SoundInformation("Assets/sound/bgm/explore_bgm.wav"),
 		// Voice
 		SoundInformation("Assets/sound/voice/StartupVoice_00.wav"),
 		SoundInformation("Assets/sound/voice/StartupVoice_01.wav"),

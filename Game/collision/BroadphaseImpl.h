@@ -37,8 +37,14 @@ namespace app
 
 			
 		public:
-			BulletDbvtBroadphase() { tree_ = new btDbvt(); }
-			~BulletDbvtBroadphase() { delete tree_; }
+			BulletDbvtBroadphase()
+			{
+				tree_ = new btDbvt();
+			}
+			~BulletDbvtBroadphase()
+			{
+				delete tree_;
+			}
 
 			void Add(GhostBody* body) override
 			{

@@ -4,6 +4,7 @@
  */
 #include "stdafx.h"
 #include "TitleScene.h"
+#include "BattleScene.h"
 
 #if defined(APP_DEBUG)
 #include "DebugScene.h"
@@ -30,7 +31,7 @@ void TitleScene::Update()
 {
 	if (g_pad[0]->IsTrigger(enButtonA)) {
 #if defined(APP_DEBUG)
-		m_requestSceneId = DebugScene::ID();
+		m_requestSceneId = BattleScene::ID();
 #endif
 	}
 
@@ -48,7 +49,7 @@ bool TitleScene::RequestScene(uint32_t& id, float& waitTime)
 {
 	if (m_requestSceneId != INVALID_SCENE_ID) {
 		id = m_requestSceneId;
-		waitTime = 0.0f;
+		waitTime = 3.0f;
 		return true;
 	}
 	return false;

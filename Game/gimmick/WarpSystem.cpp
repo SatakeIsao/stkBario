@@ -34,7 +34,8 @@ namespace app
 
         void WarpSystem::UnregisterPipe(EndpointId id)
         {
-            registMap_.erase(id);
+            /** registMap_がnullになってたので一旦コメントアウト */
+            //registMap_.erase(id);
         }
 
 

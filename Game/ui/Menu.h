@@ -24,14 +24,14 @@ namespace app
 			MenuBase() {}
 			virtual ~MenuBase() { Clear(); }
 
-            void Update()
+            virtual void Update()
             {
                 if (canvas_) {
                     canvas_->Update();
                 }
 			}
 
-			void Render(RenderContext& rc)
+            virtual void Render(RenderContext& rc)
             {
                 if (canvas_) {
                     canvas_->Render(rc);

@@ -31,7 +31,7 @@ class SceneManager
 
 private:
 	/** 次のシーンID */
-	uint32_t m_nextSceneId = INVALID_SCENE_ID;
+	uint32_t nextSceneId_ = INVALID_SCENE_ID;
 	
 	/** 経過時間 */
 	float m_elapsedTime = 0.0f;

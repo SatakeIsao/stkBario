@@ -46,7 +46,7 @@ namespace app
 		CollisionHitManager::CollisionHitManager()
 		{
 			/** DEBUG: ワイヤーフレーム描画 */
-			PhysicsWorld::Get().EnableDrawDebugWireFrame();
+			//PhysicsWorld::Get().EnableDrawDebugWireFrame();
 		}
 
 
