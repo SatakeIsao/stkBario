@@ -89,7 +89,8 @@ namespace app
 		CharacterStateMachine::CharacterStateMachine()
 		{
 			//初期ステート
-			SetCurrentState(RunCharacterState::ID());
+			//SetCurrentState(RunCharacterState::ID());
+			RequestChangeState(IdleCharacterState::ID());
 		}
 
 		CharacterStateMachine::~CharacterStateMachine()

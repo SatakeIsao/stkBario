@@ -18,6 +18,8 @@ namespace app
 		{
 			delete status_;
 			status_ = nullptr;
+
+			modelRender_.reset();
 		}
 
 		void Character::Update()
