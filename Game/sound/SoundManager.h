@@ -19,7 +19,7 @@ namespace app
      * サウンド管理クラス
      */
     class SoundManager
-    {   
+    {
     private:
         /** BMG用のサウンドソースインスタンスを保持 */
         SoundSource* m_bgm = nullptr;
@@ -32,11 +32,36 @@ namespace app
         SoundHandle m_soundHandleCount = 0;
 
 
+    public:
+        enum class SoundVolumeType : uint8_t
+        {
+            Master,
+            BGM,
+            SE,
+            Max,
+        };
+
+
+    private:
+        /** NOTE: union勉強のため書いてみる */
+        union
+        {
+            float volumes[static_cast<uint8_t>(SoundVolumeType::Max)];
+            struct
+            {
+                float volumeMaster;
+                float volumeBGM;
+                float volumeSE;
+            };
+        };
+
+
+
     private:
         SoundManager();
         ~SoundManager();
 
-    
+
     public:
         /**
          * 更新処理
@@ -46,16 +71,33 @@ namespace app
 
 
     public:
+        float GetVolume(const SoundVolumeType volumeType) const
+        {
+            return volumes[static_cast<uint8_t>(volumeType)];
+        }
+
+        void SetVolume(const SoundVolumeType volumeType, const float volume);
+
+        float ComputeOutputVolume(const SoundVolumeType volumeType)
+        {
+            float masterVolume = GetVolume(SoundVolumeType::Master);
+            float volume = masterVolume * volumes[static_cast<uint8_t>(volumeType)];
+            return volume;
+        }
+
         /** BGM再生 */
         void PlayBGM(const int kind);
         /** BGM停止 */
         void StopBGM();
-    
+        /** BGMのボリューム設定 */
+        void SetVolumeBGM(const float volume);
+
         /** SE再生 */
-        SoundHandle PlaySE(const int kind, const bool isLood = false, const bool is3D =false);
+        SoundHandle PlaySE(const int kind, const bool isLood = false, const bool is3D = false);
         /** SE停止 */
         void StopSE(const SoundHandle handle);
-
+        /** SEのボリューム設定 */
+        void SetVolumeSE(const SoundHandle handle, float volume);
 
         SoundSource* FindSE(const SoundHandle handle)
         {
@@ -94,7 +136,7 @@ namespace app
             return *m_instance;
         }
 
-    
+
         /**
          * インスタンスを破棄
          */

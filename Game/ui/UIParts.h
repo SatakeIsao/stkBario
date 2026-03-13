@@ -23,6 +23,7 @@ namespace app
 
 		protected:
 			std::unordered_map<uint32_t, std::unique_ptr<UIAnimationBase>> uiAnimationMap_;
+			uint32_t key_;
 
 
 		public:
@@ -37,6 +38,15 @@ namespace app
 
 			virtual void Update() = 0;
 			virtual void Render(RenderContext& rc) = 0;
+
+
+		public:
+			void SetKey(const uint32_t key)
+			{
+				key_ = key;
+			}
+			uint32_t GetKey() const { return key_; }
+
 
 
 		public:
@@ -306,6 +316,8 @@ namespace app
 			void UpdateNumber(const int targetDigit, const int number);
 			void UpdatePosition(const int index);
 
+			int ComputeDight();
+
 			/** 対象の桁 */
 			int GetDigit(int digit);
 		};
@@ -335,8 +347,9 @@ namespace app
 		private:
 			/**
 			 * NOTE: 各UI自体に親子関係持たせたいけど使わない可能性があるので、一旦ここだけにしてみる
+			 *       実行順を担保したかったためvectorで処理
 			 */
-			std::unordered_map<uint32_t, std::unique_ptr<UIBase>> uiMap_;
+			std::vector<std::unique_ptr<UIBase>> uiList_;
 
 
 		public:
@@ -353,21 +366,30 @@ namespace app
 			void CreateUI(const uint32_t key)
 			{
 				auto ui = std::make_unique<T>();
+				ui->SetKey(key);
 				ui->transform.SetParent(&transform);
-				uiMap_.emplace(key, std::move(ui));
+				uiList_.push_back(std::move(ui));
 			}
 
 			void RemoveUI(const uint32_t key)
 			{
-				uiMap_.erase(key);
+				// TODO:本当はstd::find使いたい
+				for (auto it = uiList_.begin(); it != uiList_.end(); it++) {
+					if ((*it)->GetKey() == key) {
+						uiList_.erase(it);
+						break;
+					}
+				}
 			}
 
 			template <typename T>
 			T* FindUI(const uint32_t key)
 			{
-				auto it = uiMap_.find(key);
-				if (it != uiMap_.end()) {
-					return dynamic_cast<T*>(it->second.get());
+				// TODO:本当はstd::find使いたい
+				for (auto it = uiList_.begin(); it != uiList_.end(); it++) {
+					if ((*it)->GetKey() == key) {
+						return dynamic_cast<T*>(it->get());
+					}
 				}
 				return nullptr;
 			}

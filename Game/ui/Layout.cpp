@@ -110,6 +110,19 @@ namespace
         text->transform.localScale = scale;
 		text->color = color;
     }
+    void InitializeUIParts(app::ui::UIDigit* text, const nlohmann::json& item)
+    {
+        const std::string assetName = item["asset"].get<std::string>();
+        const int digitCount = item["digit"].get<int>();
+        const float w = item["width"].get<float>();
+        const float h = item["height"].get<float>();
+        const Vector3 position = ParseVector3(item["position"]);
+        const Vector3 scale = ParseVector3(item["scale"]);
+        const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+
+        // 初期値の数値は0としておく
+        text->Initialize(assetName.c_str(), digitCount, 0, w, h, position, scale, rotation);
+    }
 }
 
 
@@ -189,8 +202,13 @@ namespace app
                 InitializeUIParts(text, item);
                 return text;
             }
+            if (type == "UIDigit") {
+                canvas->CreateUI<UIDigit>(key);
+                auto* digit = canvas->FindUI<UIDigit>(key);
+                InitializeUIParts(digit, item);
+                return digit;
+            }
             //if (type == "UIButton") return canvas->CreateUI<UIButton>(key);
-            //if (type == "UIDigit")  return canvas->CreateUI<UIDigit>(key);
             //if (type == "UIGauge")  return canvas->CreateUI<UIGauge>(key);
             return nullptr;
         }

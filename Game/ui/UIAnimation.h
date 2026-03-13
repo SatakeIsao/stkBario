@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <functional>       // std::function
+#include "util/Curve.h"     // EasingType, LoopMode
 
 namespace app
 {
@@ -328,7 +330,9 @@ namespace app
 			void Update() override
 			{
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				applyFunc_(curve_.GetCurrentValue());
+				if (curve_.IsPlaying()) {
+					applyFunc_(curve_.GetCurrentValue());
+				}
 			}
 		};
 
@@ -345,7 +349,9 @@ namespace app
 			void Update() override
 			{
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				applyFunc_(curve_.GetCurrentValue());
+				if (curve_.IsPlaying()) {
+					applyFunc_(curve_.GetCurrentValue());
+				}
 			}
 		};
 
@@ -362,7 +368,9 @@ namespace app
 			void Update() override
 			{
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				applyFunc_(curve_.GetCurrentValue());
+				if (curve_.IsPlaying()) {
+					applyFunc_(curve_.GetCurrentValue());
+				}
 			}
 		};
 
@@ -379,7 +387,9 @@ namespace app
 			void Update() override
 			{
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				applyFunc_(curve_.GetCurrentValue());
+				if (curve_.IsPlaying()) {
+					applyFunc_(curve_.GetCurrentValue());
+				}
 			}
 		};
 
@@ -396,8 +406,158 @@ namespace app
 			void Update() override
 			{
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				applyFunc_(curve_.GetCurrentValue());
+				if (curve_.IsPlaying()) {
+					applyFunc_(curve_.GetCurrentValue());
+				}
 			}
+		};
+
+
+
+
+		/*******************************/
+
+
+		/**
+		 * シーケンス内の1ステップ
+		 */
+		struct UIAnimationStep
+		{
+			uint32_t animationKey = 0;        // 再生するアニメーションのキー
+			float delayBefore = 0.0f;         // このステップ開始前の待機時間
+			std::function<void()> onStart;    // 開始時コールバック
+			std::function<void()> onComplete; // 完了時コールバック
+		};
+
+
+		/**
+		 * アニメーションシーケンス
+		 * 複数のアニメーションを順番に再生する
+		 *
+		 * 使用例:
+		 *   UIAnimationSequence seq;
+		 *   seq.Add(Hash32("FadeIn"))
+		 *      .Add(Hash32("ScaleUp"), 0.1f)   // 0.1秒待ってから
+		 *      .Add(Hash32("SlideOut"));
+		 *   seq.Play(uiBase);
+		 */
+		class UIAnimationSequence
+		{
+		private:
+			std::vector<UIAnimationStep> steps_;
+			int currentIndex_ = -1;
+			bool isPlaying_ = false;
+			float delayTimer_ = 0.0f;
+			bool waitingDelay_ = false;
+
+			UIBase* target_ = nullptr;
+
+			std::function<void()> onSequenceComplete_;
+
+
+		public:
+			UIAnimationSequence() {}
+			~UIAnimationSequence() {}
+
+
+			/**
+			 * ステップを追加（メソッドチェーン対応）
+			 */
+			UIAnimationSequence& Add(uint32_t animKey, float delayBefore = 0.0f)
+			{
+				UIAnimationStep step;
+				step.animationKey = animKey;
+				step.delayBefore = delayBefore;
+				steps_.push_back(step);
+				return *this;
+			}
+
+			/**
+			 * コールバック付きステップ追加
+			 */
+			UIAnimationSequence& Add(uint32_t animKey, float delayBefore,
+				std::function<void()> onStart,
+				std::function<void()> onComplete = nullptr)
+			{
+				UIAnimationStep step;
+				step.animationKey = animKey;
+				step.delayBefore = delayBefore;
+				step.onStart = std::move(onStart);
+				step.onComplete = std::move(onComplete);
+				steps_.push_back(step);
+				return *this;
+			}
+
+			/**
+			 * シーケンス全体の完了コールバック
+			 */
+			UIAnimationSequence& OnComplete(std::function<void()> callback)
+			{
+				onSequenceComplete_ = std::move(callback);
+				return *this;
+			}
+
+			/**
+			 * 再生開始
+			 */
+			void Play(UIBase* target)
+			{
+				if (steps_.empty()) return;
+				target_ = target;
+				currentIndex_ = -1;
+				isPlaying_ = true;
+				AdvanceToNext();
+			}
+
+			/**
+			 * 停止
+			 */
+			void Stop()
+			{
+				isPlaying_ = false;
+				currentIndex_ = -1;
+				waitingDelay_ = false;
+			}
+
+			/**
+			 * 毎フレーム更新
+			 */
+			void Update(float deltaTime);
+
+			bool IsPlaying() const { return isPlaying_; }
+
+			/**
+			 * ステップをクリア
+			 */
+			void Clear()
+			{
+				steps_.clear();
+				Stop();
+			}
+
+
+		private:
+			void AdvanceToNext()
+			{
+				currentIndex_++;
+				if (currentIndex_ >= static_cast<int>(steps_.size())) {
+					// 全ステップ完了
+					isPlaying_ = false;
+					if (onSequenceComplete_) onSequenceComplete_();
+					return;
+				}
+
+				const auto& step = steps_[currentIndex_];
+				if (step.delayBefore > 0.0f) {
+					delayTimer_ = step.delayBefore;
+					waitingDelay_ = true;
+				}
+				else {
+					StartCurrentStep();
+				}
+			}
+
+			void StartCurrentStep();
 		};
 	}
 }

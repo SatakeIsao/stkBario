@@ -198,6 +198,14 @@ namespace app
 		{
 			if (number_ != requestNumber_) {
 				number_ = requestNumber_;
+				digit_ = ComputeDight();
+
+				//不要な桁を削除
+				while (renderList_.size() > digit_) {
+					delete renderList_.back();
+					renderList_.pop_back();
+				}
+
 				for (int i = 0; i < digit_; ++i) {
 					UpdateNumber(i + 1, number_);
 				}
@@ -212,6 +220,7 @@ namespace app
 				UpdatePosition(i);
 				spriteRender->SetScale(transform.scale);
 				spriteRender->SetRotation(transform.rotation);
+				spriteRender->SetMulColor(color);
 				spriteRender->Update();
 			}
 
@@ -225,6 +234,7 @@ namespace app
 				spriteRender->Draw(rc);
 			}
 		}
+
 
 		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float widht, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
 		{
@@ -284,6 +294,19 @@ namespace app
 			render->SetPosition(position);
 		}
 
+		int UIDigit::ComputeDight()
+		{
+			int n = number_;
+			if (n == 0) return 1;
+			int count = 0;
+			n = std::abs(n);
+			while (n > 0) {
+				n /= 10;
+				count++;
+			}
+			return count;
+		}
+
 
 		int UIDigit::GetDigit(int digit)
 		{
@@ -302,30 +325,37 @@ namespace app
 
 		UICanvas::UICanvas()
 		{
-			uiMap_.clear();
+			uiList_.clear();
 		}
 
 
 		UICanvas::~UICanvas()
 		{
-			uiMap_.clear();
+			uiList_.clear();
 		}
 
 
 		void UICanvas::Update()
 		{
+			/** デバッグテスト */
+			UpdateAnimation();
+
 			transform.UpdateTransform();
 
-			for (auto& ui : uiMap_) {
-				ui.second->Update();
+			for (auto& ui : uiList_) {
+				/** デバッグテスト */
+				//こいつ入れるとHPバー反映されない
+				//ui.get()->color.w = this->color.w;
+
+				ui.get()->Update();
 			}
 		}
 
 
 		void UICanvas::Render(RenderContext& rc)
 		{
-			for (auto& ui : uiMap_) {
-				ui.second->Render(rc);
+			for (auto& ui : uiList_) {
+				ui.get()->Render(rc);
 			}
 		}
 	}

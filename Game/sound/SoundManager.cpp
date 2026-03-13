@@ -42,7 +42,46 @@ namespace app
 			}
 		}
 		for (const auto& key : eraseList) {
+
 			m_seList.erase(key);
+		}
+	}
+
+
+	void SoundManager::SetVolume(const SoundVolumeType volumeType, const float volume)
+	{
+		switch (volumeType)
+		{
+			case SoundVolumeType::Master:
+			{
+				volumes[static_cast<uint8_t>(volumeType)] = volume;
+				SetVolume(SoundVolumeType::BGM, volumes[static_cast<uint8_t>(SoundVolumeType::BGM)]);
+				SetVolume(SoundVolumeType::SE, volumes[static_cast<uint8_t>(SoundVolumeType::SE)]);
+				break;
+			}
+			case SoundVolumeType::BGM:
+			{
+				volumes[static_cast<uint8_t>(SoundVolumeType::BGM)] = volume;
+				// マスター(90%) * BGM
+				// 0.9 * 0.8 = 0.72
+				SetVolumeBGM(ComputeOutputVolume(SoundVolumeType::BGM));
+				break;
+			}
+			case SoundVolumeType::SE:
+			{
+				volumes[static_cast<uint8_t>(SoundVolumeType::SE)] = volume;
+				// マスター(90%) * SE
+				// 0.9 * 0.8 = 0.72
+				for (auto& it : m_seList) {
+					it.second->SetVolume(ComputeOutputVolume(SoundVolumeType::SE));
+				}
+				break;
+			}
+			default:
+			{
+				K2_ASSERT(false, "処理が追加されていません\n");
+				break;
+			}
 		}
 	}
 
@@ -53,13 +92,15 @@ namespace app
 		if (m_bgm == nullptr) {
 			// 生成
 			m_bgm = NewGO<SoundSource>(0, "bgm");
-		} else {
+		}
+		else {
 			// すでに生成されているならBGMを停止する
 			m_bgm->Stop();
 		}
 		// 初期化
 		m_bgm->Init(kind);
 		m_bgm->Play(true);	// BGMなのでループ再生する
+
 	}
 
 
@@ -69,6 +110,15 @@ namespace app
 			return;
 		}
 		m_bgm->Stop();
+	}
+
+
+	void SoundManager::SetVolumeBGM(const float volume)
+	{
+		if (m_bgm != nullptr)
+		{
+			m_bgm->SetVolume(volume);
+		}
 	}
 
 
@@ -83,7 +133,7 @@ namespace app
 		auto* se = NewGO<SoundSource>(0, "se");
 		se->Init(kind, is3D);
 		se->Play(isLood);
-
+		se->SetVolume(ComputeOutputVolume(SoundVolumeType::SE));
 		m_seList.emplace(m_soundHandleCount++, se);
 
 		return m_soundHandleCount;
@@ -99,4 +149,13 @@ namespace app
 		se->Stop();
 	}
 
+
+	void SoundManager::SetVolumeSE(const SoundHandle handle, float volume)
+	{
+		auto* se = FindSE(handle);
+		if (se == nullptr) {
+			return;
+		}
+		se->SetVolume(volume);
+	}
 }

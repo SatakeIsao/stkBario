@@ -76,5 +76,53 @@ namespace app
 					ui_->transform.localRotation.SetRotationDegZ(s);
 				});
 		}
+
+
+
+
+		/*******************************************************/
+
+
+		void UIAnimationSequence::Update(float deltaTime)
+		{
+			if (!isPlaying_ || !target_) return;
+
+			// ディレイ待ち
+			if (waitingDelay_) {
+				delayTimer_ -= deltaTime;
+				if (delayTimer_ > 0.0f) return;
+				waitingDelay_ = false;
+				StartCurrentStep();
+				return;
+			}
+
+			// 現在のアニメーション完了チェック
+			if (currentIndex_ >= 0 && currentIndex_ < static_cast<int>(steps_.size())) {
+				const auto& step = steps_[currentIndex_];
+				UIAnimationBase* anim = target_->FindAnimation(step.animationKey);
+				if (anim && !anim->IsPlay()) {
+					// 完了コールバック
+					if (step.onComplete) step.onComplete();
+					AdvanceToNext();
+				}
+			}
+		}
+
+
+		void UIAnimationSequence::StartCurrentStep()
+		{
+			if (currentIndex_ < 0 || currentIndex_ >= static_cast<int>(steps_.size())) return;
+
+			const auto& step = steps_[currentIndex_];
+			UIAnimationBase* anim = target_->FindAnimation(step.animationKey);
+			if (anim) {
+				if (step.onStart) step.onStart();
+				anim->Play();
+			}
+			else {
+				// アニメーションが見つからない場合はスキップ
+				AdvanceToNext();
+			}
+		}
 	}
 }
