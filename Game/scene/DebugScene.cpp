@@ -7,6 +7,8 @@
 #if defined(APP_DEBUG)
 
 #include "DebugScene.h"
+#include "GameOverScene.h"
+#include "GameClearScene.h"
 #include "battle/BattleManager.h"
 #include "ui/Layout.h"
 
@@ -44,8 +46,6 @@ bool DebugScene::Start()
 
 void DebugScene::Update()
 {
-	app::battle::BattleManager::Get().Update();
-
 	//testLayout->Update();
 }
 
@@ -59,10 +59,30 @@ void DebugScene::Render(RenderContext& rc)
 
 bool DebugScene::RequestScene(uint32_t& id, float& waitTime)
 {
-	if (g_pad[0]->IsTrigger(enButtonA)) {
-		//id = DebugScene::ID();
-		//waitTime = 3.0f;
-		//return true;
+	if (g_pad[0]->IsTrigger(enButtonRight)) {
+		id = GameClearScene::ID();
+		waitTime = 3.0f;
+		return true;
+	}
+	if (g_pad[0]->IsTrigger(enButtonLeft)) {
+		id = GameOverScene::ID();
+		waitTime = 3.0f;
+		return true;
+	}
+	return false;
+}
+
+
+void DebugScene::Change()
+{
+}
+
+
+bool DebugScene::CanChange() const
+{
+	if (g_pad[0]->IsTrigger(enButtonRight))
+	{
+		return true;
 	}
 
 	return false;
