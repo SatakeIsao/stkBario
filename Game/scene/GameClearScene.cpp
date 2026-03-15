@@ -6,7 +6,6 @@
 #include "stdafx.h"
 #include "GameClearScene.h"
 #include "TitleScene.h"
-#include "LoadingScene.h"
 
 
 GameClearScene::GameClearScene()

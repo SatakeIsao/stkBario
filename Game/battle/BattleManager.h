@@ -8,7 +8,6 @@
 #include "ui/HPBar.h"
 #include "ui/Layout.h"
 #include "effect/EffectManager.h"
-#include "core/PauseManagerObject.h"
 
 namespace app
 {
@@ -32,6 +31,10 @@ namespace app
     namespace effect
     {
         class EffectManagerObject;
+    }
+    namespace ui
+    {
+        class BattleSequence;
     }
 }
 
@@ -82,6 +85,7 @@ namespace app
             HPBarObject* hpBarObject_ = nullptr;
             EffectManagerObject* effectManagerObject_ = nullptr;
             app::core::PauseManagerObject* pauseManagerObject_ = nullptr;
+            app::ui::BattleSequence* battleSequenceObject_ = nullptr;
 
             /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
@@ -89,6 +93,12 @@ namespace app
             bool hasPlayedPunchEffect_ = false;
             bool deadTest_ = false;
             bool isPause_ = false;
+
+            /** あとで書き換える */
+            //Test currentDown = Test::Compleate;
+            float countDownTimer_ = 3.0f;
+            std::unique_ptr<app::ui::Layout> layout_;
+
 
         private:
             BattleManager();

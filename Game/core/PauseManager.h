@@ -24,7 +24,8 @@ namespace app
             bool isPause_ = false;
             /** Pauseフラグが切り替わった１フレームだけtrueになる */
             bool isPauseTrigger = false;
-
+            /** ポーズメニューを開くことができるか */
+            bool canPause_ = true;
 
         private:
             PauseManager();
@@ -43,6 +44,9 @@ namespace app
             bool IsPause() const { return isPause_; }
             bool IsPauseTrigger() const { return isPauseTrigger; }
 
+            /** 外部からポーズの許可/禁止を設定 */
+            void SetCanPause(bool canPause) { canPause_ = canPause; }
+            bool CanPause() const { return canPause_; }
 
             /**
              * シングルトン用

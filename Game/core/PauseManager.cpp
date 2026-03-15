@@ -34,7 +34,8 @@ namespace app
 
             // ここでボタンを押す処理書いて
             bool isOldPause = isPause_;
-            if (g_pad[0]->IsTrigger(enButtonStart))
+            if (canPause_
+                &&g_pad[0]->IsTrigger(enButtonStart))
             {
                 if (!isPause_)
                 {

@@ -180,12 +180,12 @@
     <ClCompile Include="ui\HPBar.cpp" />
     <ClCompile Include="scene\GameOverScene.cpp" />
     <ClCompile Include="scene\GameClearScene.cpp" />
-    <ClCompile Include="scene\LoadingScene.cpp" />
     <ClCompile Include="scene\BattleScene.cpp" />
     <ClCompile Include="sound\SoundManager.cpp" />
     <ClCompile Include="ui\SoundOptionMenu.cpp" />
     <ClCompile Include="core\PauseManager.cpp" />
     <ClCompile Include="core\PauseManagerObject.cpp" />
+    <ClCompile Include="ui\BattleSequence.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -351,7 +351,6 @@
     <ClInclude Include="ui\HPBar.h" />
     <ClInclude Include="scene\GameOverScene.h" />
     <ClInclude Include="scene\GameClearScene.h" />
-    <ClInclude Include="scene\LoadingScene.h" />
     <ClInclude Include="scene\BattleScene.h" />
     <ClInclude Include="sound\SoundManager.h" />
     <ClInclude Include="ui\SoundOptionMenu.h" />
@@ -359,6 +358,7 @@
     <ClInclude Include="ui\UIAnimationFactory.h" />
     <ClInclude Include="core\PauseManager.h" />
     <ClInclude Include="core\PauseManagerObject.h" />
+    <ClInclude Include="ui\BattleSequence.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

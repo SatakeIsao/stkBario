@@ -19,8 +19,10 @@
 #include "collision/GhostBodyManager.h"
 #include "collision/CollisionHitManager.h"
 #include "ui/HPBar.h"
+#include "ui/BattleSequence.h"
 #include "effect/EffectManager.h"
 #include "core/PauseManager.h"
+#include "core/PauseManagerObject.h"
 #include "sound/SoundManager.h"
 
 
@@ -106,6 +108,9 @@ namespace app
 					// 衝突ペア登録
 					app::collision::CollisionHitManager::Get().RegisterHitPair(a, b);
 				});
+
+			layout_ = std::make_unique<app::ui::Layout>();
+			layout_ ->Initialize<app::ui::MenuBase>("Assets/ui/layout/BattleSequenceMenuLayout.json");
 		}
 
 
@@ -255,6 +260,11 @@ namespace app
 				{
 					pauseManagerObject_ = NewGO<app::core::PauseManagerObject>(static_cast<uint8_t>(ObjectPriority::Pause));
 				}
+				//バトルシーケンスマネージャーオブジェクト
+				{
+					battleSequenceObject_ = NewGO<app::ui::BattleSequence>(static_cast<uint8_t>(ObjectPriority::Default));
+					//currentDown = Test::CountDown;
+				}
 				//BGM再生
 				{
 					app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
@@ -265,17 +275,44 @@ namespace app
 
 		void BattleManager::Update()
 		{
+			/** 現在のメニューポーズ状態 */
 			bool currentPause = app::core::PauseManager::Get().IsPause();
-
-			if (isPause_ != currentPause)
-			{
-				SetPause(currentPause);
+			/** シーケンス中か */
+			bool isSequence = false;
+			if (battleSequenceObject_) {
+				isSequence = battleSequenceObject_->IsPlaying();
 			}
+
+			// キャラクターたちに適用するポーズ状態（手動ポーズ中、またはシーケンス中ならポーズさせる）
+			bool targetPauseState = currentPause || isSequence;
+
+			if (isPause_ != targetPauseState)
+			{
+				SetPause(targetPauseState);
+			}
+
+			// シーケンス中は手動ポーズ（メニュー表示）を禁止する
+			app::core::PauseManager::Get().SetCanPause(!isSequence);
+
+			//if (isPause_ != currentPause)
+			//{
+			//	SetPause(currentPause);
+			//}
 			
 			if(currentPause)
 			{
 				return;
 			}
+
+			/** いらないので消す */
+			//if (currentDown == Test::CountDown)
+			//{
+			//	countDownTimer_ -= g_gameTime->GetFrameDeltaTime();
+			//
+			//	if (countDownTimer_ <= 0.0f) {
+			//		currentDown = Test::Compleate;
+			//	}
+			//}
 
 			// 上記が問題なかったら、消す
 			//if (app::core::PauseManager::Get().IsPauseTrigger()) {
@@ -293,145 +330,151 @@ namespace app
 			//	return;
 			//}
 
-			characterSteering_->Update();
 
-			// 衝突判定更新
-			if (app::collision::GhostBodyManager::IsAvailable()) {
-				app::collision::GhostBodyManager::Get().Update();
-			}
-			// 衝突ヒット管理更新
-			app::collision::CollisionHitManager::Get().Update();
-
-			// デバッグテスト: 追従の処理
-			Vector3 playerPosition = battleCharacter_->transform.position;
-			Vector3 slimePosition = eventCharacter_->transform.position;
-			//XとZのベクトルを長さに変換
-			Vector3 diffXZ(playerPosition.x - slimePosition.x, 0.0f, playerPosition.z - slimePosition.z);
-			float diff = diffXZ.Length();
-			
-			if (diff < 200.0f) {
-				//向きだけのベクトル
-				Vector3 DirectionToPlayer = diffXZ;
-				DirectionToPlayer.Normalize();
-				
-				Vector3 slimeForward = Vector3(0.0f, 0.0f, 1.0f);
-				eventCharacter_->transform.localRotation.Apply(slimeForward);
-				
-				//スライムの前方向
-				Vector3 forwardXZ(slimeForward.x, 0.0f, slimeForward.z);
-				forwardXZ.Normalize();
-				
-				//向きだけのベクトルとスライムの前方向で内積
-				float dot = forwardXZ.Dot(DirectionToPlayer);
-
-				//角度のしきい値と計算
-				float halfFovDegree = 60.0f;
-
-				float halfFovRadians = halfFovDegree * (Math::PI / 180);
-
-				//判定用のしきい値となるコサイン値
-				float threshold = std::cos(halfFovRadians);
-
-				if (dot > threshold)
-				{
-					// 視野角内に入った
-					eventCharacter_->GetStateMachine()->OnChase(DirectionToPlayer,playerPosition);
-				}
-			}
-
-			//プレイヤーの攻撃アクション
-			//TODO: Player攻撃エフェクトの修正
+			if (!isSequence)
 			{
-				if(battleCharacter_->GetStateMachine()->IsPunched())
-				{
-					effectManagerObject_->PlayEffect(
-						enEffectKind_SlimeAttack,
-						battleCharacter_->transform.position + (battleCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f),
-						Quaternion::Identity,
-						Vector3::One
-					);
-				}
-			}
+				characterSteering_->Update();
 
-			//スライムの攻撃アクション
-			{
-				if (eventCharacter_->GetStateMachine()->CheckAndConsumeAttackGhostCreated()
-					&& battleCharacter_->GetCurrentHP() > 0)
-				{
-					effectManagerObject_->PlayEffect(
-						enEffectKind_SlimeAttack,
-						eventCharacter_->transform.position + (eventCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f) + Vector3(0.0f,30.0f,0.0f),
-						Quaternion::Identity,
-						Vector3(3.0f,3.0f,3.0f)
-					);
+				// 衝突判定更新
+				if (app::collision::GhostBodyManager::IsAvailable()) {
+					app::collision::GhostBodyManager::Get().Update();
 				}
-			}
+				// 衝突ヒット管理更新
+				app::collision::CollisionHitManager::Get().Update();
 
-			//スライムのノックバック
-			{
-				if (eventCharacter_->GetStateMachine()->IsKnockBack()
-					|| eventCharacter_->GetStateMachine()->IsSquashed())
+				// デバッグテスト: 追従の処理
+				Vector3 playerPosition = battleCharacter_->transform.position;
+				Vector3 slimePosition = eventCharacter_->transform.position;
+				//XとZのベクトルを長さに変換
+				Vector3 diffXZ(playerPosition.x - slimePosition.x, 0.0f, playerPosition.z - slimePosition.z);
+				float diff = diffXZ.Length();
+
+				if (diff < 200.0f) {
+					//向きだけのベクトル
+					Vector3 DirectionToPlayer = diffXZ;
+					DirectionToPlayer.Normalize();
+
+					Vector3 slimeForward = Vector3(0.0f, 0.0f, 1.0f);
+					eventCharacter_->transform.localRotation.Apply(slimeForward);
+
+					//スライムの前方向
+					Vector3 forwardXZ(slimeForward.x, 0.0f, slimeForward.z);
+					forwardXZ.Normalize();
+
+					//向きだけのベクトルとスライムの前方向で内積
+					float dot = forwardXZ.Dot(DirectionToPlayer);
+
+					//角度のしきい値と計算
+					float halfFovDegree = 60.0f;
+
+					float halfFovRadians = halfFovDegree * (Math::PI / 180);
+
+					//判定用のしきい値となるコサイン値
+					float threshold = std::cos(halfFovRadians);
+
+					if (dot > threshold)
+					{
+						// 視野角内に入った
+						eventCharacter_->GetStateMachine()->OnChase(DirectionToPlayer, playerPosition);
+					}
+				}
+
+				//プレイヤーの攻撃アクション
+				//TODO: Player攻撃エフェクトの修正
 				{
-					if (!hasPlayedPunchEffect_)
+					if (battleCharacter_->GetStateMachine()->IsPunched())
 					{
 						effectManagerObject_->PlayEffect(
-							enEffectKind_SlimeKnockBack,
-							eventCharacter_->transform.position,
+							enEffectKind_SlimeAttack,
+							battleCharacter_->transform.position + (battleCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f),
 							Quaternion::Identity,
 							Vector3::One
 						);
-						hasPlayedPunchEffect_ = true;
 					}
 				}
-				else{
-					hasPlayedPunchEffect_ = false;
-				}
-			}
-			
 
-			//HPバー
-			{
-				const int AMOUNT_HP = 1;
-				bool isKnockBack = battleCharacter_->GetStateMachine()->GetKnockBack();
-
-				if (isKnockBack
-					&&battleCharacter_->GetCurrentHP() > 0) 
+				//スライムの攻撃アクション
 				{
-					battleCharacter_->TakeDamage(AMOUNT_HP);
-					//HPバーの現在HPの設定
-					hpBarObject_->SetCurrentHP(battleCharacter_->GetCurrentHP());
-					//エフェクト
-					effectManagerObject_->PlayEffect(
-						enEffectKind_PlayerKnockBack,
-						battleCharacter_->transform.position,
-						Quaternion::Identity,
-						Vector3::One
+					if (eventCharacter_->GetStateMachine()->CheckAndConsumeAttackGhostCreated()
+						&& battleCharacter_->GetCurrentHP() > 0)
+					{
+						effectManagerObject_->PlayEffect(
+							enEffectKind_SlimeAttack,
+							eventCharacter_->transform.position + (eventCharacter_->GetStateMachine()->GetMoveDirection() * 30.0f) + Vector3(0.0f, 30.0f, 0.0f),
+							Quaternion::Identity,
+							Vector3(3.0f, 3.0f, 3.0f)
 						);
+					}
 				}
 
-				/************************************************************************/
-
-				/** 死亡処理 */
-				if (battleCharacter_->GetCurrentHP() <= 0)
+				//スライムのノックバック
 				{
-					battleCharacter_->GetStateMachine()->OnDead();
-					/** DEBUG: 後で書き換える */
-					deadTest_ = true;
+					if (eventCharacter_->GetStateMachine()->IsKnockBack()
+						|| eventCharacter_->GetStateMachine()->IsSquashed())
+					{
+						if (!hasPlayedPunchEffect_)
+						{
+							effectManagerObject_->PlayEffect(
+								enEffectKind_SlimeKnockBack,
+								eventCharacter_->transform.position,
+								Quaternion::Identity,
+								Vector3::One
+							);
+							hasPlayedPunchEffect_ = true;
+						}
+					}
+					else {
+						hasPlayedPunchEffect_ = false;
+					}
 				}
-			}
 
-			// 衝突後の処理
-			{
-				for (auto& notify : notifyList_) {
 
+				//HPバー
+				{
+					const int AMOUNT_HP = 1;
+					bool isKnockBack = battleCharacter_->GetStateMachine()->GetKnockBack();
+
+					if (isKnockBack
+						&& battleCharacter_->GetCurrentHP() > 0)
+					{
+						battleCharacter_->TakeDamage(AMOUNT_HP);
+						//HPバーの現在HPの設定
+						hpBarObject_->SetCurrentHP(battleCharacter_->GetCurrentHP());
+						//エフェクト
+						effectManagerObject_->PlayEffect(
+							enEffectKind_PlayerKnockBack,
+							battleCharacter_->transform.position,
+							Quaternion::Identity,
+							Vector3::One
+						);
+					}
+
+					/************************************************************************/
+
+					/** 死亡処理 */
+					if (battleCharacter_->GetCurrentHP() <= 0)
+					{
+						battleCharacter_->GetStateMachine()->OnDead();
+						/** DEBUG: 後で書き換える */
+						deadTest_ = true;
+					}
 				}
-				notifyList_.clear();
+
+				// 衝突後の処理
+				{
+					for (auto& notify : notifyList_) {
+
+					}
+					notifyList_.clear();
+				}
 			}
 
 			auto gameCamera = gameCameraController_->As<app::camera::GameCamera>();
 			auto cameraData = gameCamera->GetCameraData();
 			cameraSteering_->Update(cameraData, g_gameTime->GetFrameDeltaTime());
 			gameCamera->SetState(cameraData);
+
+			layout_->Update();
 		}
 
 
