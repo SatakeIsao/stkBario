@@ -21,7 +21,7 @@
         {
             "key": "ScaleUp",
             "valueType": "Vector3",
-            "startValue": { "x": 0.7, "y": 0.7, "z": 1.0 },
+            "startValue": { "x": 1.0, "y": 0.0, "z": 1.0 },
             "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0 },
             "duration": 0.5,
             "easing": "EaseOut",
@@ -31,7 +31,7 @@
             "key": "ScaleDown",
             "valueType": "Vector3",
             "startValue": { "x": 1.0, "y": 1.0, "z": 1.0 },
-            "endValue":   { "x": 0.7, "y": 0.7, "z": 1.0 },
+            "endValue":   { "x": 1.0, "y": 0.0, "z": 1.0 },
             "duration": 0.5,
             "easing": "EaseOut",
             "loop": "Once"
@@ -66,8 +66,8 @@
         {
             "key": "FadeInPauseMenu",
             "valueType": "Vector4",
-            "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
-            "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
+            "startValue": { "x": 0.0, "y": 0.0, "z": 0.0, "w": 0.0 },
+            "endValue":   { "x": 0.3, "y": 0.3, "z": 0.3, "w": 1.0 },
             "duration": 1.0,
             "easing": "EaseOut",
             "loop": "Once"
@@ -75,10 +75,28 @@
         {
             "key": "FadeOutPauseMenu",
             "valueType": "Vector4",
-            "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
-            "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
+            "startValue": { "x": 0.3, "y": 0.3, "z": 0.3, "w": 1.0 },
+            "endValue":   { "x": 0.0, "y": 0.0, "z": 0.0, "w": 0.0 },
             "duration": 1.0,
             "easing": "EaseIn",
+            "loop": "Once"
+        },
+        {
+            "key": "ScaleUp_Ready",
+            "valueType": "Vector3",
+            "startValue": { "x": 2.0, "y": 2.0, "z": 1.0 },
+            "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0 },
+            "duration": 1.5,
+            "easing": "EaseOut",
+            "loop": "Once"
+        },
+        {
+            "key": "ScaleUp_Go",
+            "valueType": "Vector3",
+            "startValue": { "x": 0.8, "y": 0.8, "z": 1.0 },
+            "endValue":   { "x": 2.5, "y": 2.5, "z": 1.0 },
+            "duration": 0.5,
+            "easing": "EaseOut",
             "loop": "Once"
         }
     ]

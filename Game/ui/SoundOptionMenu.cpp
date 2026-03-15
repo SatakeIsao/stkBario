@@ -82,10 +82,14 @@ namespace app
 					auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
 					if (closeAnim && !closeAnim->IsPlay())
 					{
-						//canvas->RemoveAnimation(Hash32("FadeOutPauseMenu"));
 						canvas->RemoveAnimation(Hash32("ScaleDown"));
 						closeAnim = nullptr;
 						isPause_ = false;
+
+						//ForEachUI([](app::ui::UIBase* ui)
+						//	{
+						//		ui->RemoveAnimation(Hash32("FadeOutPauseMenu"));
+						//	});
 					}
 				}
 				//開く
@@ -94,8 +98,10 @@ namespace app
 					if (openAnim && !openAnim->IsPlay())
 					{
 						canvas->RemoveAnimation(Hash32("ScaleUp"));
-						//openAnim = nullptr;
-						//isPause_ = false;
+						
+						//ForEachUI([](app::ui::UIBase* ui) {
+						//	ui->RemoveAnimation(Hash32("FadeInPauseMenu"));
+						//	});
 					}
 				}
 			}
@@ -257,20 +263,30 @@ namespace app
 			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 			isPause_ = true;
 
-			auto* canvas = GetCanvas();
-			if (canvas)
+			//キャンバス
 			{
-				//canvas->RemoveAnimation(Hash32("FadeInPauseMenu"));
-				//canvas->RemoveAnimation(Hash32("FadeOutPauseMenu"));
-				canvas->RemoveAnimation(Hash32("ScaleUp"));
-				canvas->RemoveAnimation(Hash32("ScaleDown"));
+				auto* canvas = GetCanvas();
+				if (canvas)
+				{
+					canvas->RemoveAnimation(Hash32("ScaleUp"));
+					canvas->RemoveAnimation(Hash32("ScaleDown"));
+					//アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleUp"));
+					auto* openAnim = canvas->FindAnimation(Hash32("ScaleUp"));
+					if (openAnim) openAnim->Play();
+				}
+			}
 
-				//アニメーションをアタッチ
-				app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleUp"));
-
-				auto* openAnim = canvas->FindAnimation(Hash32("ScaleUp"));
-				
-				if (openAnim) openAnim->Play();
+			//各UIパーツの一斉フェードイン
+			{
+				ForEachUI([](app::ui::UIBase* ui)
+					{
+						ui->RemoveAnimation(Hash32("FadeInPauseMenu"));
+						ui->RemoveAnimation(Hash32("FadeOutPauseMenu"));
+						app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(ui, Hash32("FadeInPauseMenu"));
+						auto* openAnim = ui->FindAnimation(Hash32("FadeInPauseMenu"));
+						//if (openAnim) openAnim->Play();
+					});
 			}
 		}
 
@@ -279,25 +295,31 @@ namespace app
 		{
 			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
-			auto* canvas = GetCanvas();
-			if (canvas)
+			// キャンバス
 			{
-				//canvas->RemoveAnimation(Hash32("FadeInPauseMenu"));
-				//canvas->RemoveAnimation(Hash32("FadeOutPauseMenu"));
-				canvas->RemoveAnimation(Hash32("ScaleUp"));
-				canvas->RemoveAnimation(Hash32("ScaleDown"));
-
-				//アニメーションをアタッチ
-				//app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("FadeOutPauseMenu"));
-				app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleDown"));
-
-				auto* fadeAnim = canvas->FindAnimation(Hash32("FadeOutPauseMenu"));
-				auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
-				
-				if (fadeAnim) fadeAnim->Play();
-				if (closeAnim) closeAnim->Play();
-
+				auto* canvas = GetCanvas();
+				if (canvas)
+				{
+					canvas->RemoveAnimation(Hash32("ScaleUp"));
+					canvas->RemoveAnimation(Hash32("ScaleDown"));
+					//アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleDown"));
+					auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
+					if (closeAnim) closeAnim->Play();
+				}
 			}
+
+			//各UIパーツの一斉フェードアウト
+			{
+				ForEachUI([](app::ui::UIBase* ui) {
+					ui->RemoveAnimation(Hash32("FadeInPauseMenu"));
+					ui->RemoveAnimation(Hash32("FadeOutPauseMenu"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(ui, Hash32("FadeOutPauseMenu"));
+					auto* closeAnim = ui->FindAnimation(Hash32("FadeOutPauseMenu"));
+					//if (closeAnim) closeAnim->Play();
+					});
+			}
+			
 		}
 
 

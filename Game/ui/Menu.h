@@ -81,6 +81,14 @@ namespace app
                 uiMap_.clear();
             }
 
+            /** 登録されている全UIに対して一括処理を行う */
+            void ForEachUI(const std::function<void(UIBase*)>& func)
+            {
+                for (auto& pair : uiMap_){
+                    func(pair.second);
+                }
+            }
+
             /**
 			 * UIのロジック初期化処理
              * NOTE: ここに「ボタンが押された時の処理」などを書く
