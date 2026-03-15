@@ -79,7 +79,9 @@ namespace app
 			modelRender_ = std::make_unique<ModelRender>();
 			modelRender_->Init(param.modelName, animationClips_.data(), animationClips_.size());
 
-			transform.position = Vector3::Zero;
+			/** DEBUG: スライムと座標同じだったのでテスト用でずらした */
+			//transform.position = Vector3::Zero;
+			transform.position = Vector3(0.0f,0.0f,-500.0f);
 			transform.scale = Vector3::One;
 			transform.rotation = Quaternion::Identity;
 
