@@ -64,8 +64,10 @@ namespace app
 			/** 更新 */
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (applyFunc_) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -129,8 +131,10 @@ namespace app
 			/** 更新 */
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (applyFunc_) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -204,8 +208,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (applyFunc_) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -272,8 +278,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (applyFunc_) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -329,8 +337,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (curve_.IsPlaying()) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -348,8 +358,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (curve_.IsPlaying()) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -367,8 +379,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (curve_.IsPlaying()) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -386,8 +400,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (curve_.IsPlaying()) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
@@ -405,8 +421,10 @@ namespace app
 
 			void Update() override
 			{
+				bool wasPlaying = curve_.IsPlaying();
 				curve_.Update(g_gameTime->GetFrameDeltaTime());
-				if (curve_.IsPlaying()) {
+				// 再生中 OR 今フレームで終了した瞬間に適用
+				if (curve_.IsPlaying() || wasPlaying) {
 					applyFunc_(curve_.GetCurrentValue());
 				}
 			}
