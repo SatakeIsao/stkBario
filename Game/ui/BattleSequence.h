@@ -26,7 +26,9 @@ namespace app
 			
 			float delayTimer_ = 0.5f;
 			float maxCountDownTimer_ = 2.0f;
-			float goTimer_ = 1.0f;
+			float goTimer_ = 1.5f;
+
+			bool hasPlayedGoFadeOut_ = false;
 
 			UIIcon* readyIcon_ = nullptr;
 			UIIcon* goIcon_ = nullptr;

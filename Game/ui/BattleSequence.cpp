@@ -57,9 +57,16 @@ namespace app
 							//seq->Play(readyIcon);
 
 							/** DEBUG_TEST: UIAnimシーケンスで再生したい */
-							app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(readyIcon, Hash32("ScaleUp_Ready"));
-							auto* anim = readyIcon->FindAnimation(Hash32("ScaleUp_Ready"));
-							if (anim) anim->Play();
+							{
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(readyIcon, Hash32("ScaleUp_Ready"));
+								auto* anim = readyIcon->FindAnimation(Hash32("ScaleUp_Ready"));
+								if (anim) anim->Play();
+							}
+							{
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(readyIcon, Hash32("FadeOut2"));
+								auto* anim = readyIcon->FindAnimation(Hash32("FadeOut2"));
+								if (anim) anim->Play();
+							}
 						}
 					}
 				}
@@ -70,6 +77,7 @@ namespace app
 				if (maxCountDownTimer_ <= 0.0f)
 				{
 					currentDown_ = SequenceName::GO;
+					hasPlayedGoFadeOut_ = false;
 					if (menu)
 					{
 						auto* goIcon = menu->GetUI<UIIcon>(Hash32("Go"));
@@ -86,6 +94,31 @@ namespace app
 			else if (currentDown_ == SequenceName::GO)
 			{
 				goTimer_ -= g_gameTime->GetFrameDeltaTime();
+				if (goTimer_ <= 1.0f
+					&& !hasPlayedGoFadeOut_)
+				{
+					hasPlayedGoFadeOut_ = true;
+
+					if (menu)
+					{
+						auto* goIcon = menu->GetUI<UIIcon>(Hash32("Go"));
+						if (goIcon)
+						{
+							goIcon->RemoveAnimation(Hash32("ScaleUp_Go"));
+							{
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(goIcon, Hash32("FadeOut"));
+								auto* animFade = goIcon->FindAnimation(Hash32("FadeOut"));
+								if (animFade) animFade->Play();
+							}
+							{
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(goIcon, Hash32("ScaleUp_Go2"));
+								auto* animFade2 = goIcon->FindAnimation(Hash32("ScaleUp_Go2"));
+								if (animFade2)animFade2->Play();
+							}
+						}
+					}
+				}
+
 				if (goTimer_ <= 0.0f)
 				{
 					currentDown_ = SequenceName::Finished;
