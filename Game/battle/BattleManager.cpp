@@ -116,9 +116,11 @@ namespace app
 
 		BattleManager::~BattleManager()
 		{
+			DeleteGO(skyCube_);
 			DeleteGO(battleCharacter_);
 			DeleteGO(eventCharacter_);
 			DeleteGO(hpBarObject_);
+			DeleteGO(coinUIObject_);
 			for (auto& test : testGimmickList_)
 			{
 				DeleteGO(test);
@@ -126,6 +128,10 @@ namespace app
 			for (auto& pipe : pipeGimmickList_)
 			{
 				DeleteGO(pipe);
+			}
+			for (auto& coin : coinGimmickList_)
+			{
+				DeleteGO(coin);
 			}
 
 			// パラメーター解放
@@ -143,6 +149,16 @@ namespace app
 			// パラメーター読み込み
 			LoadParameter();
 
+			// スカイキューブ
+			{
+				skyCube_ = NewGO<nsK2EngineLow::SkyCube>(0, "skycube");
+				//明るさを設定
+				skyCube_->SetLuminance(1.0f);
+				skyCube_->SetScale(300.0f);
+				skyCube_->SetPosition({ 1000.0f,0.0f,1000.0f });
+				//スカイキューブの種類を設定
+				skyCube_->SetType((nsK2EngineLow::EnSkyCubeType)enSkyCubeType_Day);
+			}
 			{
 				characterSteering_ = std::make_unique<app::actor::CharacterSteering>();
 				// マリオにしてみた
@@ -225,6 +241,14 @@ namespace app
 					pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 1, 0, Vector3::Down);
 					pipeGimmickList_.push_back(pipeGimmick);
 				}
+				// コイン
+				{
+					coinGimmick_ = NewGO<app::actor::CoinGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "coinGimmick");
+					coinGimmick_->transform.localPosition = Vector3(-200.0f, 20.0f, 0.0f);
+					coinGimmick_->transform.UpdateTransform();
+					coinGimmick_->Initialize("Assets/ModelData/item/coin/coin.tkm", 0, Vector3::Down);
+					coinGimmickList_.push_back(coinGimmick_);
+				}
 				// カメラ初期化
 				{
 					auto parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterBattleCameraParameter>();
@@ -250,7 +274,11 @@ namespace app
 				//HPバー
 				{
 					// HPバー生成
-					hpBarObject_ = NewGO<HPBarObject>(static_cast<uint8_t>(ObjectPriority::Default));
+					hpBarObject_ = NewGO<app::ui::HPBarObject>(static_cast<uint8_t>(ObjectPriority::Default));
+				}
+				//コインUI
+				{
+					coinUIObject_ = NewGO < app::ui::CoinUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
 				}
 				//エフェクトマネージャーオブジェクト
 				{
@@ -293,42 +321,11 @@ namespace app
 
 			// シーケンス中は手動ポーズ（メニュー表示）を禁止する
 			app::core::PauseManager::Get().SetCanPause(!isSequence);
-
-			//if (isPause_ != currentPause)
-			//{
-			//	SetPause(currentPause);
-			//}
 			
 			if(currentPause)
 			{
 				return;
 			}
-
-			/** いらないので消す */
-			//if (currentDown == Test::CountDown)
-			//{
-			//	countDownTimer_ -= g_gameTime->GetFrameDeltaTime();
-			//
-			//	if (countDownTimer_ <= 0.0f) {
-			//		currentDown = Test::Compleate;
-			//	}
-			//}
-
-			// 上記が問題なかったら、消す
-			//if (app::core::PauseManager::Get().IsPauseTrigger()) {
-			//	if (app::core::PauseManager::Get().IsPause()) {
-			//		// ここでGameObject止める
-			//		SetPause(true);
-			//	} else {
-			//		// ここでGameObject動かす
-			//		SetPause(false);
-			//	}
-			//}
-			//
-			//
-			//if (app::core::PauseManager::Get().IsPause()) {
-			//	return;
-			//}
 
 
 			if (!isSequence)
@@ -426,6 +423,43 @@ namespace app
 					else {
 						hasPlayedPunchEffect_ = false;
 					}
+				}
+
+
+				// コイン
+				{
+					if (coinGimmick_->IsDead()
+						&& !coinUIObject_->HasCoinDeadEffect())
+					{
+						//エフェクト
+						effectManagerObject_->PlayEffect(
+							enEffectKind_PlayerKnockBack,
+							coinGimmick_->transform.position += Vector3(0.0f, 10.0f, 0.0f),
+							Quaternion::Identity,
+							Vector3::One
+						);
+						totalCoin_++;
+
+						coinUIObject_->SetCoinNumber(totalCoin_);
+						coinUIObject_->SetCoinDeadEffect(true);
+
+						coinUIObject_->GetPlayAnimation();
+					}
+					/** デバッグテスト */
+					if (g_pad[0]->IsTrigger(enButtonLB1))
+					{
+						totalCoin_--;
+						if (totalCoin_ <= 0) totalCoin_ = 0;
+					}
+					if (g_pad[0]->IsTrigger(enButtonRB1))
+					{
+						totalCoin_++;
+						coinUIObject_->GetPlayAnimation();
+						if (totalCoin_ >= 20) totalCoin_ = 20;
+					}
+					/*************************/
+					coinUIObject_->SetCoinNumber(totalCoin_);
+
 				}
 
 

@@ -14,7 +14,16 @@
             "valueType": "Vector4",
             "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
             "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
-            "duration": 1.0,
+            "duration": 0.5,
+            "easing": "EaseOut",
+            "loop": "Once"
+        },
+        {
+            "key": "FadeOut2",
+            "valueType": "Vector4",
+            "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
+            "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
+            "duration": 2.0,
             "easing": "EaseIn",
             "loop": "Once"
         },
@@ -97,6 +106,33 @@
             "endValue":   { "x": 2.5, "y": 2.5, "z": 1.0 },
             "duration": 0.5,
             "easing": "EaseOut",
+            "loop": "Once"
+        },
+        {
+            "key": "ScaleUp_Go2",
+            "valueType": "Vector3",
+            "startValue": { "x": 2.5, "y": 2.5, "z": 1.0 },
+            "endValue":   { "x": 10.5, "y": 10.5, "z": 1.0 },
+            "duration": 0.5,
+            "easing": "EaseOut",
+            "loop": "Once"
+        },
+        {
+            "key": "CoinBounceUpY",
+            "valueType": "Vector3",
+            "startValue": { "x": 750.0, "y": 300.0, "z": 0.0 },
+            "endValue":   { "x": 750.0, "y": 330.0, "z": 0.0 }, 
+            "duration": 0.15,
+            "easing": "EaseInOut",
+            "loop": "Once"
+        },
+        {
+            "key": "CoinBounceDownY",
+            "valueType": "Vector3",
+            "startValue": { "x": 750.0, "y": 330.0, "z": 0.0 },
+            "endValue":   { "x": 750.0, "y": 300.0, "z": 0.0 }, 
+            "duration": 0.15,
+            "easing": "EaseInOut",
             "loop": "Once"
         }
     ]

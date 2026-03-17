@@ -5,10 +5,13 @@
 #pragma once
 #include "camera/CameraCommon.h"
 #include "camera/CameraSteering.h"
-#include "ui/HPBar.h"
 #include "ui/Layout.h"
 #include "effect/EffectManager.h"
 
+namespace nsK2EngineLow
+{
+    class SkyCube;
+}
 namespace app
 {
     namespace actor
@@ -17,8 +20,8 @@ namespace app
         class EventCharacter;
         class CharacterSteering;
         class StaticGimmick;
-        class HPBarObject;
         class PipeGimmick;
+        class CoinGimmick;
     }
     namespace collision
     {
@@ -34,6 +37,8 @@ namespace app
     }
     namespace ui
     {
+        class HPBarObject;
+        class CoinUIObject;
         class BattleSequence;
     }
 }
@@ -75,30 +80,34 @@ namespace app
             // @todo for test
             app::actor::BattleCharacter* battleCharacter_ = nullptr;
             app::actor::EventCharacter* eventCharacter_ = nullptr;
+            app::actor::CoinGimmick* coinGimmick_ = nullptr;
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
             std::vector<app::actor::PipeGimmick*> pipeGimmickList_;
+            std::vector<app::actor::CoinGimmick*> coinGimmickList_;
             
             std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
 			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
 			app::camera::RefCameraController gameCameraController_ = nullptr;
 
-            HPBarObject* hpBarObject_ = nullptr;
             EffectManagerObject* effectManagerObject_ = nullptr;
             app::core::PauseManagerObject* pauseManagerObject_ = nullptr;
+            app::ui::HPBarObject* hpBarObject_ = nullptr;
+            app::ui::CoinUIObject* coinUIObject_ = nullptr;
             app::ui::BattleSequence* battleSequenceObject_ = nullptr;
 
+            nsK2EngineLow::SkyCube* skyCube_ = nullptr;									//スカイキューブのオブジェクト
             /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
-
-            bool hasPlayedPunchEffect_ = false;
-            bool deadTest_ = false;
-            bool isPause_ = false;
 
             /** あとで書き換える */
             //Test currentDown = Test::Compleate;
             float countDownTimer_ = 3.0f;
+            int totalCoin_ = 0;
             std::unique_ptr<app::ui::Layout> layout_;
 
+            bool hasPlayedPunchEffect_ = false;
+            bool deadTest_ = false;
+            bool isPause_ = false;
 
         private:
             BattleManager();
