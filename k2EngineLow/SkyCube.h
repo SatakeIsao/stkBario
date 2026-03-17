@@ -19,7 +19,7 @@ namespace nsK2EngineLow {
 		enSkyCubeType_NightToon,		// 夜間(トゥーン調)
 		enSkyCubeType_NightToon_2,		// 夜間(トゥーン調)２
 		enSkyCubeType_SunriseToon,		// 明け方(トゥーン調)
-		enSkyCubeType_SpaceToon,		// 大気圏(トゥーン調)
+		//enSkyCubeType_SpaceToon,		// 大気圏(トゥーン調)
 		enSkyCubeType_SpaceToon_2,		// 大気圏(トゥーン調)２
 		enSkyCubeType_Num,
 
@@ -67,7 +67,7 @@ namespace nsK2EngineLow {
 		ModelRender m_modelRender;
 		Texture m_texture[enSkyCubeType_Num];
 		Vector3 m_position = g_vec3Zero;
-		Vector3 m_scale = g_vec3One * 50.0f;
+		Vector3 m_scale = g_vec3One * 1000.0f;
 		EnSkyCubeType m_type = enSkyCubeType_Day;
 		Quaternion m_rot = { 0.0f,0.0f,0.0f,1.0f };
 		const wchar_t* m_textureFilePaths[enSkyCubeType_Num];

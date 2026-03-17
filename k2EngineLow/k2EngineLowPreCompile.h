@@ -124,3 +124,5 @@ static const int MAX_BONE = 512;	// ƒ{[ƒ“‚ÌÅ‘å”B
 #include "graphics/effect/EffectEngine.h"
 #include "sound/SoundSource.h"
 #include "graphics/effect/EffectEmitter.h"
+
+#include "SkyCube.h"

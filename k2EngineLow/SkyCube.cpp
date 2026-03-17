@@ -21,7 +21,7 @@ namespace nsK2EngineLow
 		m_textureFilePaths[enSkyCubeType_NightToon] = L"Assets/ModelData/preset/skyCubeMapNight_Toon.dds";
 		m_textureFilePaths[enSkyCubeType_NightToon_2] = L"Assets/ModelData/preset/skyCubeMapNight_Toon_02.dds";
 		m_textureFilePaths[enSkyCubeType_SunriseToon] = L"Assets/ModelData/preset/skyCubeMapSunrise_Toon.dds";
-		m_textureFilePaths[enSkyCubeType_SpaceToon] = L"Assets/ModelData/preset/skyCubeMapSpace_Toon.dds";
+		//m_textureFilePaths[enSkyCubeType_SpaceToon] = L"Assets/ModelData/preset/skyCubeMapSpace_Toon.dds";
 		m_textureFilePaths[enSkyCubeType_SpaceToon_2] = L"Assets/ModelData/preset/skyCubeMapSpace_Toon_2.dds";
 	}
 

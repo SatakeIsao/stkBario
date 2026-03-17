@@ -225,7 +225,7 @@ namespace nsK2EngineLow
 		/// <param name="initData"></param>
 		void InitSkyCubeModel(ModelInitData& initData)
 		{
-			m_renderToGBufferModel.Init(initData);
+			m_model.Init(initData);
 		}
 
 		/// <summary>
