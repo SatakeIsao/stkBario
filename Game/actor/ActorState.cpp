@@ -62,8 +62,23 @@ namespace app
 
 		void RunCharacterState::Enter()
 		{
+
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run));
+
+			//  runBody_ = new app::collision::GhostBody();
+			//  runBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(),10.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+			//  // @todo for test
+			//  const float radius = characterStateMachine->GetStatus()->GetRadius();
+			//  // キャラクターの現在の回転から前方向ベクトルを計算する
+			//  Vector3 forward = Vector3(0.0f, 0.0f, 1.0f); // または Vector3::Front
+			//  characterStateMachine->transform.rotation.Apply(forward);
+			//  forward.Normalize();
+			//  
+			//  // キャラクターの正面にゴーストを配置
+			//  runBody_->SetPosition(characterStateMachine->transform.position + forward * (radius) + Vector3(0.0f, radius, 0.0f));
+			//  //runBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
+			//  runBody_->SetRotation(characterStateMachine->transform.rotation);
 		}
 
 
@@ -74,11 +89,30 @@ namespace app
 			characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetMoveSpeed());
 
 			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveSpeedVector());
+
+			//  //ゴーストの位置をスライムの現在位置に合わせて追従させる
+			//  if (runBody_)
+			//  {
+			//  	const float radius = characterStateMachine->GetStatus()->GetRadius();
+			//  	// GetMoveDirection() ではなく、キャラクターの実際の向きを使う
+			//  	Vector3 forward = Vector3(0.0f, 0.0f, 1.0f);
+			//  	characterStateMachine->transform.rotation.Apply(forward);
+			//  	forward.Normalize();
+			//  
+			//  	// キャラクターの正面に追従させる
+			//  	runBody_->SetPosition(characterStateMachine->transform.position + forward * (radius) + Vector3(0.0f, radius, 0.0f));
+			//  	runBody_->SetRotation(characterStateMachine->transform.rotation);
+			//  }
 		}
 
 
 		void RunCharacterState::Exit()
 		{
+			//if (runBody_ != nullptr)
+			//{
+			//	delete runBody_;
+			//	runBody_ = nullptr;
+			//}
 		}
 
 
@@ -107,7 +141,6 @@ namespace app
 			attackScheduler_->AddTimer(0.1f, [&]()
 				{
 					auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-					//characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::SlimeAnimationKind::Attack));
 					attackBody_ = new app::collision::GhostBody();
 					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 20.0f, app::collision::ghost::CollisionAttribute::Enemy, app::collision::ghost::CollisionAttributeMask::All);
 					isAttackBody_ = true;

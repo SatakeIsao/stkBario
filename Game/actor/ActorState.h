@@ -72,6 +72,8 @@ namespace app
 			appState(RunCharacterState);
 
 
+		private:
+			app::collision::GhostBody* runBody_ = nullptr;
 		public:
 			RunCharacterState(IStateMachine* owner);
 			~RunCharacterState();

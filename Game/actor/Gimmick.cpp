@@ -74,7 +74,6 @@ namespace app
 			modelRender_->Update();
 			// 物理オブジェクト作成
 			physicalBody_.reset(new app::collision::PhysicalBody());
-			//physicalBody_->CreateFromModel(modelRender_->GetModel(), Matrix::Identity, app::collision::CollisionAttribute::Ground);
 
 			app::collision::Bounds bounds;
 			bounds.Compute(modelRender_->GetModel());
@@ -178,6 +177,118 @@ namespace app
 		Vector3 PipeGimmick::GetForward() const
 		{
 			return forward_;
+		}
+
+
+
+		/******************************************/
+
+
+		CoinGimmick::CoinGimmick()
+		{
+		}
+
+
+		CoinGimmick::~CoinGimmick()
+		{
+		}
+
+
+		bool CoinGimmick::Start()
+		{
+			IGimmick::Start();
+
+			// システムへの登録
+			if (endpointId_ >= 0) {
+				//app::gimmick::WarpSystem::Get().RegisterPipe(endpointId_, this);
+				// TODO: 簡易実装としてここでリンクも登録してしまう（本来はLevelLoaderなどがやるべき）
+				if (targetEndpointId_ >= 0) {
+					//app::gimmick::WarpSystem::Get().AddLink(endpointId_, targetEndpointId_);
+				}
+			}
+
+			return true;
+		}
+
+
+		void CoinGimmick::Update()
+		{
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			transform.position += velocity_ * deltaTime;
+
+			if (isDead_)
+			{
+				const float shlinkScale = 2.0f;
+				actionScale_ -= shlinkScale * deltaTime;
+				if (actionScale_ <= 0.0f){
+					actionScale_ = 0.0f;
+					Dead();
+				}
+				transform.scale = Vector3(actionScale_, actionScale_, actionScale_);
+			}
+			
+
+			// 高速で回転
+			Quaternion rot;
+			rot.SetRotationDegY(deltaTime * 500.0f);
+			transform.rotation *= rot;
+
+			IGimmick::Update();
+		}
+
+
+		void CoinGimmick::Render(RenderContext& rc)
+		{
+			IGimmick::Render(rc);
+		}
+
+
+		void CoinGimmick::Initialize(const char* path, int32_t myId, const Vector3& forward)
+		{
+			// ID設定
+			endpointId_ = myId;
+
+			// 方向設定
+			forward_ = forward;
+
+			// モデル読み込み
+			modelRender_ = std::make_unique<ModelRender>();
+			modelRender_->Init(path);
+			modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
+			modelRender_->Update();
+
+			// バウンディングボックス計算
+			boudingVolume_.Compute(modelRender_->GetModel());
+			// サイズ計算
+			Vector3 size = boudingVolume_.maxPoint - boudingVolume_.minPoint;
+			Vector3 halfSize = size / 2.0f;
+
+			// ゴーストボディ作成
+			ghostBody_.reset(new app::collision::GhostBody());
+			ghostBody_->CreateCapsule(this, ID(), 10.0f, 20.0f, app::collision::ghost::CollisionAttribute::Coin, app::collision::ghost::CollisionAttributeMask::Coin);
+			ghostBody_->SetPosition(transform.position);
+		}
+
+		void CoinGimmick::DeadAction()
+		{
+			// 上に跳ねあがるための初速を設定
+			velocity_.y += 10.0f;
+			actionScale_ = 1.0f;
+
+			isDead_ = true;
+		}
+
+
+		const Vector3& CoinGimmick::GetPosition() const
+		{
+			return Vector3(transform.position.x, transform.position.y, transform.position.z);
+		}
+
+
+		const Quaternion& CoinGimmick::GetRotation() const
+		{
+			return transform.rotation;
 		}
 	}
 }

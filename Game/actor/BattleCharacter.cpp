@@ -53,7 +53,8 @@ namespace app
 			transform.UpdateTransform();
 			stateMachine_->transform.position = nextPosition;
 
-			ghostBody_->SetPosition(transform.position);
+			transform.localPosition.y += 30.0f;
+			ghostBody_->SetPosition(transform.localPosition);
 
 			SuperClass::Update();
 		}
@@ -85,7 +86,7 @@ namespace app
 			transform.scale = Vector3::One;
 			transform.rotation = Quaternion::Identity;
 
-			ghostBody_->CreateCapsule(this, ID(), status_->GetRadius(), status_->GetHeight(), app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+			ghostBody_->CreateCapsule(this, ID(), status_->GetRadius() + 15.0f, status_->GetHeight()+60.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 		}
 	}
 }

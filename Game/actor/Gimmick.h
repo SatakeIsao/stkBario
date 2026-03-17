@@ -104,5 +104,46 @@ namespace app
 			/** 土管の入り口方向（吸い込まれる方向） */
 			Vector3 GetForward() const;
 		};
+
+
+
+
+		/******************************************/
+
+
+		class CoinGimmick : public IGimmick
+		{
+			appActor(CoinGimmick);
+
+			
+		private:
+			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
+			uint32_t endpointId_ = -1;
+			uint32_t targetEndpointId_ = -1;
+			app::collision::Bounds boudingVolume_;
+			/** 吸い込まれる方向 */
+			Vector3 forward_;
+			/** 跳ねるアクション速度 */
+			Vector3 velocity_ = Vector3::Zero;
+			float actionScale_ = 1.0f;
+
+			bool isDead_ = false;
+
+		public:
+			CoinGimmick();
+			virtual ~CoinGimmick();
+			bool Start() override;
+			void Update() override;
+			void Render(RenderContext& rc) override;
+
+			virtual void Initialize(const char* path) override {}
+			virtual void Initialize(const char* path, int32_t myId, const Vector3& forward);
+
+			void DeadAction();
+			bool IsDead() { return isDead_;}
+		public:
+			const Vector3& GetPosition() const;
+			const Quaternion& GetRotation() const;
+		};
 	}
 }

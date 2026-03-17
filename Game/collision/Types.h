@@ -45,6 +45,7 @@ namespace app
 					Enemy = 1 << 1,
 					StaticGimmick = 1 << 2,
 					Pipe = 1 << 3,
+					Coin = 1 << 4,
 				};
 			};
 
@@ -53,10 +54,11 @@ namespace app
 			{
 				enum Enum : uint32_t
 				{
-					Player			= CollisionAttribute::Enemy | CollisionAttribute::Pipe,
+					Player			= CollisionAttribute::Enemy | CollisionAttribute::Pipe | CollisionAttribute::Coin,
 					Enemy			= 1 << 1,
 					StaticGimmick	= 1 << 2,
 					Pipe			= CollisionAttribute::Player,
+					Coin			= CollisionAttribute::Player,
 					All				= 0xFFFFFFFF,
 				};
 			};

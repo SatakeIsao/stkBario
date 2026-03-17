@@ -68,6 +68,7 @@ namespace app
 				app::memory::StackAllocatorMarker marker;
 				app::memory::StackVector<Pair*>  pipeHitPairList(marker);
 				app::memory::StackVector<Pair*>  eventCharacterPairList(marker);
+				app::memory::StackVector<Pair*>  coinHitPairList(marker);
 				for (auto& hitPair : hitPairList_) {
 					char idBuf[256];
 					sprintf_s(idBuf, "Collision! A_ID: %u, B_ID: %u\n", hitPair.a->GetOwnerId(), hitPair.b->GetOwnerId());
@@ -81,6 +82,10 @@ namespace app
 					if (ContainsEventCharacterPair(hitPair)) {
 						eventCharacterPairList.push_back(&hitPair);
 					}
+					// コインのペアか
+					if (ContainsCoinGimmickPair(hitPair)) {
+						coinHitPairList.push_back(&hitPair);
+					}
 				}
 
 				for (auto* pair : pipeHitPairList) {
@@ -88,6 +93,9 @@ namespace app
 				}
 				for (auto* pair : eventCharacterPairList) {
 					UpdateEventCharacterPair(*pair);
+				}
+				for (auto* pair : coinHitPairList) {
+					UpdateCoinGimmickPair(*pair);
 				}
 			}
 			hitPairList_.clear();
@@ -172,12 +180,15 @@ namespace app
 			if (colliedPlayerBody != nullptr
 				&& colliedPlayerBody != battleCharacter->GetGhostBody())
 			{
-				//プレイヤーからスライムへのベクトルを計算
-				Vector3 knockBackDirection = slimePos - playerPos;
-				knockBackDirection.y = 0.0f;
-				knockBackDirection.Normalize();
-				//スライムがノックバックした
-				eventCharacter->GetStateMachine()->OnKnockBack(knockBackDirection);
+				if (battleCharacter->GetStateMachine()->GetCurrentStateID() == app::actor::PunchCharacterState::ID())
+				{
+					//プレイヤーからスライムへのベクトルを計算
+					Vector3 knockBackDirection = slimePos - playerPos;
+					knockBackDirection.y = 0.0f;
+					knockBackDirection.Normalize();
+					//スライムがノックバックした
+					eventCharacter->GetStateMachine()->OnKnockBack(knockBackDirection);
+				}
 			}
 			/** プレイヤー本体のゴーストと衝突した時 */
 			else
@@ -198,6 +209,41 @@ namespace app
 				{
 					battleCharacter->GetStateMachine()->OnKnockBack();
 				}
+			}
+		}
+
+		bool CollisionHitManager::ContainsCoinGimmickPair(const Pair& hitPair)
+		{
+			if (!IsHitObject<app::actor::CoinGimmick>(hitPair)) {
+				return false;
+			}
+			if (!IsHitObject<app::actor::BattleCharacter>(hitPair)) {
+				return false;
+			}
+			return true;
+		}
+
+		void CollisionHitManager::UpdateCoinGimmickPair(Pair& hitPair)
+		{
+			auto* battleCharacter = GetHitObject<app::actor::BattleCharacter>(hitPair);
+			auto* coinCharacter = GetHitObject <app::actor::CoinGimmick>(hitPair);
+
+			app::collision::GhostBody* colliedPlayerBody = nullptr;
+			if (hitPair.a->GetOwnerId() == app::actor::BattleCharacter::ID())
+			{
+				colliedPlayerBody = hitPair.a;
+			}
+			else if (hitPair.b->GetOwnerId() == app::actor::BattleCharacter::ID())
+			{
+				colliedPlayerBody = hitPair.b;
+			}
+
+			//当たり判定の時
+			if (colliedPlayerBody != nullptr
+				&& colliedPlayerBody == battleCharacter->GetGhostBody())
+			{
+				coinCharacter->DeadAction();
+				coinCharacter->IsDead();
 			}
 		}
 	}

@@ -36,6 +36,8 @@ namespace app
 			virtual void Initialize() = 0;
 			virtual void Update() = 0;
 
+			uint32_t GetCurrentStateID() const { return currentStateId_; }
+
 
 		public:
 			template <typename T>

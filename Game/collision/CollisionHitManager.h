@@ -32,7 +32,6 @@ namespace app
 
 		private:
 			std::vector<Pair> hitPairList_;
-			
 
 		private:
 			CollisionHitManager();
@@ -54,6 +53,9 @@ namespace app
 			/** スライムを含むペアか */
 			bool ContainsEventCharacterPair(const Pair& hitPair);
 			void UpdateEventCharacterPair(Pair& hitPair);
+			/** コインを含むペアか */
+			bool ContainsCoinGimmickPair(const Pair& hitPair);
+			void UpdateCoinGimmickPair(Pair& hitPair);
 
 
 
