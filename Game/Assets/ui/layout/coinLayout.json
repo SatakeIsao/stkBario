@@ -1,0 +1,40 @@
+﻿{
+  "canvas": {
+    "elements": [
+      {
+        "type": "UIIcon",
+        "name": "coin",
+        "asset": "Assets/ui/seq/coin.DDS",
+        "width": 90,
+        "height": 90,
+        "position": [530, 300, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      },
+      {
+        "type": "UIIcon",
+        "name": "coinMul",
+        "asset": "Assets/ui/seq/mulCoin.DDS",
+        "width": 57,
+        "height": 52,
+        "position": [610, 285, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      },
+      {
+        "type": "UIDigit",
+        "name": "coinNumbers",
+        "asset": "Assets/ui/seq/numbers",
+        "digit":2,
+        "width": 70,
+        "height": 100,
+        "position": [750, 300, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      }
+    ]
+  }
+}
