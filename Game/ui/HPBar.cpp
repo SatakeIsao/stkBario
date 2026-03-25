@@ -3,12 +3,16 @@
 #include "ui/Layout.h"
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
+#include "battle/BattleManager.h"
 
 
 namespace
 {
 	static const int MAX_HP = 8;
+	static const int MAX_TIME = 10;
 	static const float BOUNCE_DURACTION = 0.30f;
+	/** 点滅を開始するタイミングのしきい値 */
+	static const float HURRY_UP_TRIGGER_TIME = 30.0f;
 }
 
 namespace app
@@ -107,7 +111,15 @@ namespace app
 				auto coinDigit = menu->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
 				if (coinDigit)
 				{
+					coinDigit->SetZeroPadding(true);
 					coinDigit->SetNumber(currentCoin_);
+
+					if (currentCoin_ >= 5)
+					{
+						/** ハイスコアで黄色を増す */
+						coinDigit->color = Vector4(1.3f, 1.3f, 0.0f, 1.0f);
+					}
+
 					// バウンド中の処理
 					if (bounceState_ != BounceState::enStop)
 					{
@@ -189,6 +201,255 @@ namespace app
 						bounceTime_ = 0.0f;
 					}
 				}
+			}
+		}
+
+
+
+
+		/******************************************************/
+
+
+		TimerUIObject::TimerUIObject()
+		{
+			layout_ = std::make_unique<app::ui::Layout>();
+			layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/timerLayout.json");
+
+			timer_ = MAX_TIME;
+		}
+
+		TimerUIObject::~TimerUIObject()
+		{}
+
+		void TimerUIObject::Update()
+		{
+			// 0未満にならないように制限
+			if (timer_ <= 0.0f) {
+				timer_ = 0.0f;
+			}
+
+			// タイマーが巻き戻った時（リトライなど）にフラグをリセット
+			if (timer_ > 100.0f) hasPulsed100_ = false;
+			if (timer_ > 50.0f)  hasPulsed50_ = false;
+			if (timer_ > 30.0f)  hasPulsed30_ = false;
+
+			// ① 100秒になった瞬間
+			if (timer_ <= 100.0f && !hasPulsed100_) {
+				hasPulsed100_ = true;
+				bounceState_ = BounceState::enUp;
+				bounceTime_ = 0.0f;
+			}
+			// ② 50秒になった瞬間
+			else if (timer_ <= 50.0f && !hasPulsed50_) {
+				hasPulsed50_ = true;
+				bounceState_ = BounceState::enUp;
+				bounceTime_ = 0.0f;
+			}
+			// ③ 30秒になった瞬間
+			else if (timer_ <= 30.0f && !hasPulsed30_) {
+				hasPulsed30_ = true;
+				bounceState_ = BounceState::enUp;
+				bounceTime_ = 0.0f;
+			}
+
+			// パルスの状態更新（0.2秒で拡大、さらに0.2秒で縮小して停止）
+			if (bounceState_ != BounceState::enStop)
+			{
+				bounceTime_ += g_gameTime->GetFrameDeltaTime();
+
+				if (bounceState_ == BounceState::enUp && bounceTime_ >= 0.2f) {
+					bounceState_ = BounceState::enDown;
+				}
+				else if (bounceState_ == BounceState::enDown && bounceTime_ >= 0.4f) {
+					bounceState_ = BounceState::enStop; // ここで止める
+				}
+			}
+
+			/** UIの描画とアニメーション制御 */
+			auto* menu = layout_->GetMenu();
+			if (menu)
+			{
+				/** 数字 (timerDigit) の処理 */
+				{
+					auto timerDigit = menu->GetUI<app::ui::UIDigit>(Hash32("timerNumbers"));
+					if (timerDigit)
+					{
+						// 数値のセット
+						timerDigit->SetZeroPadding(true);
+						timerDigit->SetNumber(static_cast<int>(std::ceil(timer_)));
+
+						// スケールアニメーション
+						if (bounceState_ == BounceState::enUp)
+						{
+							auto* animDown = timerDigit->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (animDown && animDown->IsPlay()) animDown->Stop();
+
+							auto* animUp = timerDigit->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (!animUp) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timerDigit, Hash32("timerPulseScaleUp"));
+								animUp = timerDigit->FindAnimation(Hash32("timerPulseScaleUp"));
+							}
+							if (animUp && !animUp->IsPlay()) animUp->Play();
+						}
+						else if (bounceState_ == BounceState::enDown)
+						{
+							auto* animUp = timerDigit->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (animUp && animUp->IsPlay()) animUp->Stop();
+
+							auto* animDown = timerDigit->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (!animDown) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timerDigit, Hash32("timerPulseScaleDown"));
+								animDown = timerDigit->FindAnimation(Hash32("timerPulseScaleDown"));
+							}
+							if (animDown && !animDown->IsPlay()) animDown->Play();
+						}
+						else // BounceState::enStop
+						{
+							auto* animUp = timerDigit->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (animUp && animUp->IsPlay()) animUp->Stop();
+							auto* animDown = timerDigit->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (animDown && animDown->IsPlay()) animDown->Stop();
+
+							timerDigit->transform.scale = Vector3::One;
+						}
+
+
+						/** 点滅アニメーション */
+						auto* animRed = timerDigit->FindAnimation(Hash32("timerRedFlash"));
+						auto* animFast = timerDigit->FindAnimation(Hash32("timerFastBlink"));
+
+						// 拡大・縮小の最中 (ドクン！とやっている間)
+						if (bounceState_ != BounceState::enStop)
+						{
+							if (animRed && animRed->IsPlay()) animRed->Stop(); // 通常点滅は止める
+
+							// 高速チカチカアニメーションを再生
+							if (!animFast) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timerDigit, Hash32("timerFastBlink"));
+								animFast = timerDigit->FindAnimation(Hash32("timerFastBlink"));
+							}
+							if (animFast && !animFast->IsPlay()) animFast->Play();
+						}
+						// 拡大・縮小が終わった後 (30秒以下で、enStopになった後)
+						else if (app::battle::BattleManager::Get().IsBlinking())
+						{
+							if (animFast && animFast->IsPlay()) animFast->Stop(); // 高速チカチカを止める
+
+							// 通常の赤点滅を再生
+							if (!animRed) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timerDigit, Hash32("timerRedFlash"));
+								animRed = timerDigit->FindAnimation(Hash32("timerRedFlash"));
+							}
+							if (animRed && !animRed->IsPlay()) animRed->Play();
+						}
+						// 通常時 (31秒以上、または0秒)
+						else
+						{
+							if (animRed && animRed->IsPlay()) animRed->Stop();
+							if (animFast && animFast->IsPlay()) animFast->Stop();
+
+							if (timer_ <= 0.0f) {
+								timerDigit->color = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 0秒は赤固定
+							}
+							else {
+								timerDigit->color = Vector4::White; // 通常は白固定
+							}
+						}
+					}
+				}
+				
+			
+				/** アイコン (timerUI) の処理 */
+				{
+					auto timerUI = menu->GetUI<app::ui::UIIcon>(Hash32("timerUI"));
+					if (timerUI)
+					{
+						// スケール(拡大/縮小)アニメーション
+						if (bounceState_ == BounceState::enUp)
+						{
+							auto* animDown = timerUI->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (animDown && animDown->IsPlay()) animDown->Stop();
+
+							auto* animUp = timerUI->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (!animUp) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timerUI, Hash32("timerPulseScaleUp"));
+								animUp = timerUI->FindAnimation(Hash32("timerPulseScaleUp"));
+							}
+							if (animUp && !animUp->IsPlay()) animUp->Play();
+						}
+						else if (bounceState_ == BounceState::enDown)
+						{
+							auto* animUp = timerUI->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (animUp && animUp->IsPlay()) animUp->Stop();
+
+							auto* animDown = timerUI->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (!animDown) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timerUI, Hash32("timerPulseScaleDown"));
+								animDown = timerUI->FindAnimation(Hash32("timerPulseScaleDown"));
+							}
+							if (animDown && !animDown->IsPlay()) animDown->Play();
+						}
+						else // BounceState::enStop
+						{
+							auto* animUp = timerUI->FindAnimation(Hash32("timerPulseScaleUp"));
+							if (animUp && animUp->IsPlay()) animUp->Stop();
+							auto* animDown = timerUI->FindAnimation(Hash32("timerPulseScaleDown"));
+							if (animDown && animDown->IsPlay()) animDown->Stop();
+
+							timerUI->transform.scale = Vector3::One; // スケールを1.0に戻す
+						}
+
+
+						// 色 (点滅) アニメーション
+						auto* animRed = timerUI->FindAnimation(Hash32("timerRedFlash"));
+						auto* animFast = timerUI->FindAnimation(Hash32("timerFastBlink"));
+
+						// 拡大・縮小の最中 (ドクン！とやっている間)
+						if (bounceState_ != BounceState::enStop)
+						{
+							if (animRed && animRed->IsPlay()) animRed->Stop();
+
+							if (!animFast) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timerUI, Hash32("timerFastBlink"));
+								animFast = timerUI->FindAnimation(Hash32("timerFastBlink"));
+							}
+							if (animFast && !animFast->IsPlay()) animFast->Play();
+						}
+						// 拡大・縮小が終わった後 (30秒以下で、enStopになった後)
+						else if (app::battle::BattleManager::Get().IsBlinking())
+						{
+							if (animFast && animFast->IsPlay()) animFast->Stop();
+
+							if (!animRed) {
+								app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timerUI, Hash32("timerRedFlash"));
+								animRed = timerUI->FindAnimation(Hash32("timerRedFlash"));
+							}
+							if (animRed && !animRed->IsPlay()) animRed->Play();
+						}
+						// 通常時 (31秒以上、または0秒)
+						else
+						{
+							if (animRed && animRed->IsPlay()) animRed->Stop();
+							if (animFast && animFast->IsPlay()) animFast->Stop();
+
+							if (timer_ <= 0.0f) {
+								timerUI->color = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 0秒は赤固定
+							}
+							else {
+								timerUI->color = Vector4::White; // 通常は白固定
+							}
+						}
+					}
+				}
+				
+			}
+			layout_->Update();
+		}
+
+		void TimerUIObject::Render(RenderContext& rc)
+		{
+			if (layout_) {
+				layout_->Render(rc);
 			}
 		}
 	}
