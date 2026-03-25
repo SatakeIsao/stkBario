@@ -23,6 +23,39 @@
         "scale": [1, 1, 1],
         "rotation": 0,
         "color": [1.0, 1.0, 1.0, 0.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "GameClear",
+        "asset": "Assets/ui/gameclear/text_gameClear.DDS",
+        "width": 965,
+        "height": 264,
+        "position": [0, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0, 1.0, 1.0, 0.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "GameOver",
+        "asset": "Assets/ui/gameover/GameOver.DDS",
+        "width": 965,
+        "height": 264,
+        "position": [0, 600, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0, 1.0, 1.0, 0.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "TimeUp",
+        "asset": "Assets/ui/timer/timeUp.DDS",
+        "width": 965,
+        "height": 264,
+        "position": [0, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0, 1.0, 1.0, 0.0]
       }
     ]
   }

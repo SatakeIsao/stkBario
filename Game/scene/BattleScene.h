@@ -5,7 +5,6 @@
 #pragma once
 #include "IScene.h"
 
-
 /** バトルシーン */
 class BattleScene : public IScene
 {
