@@ -4,7 +4,13 @@
  */
 #pragma once
 #include "IScene.h"
-
+namespace app
+{
+	namespace ui
+	{
+		class TitleMenu;
+	}
+}
 
 /** タイトルシーン */
 class TitleScene : public IScene
@@ -17,6 +23,7 @@ private:
 	uint32_t m_requestSceneId = INVALID_SCENE_ID;
 
 	SpriteRender backGroundRender_;
+	app::ui::TitleMenu* titleMenu_ = nullptr;
 
 
 public:

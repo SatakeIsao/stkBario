@@ -6,6 +6,8 @@
 #include "stdafx.h"
 #include "GameClearScene.h"
 #include "TitleScene.h"
+#include "ui/ResultMenu.h"
+#include "sound/SoundManager.h"
 
 
 GameClearScene::GameClearScene()
@@ -15,31 +17,38 @@ GameClearScene::GameClearScene()
 
 GameClearScene:: ~GameClearScene()
 {
+	DeleteGO(resultMenu_);
 }
 
 
 bool GameClearScene::Start()
 {
-	m_spriteRender.Init("Assets/ui/gameclear/gameClear.DDS", MAX_SPRITE_WIDTH, MAX_SPRITE_HIGHT);
+	//リザルトメニューマネージャーオブジェクト
+	{
+		resultMenu_ = NewGO<app::ui::ResultMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
+	}
 	return true;
 }
 
 
 void GameClearScene::Update()
 {
-	if (g_pad[0]->IsTrigger(enButtonDown))
+	/** リザルトUIが全部表示され、Aボタン押したら遷移 */
+	if (resultMenu_ && resultMenu_->IsReadyToExit())
 	{
-		m_requestSceneId = TitleScene::ID();
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
+			m_requestSceneId = TitleScene::ID();
+		}
 	}
-
-	m_spriteRender.Update();
 }
 
 
 void GameClearScene::Render(RenderContext& rc)
 {
-	m_spriteRender.Draw(rc);
 }
+
 
 bool GameClearScene::RequestScene(uint32_t& id, float& waitTime)
 {

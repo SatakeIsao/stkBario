@@ -6,6 +6,9 @@
 #include "stdafx.h"
 #include "GameOverScene.h"
 #include "TitleScene.h"
+#include "BattleScene.h"
+#include "ui/GameOverMenu.h"
+#include "sound/SoundManager.h"
 
 
 GameOverScene::GameOverScene()
@@ -15,29 +18,39 @@ GameOverScene::GameOverScene()
 
 GameOverScene:: ~GameOverScene()
 {
+	DeleteGO(gameOverMenu_);
 }
 
 
 bool GameOverScene::Start()
 {
-	backGroundRender_.Init("Assets/ui/gameover/gameOver.DDS", MAX_SPRITE_WIDTH, MAX_SPRITE_HIGHT);
+	//ゲームオーバーマネージャーオブジェクト
+	{
+		gameOverMenu_ = NewGO<app::ui::GameOverMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
+	}
 	return true;
 }
 
 
 void GameOverScene::Update()
 {
-	if (g_pad[0]->IsTrigger(enButtonDown))
+	if (gameOverMenu_->GerCurrentIndex() == 0
+		&& g_pad[0]->IsTrigger(enButtonA))
 	{
+		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
+		m_requestSceneId = BattleScene::ID();
+	}
+	if (gameOverMenu_->GerCurrentIndex() == 1
+		&& g_pad[0]->IsTrigger(enButtonA))
+	{
+		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 		m_requestSceneId = TitleScene::ID();
 	}
-	backGroundRender_.Update();
 }
 
 
 void GameOverScene::Render(RenderContext& rc)
 {
-	backGroundRender_.Draw(rc);
 }
 
 

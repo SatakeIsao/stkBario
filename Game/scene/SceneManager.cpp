@@ -32,25 +32,70 @@ SceneManager::~SceneManager()
 
 void SceneManager::Update()
 {
-	if (m_currentScene) {
-		m_currentScene->Update();
-		if (m_currentScene->RequestScene(nextSceneId_, m_waitTime)) {
-			delete m_currentScene;
-			m_currentScene = nullptr;
+	// 1. 通常のシーン更新（遷移リクエストが来ていない時だけ更新する）
+	if (m_currentScene && nextSceneId_ == INVALID_SCENE_ID) {
 
-			Fade::Get().Enable();
+		m_currentScene->Update();
+
+		if (m_currentScene->RequestScene(nextSceneId_, m_waitTime)) {
+			// シーン遷移リクエストが来た！
+
+			// 次に遷移するシーンがゲームオーバーかどうかで演出を変える
+			if (nextSceneId_ == GameOverScene::ID()) {
+				// ゲームオーバーならスライム演出
+				Fade::Get().Enable(FadeState::SlimeAnim);
+			}
+			// /** おかしい */
+			// else if(nextSceneId_ = BattleScene::ID()) {
+			// 	Fade::Get().Enable(FadeState::BIconScaleUpAnim);
+			// }
+			else {
+				// それ以外はBロゴ演出
+				Fade::Get().Enable(FadeState::BIconAnim);
+			}
 		}
 	}
 
+	// 2. シーン遷移処理中
 	if (nextSceneId_ != INVALID_SCENE_ID) {
-		m_elapsedTime += g_gameTime->GetFrameDeltaTime();
-		if (m_elapsedTime >= m_waitTime) {
-			CreateScene(nextSceneId_);
-			m_waitTime = 0.0f;
-			m_elapsedTime = 0.0f;
-			nextSceneId_ = INVALID_SCENE_ID;
 
-			Fade::Get().Disable();
+		// ★スライム演出が完了し、画面が真っ黒になったかチェック
+		if (Fade::Get().IsFadedOut()) {
+
+			// 画面が黒くなったので、ここで初めて古いシーンを削除する
+			if (m_currentScene != nullptr) {
+				delete m_currentScene;
+				m_currentScene = nullptr;
+			}
+
+			// Bロゴが回転している間のロード時間（waitTime）をカウント
+			m_elapsedTime += g_gameTime->GetFrameDeltaTime();
+			if (m_elapsedTime >= m_waitTime) {
+
+				// 時間が来たら新しいシーンを生成
+				CreateScene(nextSceneId_);
+
+				//if (nextSceneId_ == BattleScene::ID()) {
+				if (nextSceneId_ == GameOverScene::ID()) {
+					Fade::Get().StartSlimeFadeIn();
+				}
+				else {
+					Fade::Get().StartFadeIn();
+				}
+
+					
+				//}
+				//else {
+				//	Fade::Get().Disable();
+				//}
+
+				m_waitTime = 0.0f;
+				m_elapsedTime = 0.0f;
+				nextSceneId_ = INVALID_SCENE_ID;
+
+				// フェード演出を終了して画面を表示
+				//Fade::Get().Disable();
+			}
 		}
 	}
 }

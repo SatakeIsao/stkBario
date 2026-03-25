@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "TitleScene.h"
 #include "BattleScene.h"
+#include "sound/SoundManager.h"
+#include "ui/TitleMenu.h"
 
 #if defined(APP_DEBUG)
 #include "DebugScene.h"
@@ -17,31 +19,61 @@ TitleScene::TitleScene()
 
 TitleScene::~TitleScene()
 {
+	DeleteGO(titleMenu_);
 }
 
 
 bool TitleScene::Start()
 {
-	backGroundRender_.Init("Assets/ui/title/background.dds", MAX_SPRITE_WIDTH, MAX_SPRITE_HIGHT);
+	//リザルトメニューマネージャーオブジェクト
+	{
+		titleMenu_ = NewGO<app::ui::TitleMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
+	}
 	return true;
 }
 
 
 void TitleScene::Update()
 {
-	if (g_pad[0]->IsTrigger(enButtonA)) {
+	if (titleMenu_ && titleMenu_->IsReadyToSelect())
+	{
+		if (g_pad[0]->IsTrigger(enButtonA)) {
 #if defined(APP_DEBUG)
-		m_requestSceneId = BattleScene::ID();
-#endif
-	}
 
-	backGroundRender_.Update();
+			if (titleMenu_->GerCurrentIndex() == 0)
+			{
+				/** バトルシーン遷移 */
+				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
+				m_requestSceneId = BattleScene::ID();
+			}
+			if (titleMenu_->GerCurrentIndex() == 1)
+			{
+				/**
+				 * あそびかた開く
+				 * これはメニュー側でやる
+				 */
+			}
+			if (titleMenu_->GerCurrentIndex() == 2)
+			{
+				/**
+				 * 称号メニュー開く
+				 * これはメニュー側でやる
+				 */
+			}
+			if (titleMenu_->GerCurrentIndex() == 3)
+			{
+				/** ゲーム終了 */
+				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
+				exit(0);
+			}
+#endif
+		}
+	}
 }
 
 
 void TitleScene::Render(RenderContext& rc)
 {
-	backGroundRender_.Draw(rc);
 }
 
 

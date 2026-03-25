@@ -1,0 +1,220 @@
+{
+  "canvas": {
+    "elements": [
+      {
+        "type": "UIIcon",
+        "name": "Background2",
+        "asset": "Assets/ui/pause/volume/baseAll.DDS",
+        "width": 1660,
+        "height": 985,
+        "position": [0, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "resultBackGround",
+        "asset": "Assets/ui/result/resultBackGround.DDS",
+        "width": 564,
+        "height": 480,
+        "position": [273, -80, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "scoreBackGroundUp",
+        "asset": "Assets/ui/result/scoreBackGround.DDS",
+        "width": 523.2,
+        "height": 229.6,
+        "position": [-292, 50, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "scoreBackGroundDown",
+        "asset": "Assets/ui/result/scoreBackGround.DDS",
+        "width": 523.2,
+        "height": 229.6,
+        "position": [-292, -205, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_result",
+        "asset": "Assets/ui/result/text_result.DDS",
+        "width": 384,
+        "height": 112,
+        "position": [0, 360, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_score",
+        "asset": "Assets/ui/result/text_score.DDS",
+        "width": 151.2,
+        "height": 59.2,
+        "position": [-292, 117, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_awardTitle",
+        "asset": "Assets/ui/result/text_awardTitle.DDS",
+        "width": 243.2,
+        "height": 62.2,
+        "position": [-292, -137, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_award_coinMaster",
+        "asset": "Assets/ui/result/text_award_coinMaster.DDS",
+        "width": 463.2,
+        "height": 74.56,
+        "position": [-292, -252, 0],
+        "scale": [0, 0, 0],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_time",
+        "asset": "Assets/ui/result/text_time.DDS",
+        "width": 182.56,
+        "height": 66.56,
+        "position": [140, 70, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "slimeUI",
+        "asset": "Assets/ui/result/slimeUi.DDS",
+        "width": 93.6,
+        "height": 91.8,
+        "position": [160, -245, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "coinUI",
+        "asset": "Assets/ui/seq/coin.DDS",
+        "width": 103.6,
+        "height": 101.8,
+        "position": [160, -85, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_x_slime",
+        "asset": "Assets/ui/result/text_x.DDS",
+        "width": 62.88,
+        "height": 61.44,
+        "position": [260, -245, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_x_coin",
+        "asset": "Assets/ui/result/text_x.DDS",
+        "width": 62.88,
+        "height": 61.44,
+        "position": [260, -90, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "buttonA",
+        "asset": "Assets/ui/result/buttonA.DDS",
+        "width": 64,
+        "height": 64,
+        "position": [600, -400, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_next",
+        "asset": "Assets/ui/result/text_next.DDS",
+        "width": 124,
+        "height": 50,
+        "position": [700, -400, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "comment": "秒",
+        "type": "UIDigit",
+        "name": "timeNumbers",
+        "asset": "Assets/ui/numbers",
+        "digit":3,
+        "width": 70,
+        "height": 100,
+        "position": [440, 70, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      },
+      {
+        "type": "UIDigit",
+        "name": "coinNumbers",
+        "asset": "Assets/ui/numbers",
+        "digit":2,
+        "width": 70,
+        "height": 100,
+        "position": [410, -85, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      },
+      {
+        "type": "UIDigit",
+        "name": "slimeNumbers",
+        "asset": "Assets/ui/numbers",
+        "digit":2,
+        "width": 70,
+        "height": 100,
+        "position": [410, -245, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      },
+      {
+        "type": "UIDigit",
+        "name": "scoreNumbers",
+        "asset": "Assets/ui/numbers",
+        "digit":4,
+        "width": 70,
+        "height": 100,
+        "position": [-182, 5, 0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0,
+        "color": [0.894 ,0.8, 0.671, 0.1]
+      }
+    ]
+  }
+}

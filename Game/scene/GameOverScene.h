@@ -5,6 +5,14 @@
 #pragma once
 #include "IScene.h"
 
+namespace app
+{
+	namespace ui
+	{
+		class GameOverMenu;
+	}
+}
+
 
 /** ゲームオーバーシーン */
 class GameOverScene : public IScene
@@ -18,6 +26,7 @@ private:
 
 	SpriteRender backGroundRender_;
 
+	app::ui::GameOverMenu* gameOverMenu_ = nullptr;
 
 public:
 	GameOverScene();

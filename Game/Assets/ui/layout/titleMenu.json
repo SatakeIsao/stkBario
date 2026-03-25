@@ -1,0 +1,105 @@
+{
+  "canvas": {
+    "elements": [
+      {
+        "type": "UIIcon",
+        "name": "Background",
+        "asset": "Assets/ui/title/backGround2.DDS",
+        "width": 1660,
+        "height": 985,
+        "position": [0, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "Cursol",
+        "asset": "Assets/ui/pause/volume/cursol.DDS",
+        "width": 127,
+        "height": 84,
+        "position": [-265, 50, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_title",
+        "asset": "Assets/ui/title/title.DDS",
+        "width": 1093,
+        "height": 512,
+        "position": [0, 0, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "buttonA",
+        "asset": "Assets/ui/result/buttonA.DDS",
+        "width": 84,
+        "height": 84,
+        "position": [-130, -305, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_push",
+        "asset": "Assets/ui/title/text_push.DDS",
+        "width": 285,
+        "height": 78,
+        "position": [50, -300, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_start",
+        "asset": "Assets/ui/title/text_start.DDS",
+        "width": 285,
+        "height": 78,
+        "position": [0, 120, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_howToPlay",
+        "asset": "Assets/ui/title/text_howToPlay.DDS",
+        "width": 360,
+        "height": 80,
+        "position": [0, -20, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_award",
+        "asset": "Assets/ui/title/text_award.DDS",
+        "width": 287,
+        "height": 77,
+        "position": [0, -160, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      },
+      {
+        "type": "UIIcon",
+        "name": "text_exit",
+        "asset": "Assets/ui/title/text_exit.DDS",
+        "width": 219,
+        "height": 78,
+        "position": [0, -300, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [1.0 ,1.0, 1.0, 1.0]
+      }
+    ]
+  }
+}

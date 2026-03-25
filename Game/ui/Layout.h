@@ -5,6 +5,7 @@
 #pragma once
 #include "Menu.h"
 #include "json/json.hpp"
+#include <sys/stat.h>
 
 
 #ifdef APP_DEBUG
@@ -36,6 +37,14 @@ namespace app
                 filePath_ = path;
                 menu_ = std::make_unique<T>();
                 Reload();
+
+/** デバッグテスト: アニメーション再生されなかったので修正 */
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
+                struct stat st;
+                if (stat(filePath_.c_str(), &st) == 0) {
+                    lastUpdateTime_ = st.st_mtime; // 初回読み込み時の時間を記録する
+                }
+#endif
             }
 
             MenuBase* GetMenu() const { return menu_.get(); }

@@ -120,20 +120,52 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
-
 		struct MasterSoundOptionMenuParameter : public IParameter
 		{
 			appParameter(MasterSoundOptionMenuParameter);
 			//
-			float gaugeBarX[11];
-			float gaugeBarY[3];
-
-			//
-			float gaugeBarScaleX[11];
-
-			float knobX[11];
+			float gaugeBarX[11]; //
+			float gaugeBarY[3];  //
+			float gaugeBarScaleX[11]; //
+			float knobX[11];	//
 		};
 
+
+		/**  */
+		struct MasterPauseMenuParameter : public IParameter
+		{
+			appParameter(MasterPauseMenuParameter);
+
+			float cursolPositionX[2]; //
+			float cursolPositionY[2]; //
+		};
+
+
+		struct ReturnToTitleMenuParameter : public IParameter
+		{
+			appParameter(ReturnToTitleMenuParameter);
+
+			float cursolPositionX[2]; //
+			float cursolPositionY[2]; //
+		};
+
+
+		struct GameOverMenuParameter : public IParameter
+		{
+			appParameter(GameOverMenuParameter);
+
+			float cursolPositionX[2]; //
+			float cursolPositionY[2]; //
+		};
+
+
+		struct TitleMenuParameter : public IParameter
+		{
+			appParameter(TitleMenuParameter);
+
+			float cursolPositionX[4]; //
+			float cursolPositionY[4]; //
+		};
 
 
 		#undef appParameter

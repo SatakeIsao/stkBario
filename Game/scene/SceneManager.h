@@ -36,6 +36,9 @@ private:
 	/** 経過時間 */
 	float m_elapsedTime = 0.0f;
 	float m_waitTime = 0.0f;
+	/** コイン数 */
+	int totalCoin_ = 0;
+	int currentTimer_ = 0;
 
 
 private:
@@ -54,6 +57,11 @@ public:
 	 */
 	void Render(RenderContext& rc);
 
+	void SetTotalCoin(int coin) { totalCoin_ = coin; }
+	int GetTotalCoin() const { return totalCoin_; }
+
+	void SetCurrentTimer(int timer) { currentTimer_ = timer; }
+	int GetCurrentTimer() const { return currentTimer_; }
 
 private:
 	/**

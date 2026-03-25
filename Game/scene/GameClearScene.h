@@ -5,6 +5,14 @@
 #pragma once
 #include "IScene.h"
 
+namespace app
+{
+	namespace ui
+	{
+		class ResultMenu;
+	}
+}
+
 
 /** ゲームクリアシーン */
 class GameClearScene : public IScene
@@ -17,7 +25,7 @@ private:
 	uint32_t m_requestSceneId = INVALID_SCENE_ID;
 
 	SpriteRender m_spriteRender;
-
+	app::ui::ResultMenu* resultMenu_ = nullptr;
 
 public:
 	GameClearScene();
