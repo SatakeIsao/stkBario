@@ -186,6 +186,12 @@
     <ClCompile Include="core\PauseManager.cpp" />
     <ClCompile Include="core\PauseManagerObject.cpp" />
     <ClCompile Include="ui\BattleSequence.cpp" />
+    <ClCompile Include="ui\PauseMenu.cpp" />
+    <ClCompile Include="ui\ReturnToTitleMenu.cpp" />
+    <ClCompile Include="ui\GameOverMenu.cpp" />
+    <ClCompile Include="ui\ResultMenu.cpp" />
+    <ClCompile Include="ui\AwardManagaer.cpp" />
+    <ClCompile Include="ui\TitleMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -359,6 +365,12 @@
     <ClInclude Include="core\PauseManager.h" />
     <ClInclude Include="core\PauseManagerObject.h" />
     <ClInclude Include="ui\BattleSequence.h" />
+    <ClInclude Include="ui\PauseMenu.h" />
+    <ClInclude Include="ui\ReturnToTitleMenu.h" />
+    <ClInclude Include="ui\GameOverMenu.h" />
+    <ClInclude Include="ui\ResultMenu.h" />
+    <ClInclude Include="ui\AwardManagaer.h" />
+    <ClInclude Include="ui\TitleMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
