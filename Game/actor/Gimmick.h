@@ -128,6 +128,7 @@ namespace app
 			float actionScale_ = 1.0f;
 
 			bool isDead_ = false;
+			bool isPause_ = false;
 
 		public:
 			CoinGimmick();
@@ -141,6 +142,10 @@ namespace app
 
 			void DeadAction();
 			bool IsDead() { return isDead_;}
+			void SetPause(bool isPause)
+			{
+				isPause_ = isPause;
+			}
 		public:
 			const Vector3& GetPosition() const;
 			const Quaternion& GetRotation() const;

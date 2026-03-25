@@ -213,6 +213,7 @@ namespace app
 
 		void CoinGimmick::Update()
 		{
+			if (isPause_) { return; }
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			transform.position += velocity_ * deltaTime;
