@@ -30,6 +30,7 @@ namespace app
     namespace core
     {
         class PauseManagerObject;
+       // class GameOverManagerObject;
     }
     namespace effect
     {
@@ -39,6 +40,7 @@ namespace app
     {
         class HPBarObject;
         class CoinUIObject;
+        class TimerUIObject;
         class BattleSequence;
     }
 }
@@ -91,8 +93,10 @@ namespace app
 
             EffectManagerObject* effectManagerObject_ = nullptr;
             app::core::PauseManagerObject* pauseManagerObject_ = nullptr;
+
             app::ui::HPBarObject* hpBarObject_ = nullptr;
             app::ui::CoinUIObject* coinUIObject_ = nullptr;
+            app::ui::TimerUIObject* timerUIObject_ = nullptr;
             app::ui::BattleSequence* battleSequenceObject_ = nullptr;
 
             nsK2EngineLow::SkyCube* skyCube_ = nullptr;									//スカイキューブのオブジェクト
@@ -102,12 +106,21 @@ namespace app
             /** あとで書き換える */
             //Test currentDown = Test::Compleate;
             float countDownTimer_ = 3.0f;
+            // 残り時間;
+            float remainTime_ = 120.0f;
             int totalCoin_ = 0;
             std::unique_ptr<app::ui::Layout> layout_;
 
             bool hasPlayedPunchEffect_ = false;
-            bool deadTest_ = false;
+            /** 死亡したか */
+            bool isPlayerDead_ = false;
             bool isPause_ = false;
+            bool isGameOverAnimFinished_ = false;
+            bool isGameClearAnimFinished_ = false;
+            bool hasStartedGameOverUI_ = false;
+            bool isTimeUp_ = false;
+            bool isBlinking_ = false;
+            bool isSeparator = false;
 
         private:
             BattleManager();
@@ -120,18 +133,64 @@ namespace app
             /** 更新処理 */
             void Update();
 
+            int GetTotalCoin() const
+            {
+                return totalCoin_;
+            }
+
+            int GetRemainTime() const
+            {
+                return remainTime_;
+            }
+
 
             void AddNotify(INotify* notify)
             {
                 notifyList_.push_back(std::move(std::unique_ptr<INotify>(notify)));
 			}
 
-            /** DEBUG:あとで書き換える */
-            bool GetDeadTest()
+            bool IsPlayerDead()
             {
-                return deadTest_;
+                return isPlayerDead_;
             }
 
+            bool IsGameOverAnimFinished() const
+            {
+                return isGameOverAnimFinished_;
+            }
+            void SetGameOverAnimFinished(bool isGameOverAnimFinished)
+            {
+                isGameOverAnimFinished_ = isGameOverAnimFinished;
+            }
+
+            bool IsGameClearAnimFinished() const
+            {
+                return isGameClearAnimFinished_;
+            }
+            void SetGameClearAnimFinished(bool isGameClearAnimFinished)
+            {
+                isGameClearAnimFinished_ = isGameClearAnimFinished;
+            }
+
+            /** タイムアップ */
+            bool IsTimeUpAnimFinished() const
+            {
+                return isTimeUp_;
+            }
+            void SetTimeUpAnimFinished(bool isTimeUp)
+            {
+                isTimeUp_ = isTimeUp;
+            }
+
+            bool IsBlinking() const
+            {
+                return isBlinking_;
+            }
+
+            bool IsSeparator() const
+            {
+                return isSeparator;
+            }
 
             void SetPause(bool isPause);
 

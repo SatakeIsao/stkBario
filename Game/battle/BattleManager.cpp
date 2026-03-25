@@ -23,6 +23,8 @@
 #include "effect/EffectManager.h"
 #include "core/PauseManager.h"
 #include "core/PauseManagerObject.h"
+//#include "core/GameOverManager.h"
+
 #include "sound/SoundManager.h"
 
 
@@ -121,6 +123,12 @@ namespace app
 			DeleteGO(eventCharacter_);
 			DeleteGO(hpBarObject_);
 			DeleteGO(coinUIObject_);
+			DeleteGO(timerUIObject_);
+			DeleteGO(effectManagerObject_);
+			DeleteGO(pauseManagerObject_);
+			//DeleteGO(gameOverManagerObject_);
+			DeleteGO(battleSequenceObject_);
+
 			for (auto& test : testGimmickList_)
 			{
 				DeleteGO(test);
@@ -278,7 +286,11 @@ namespace app
 				}
 				//コインUI
 				{
-					coinUIObject_ = NewGO < app::ui::CoinUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
+					coinUIObject_ = NewGO <app::ui::CoinUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
+				}
+				//タイマーUI
+				{
+					timerUIObject_ = NewGO <app::ui::TimerUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
 				}
 				//エフェクトマネージャーオブジェクト
 				{
@@ -291,7 +303,10 @@ namespace app
 				//バトルシーケンスマネージャーオブジェクト
 				{
 					battleSequenceObject_ = NewGO<app::ui::BattleSequence>(static_cast<uint8_t>(ObjectPriority::Default));
-					//currentDown = Test::CountDown;
+				}
+				//ゲームオーバーマネージャーオブジェクト
+				{
+					//gameOverManagerObject_ = NewGO<app::core::GameOverManagerObject>(static_cast<uint8_t>(ObjectPriority::Pause));
 				}
 				//BGM再生
 				{
@@ -327,6 +342,46 @@ namespace app
 				return;
 			}
 
+			// ポーズ中やシーケンス中は進めないなどの処理
+			if (currentPause || isSequence) return;
+
+			// ① BattleManagerでカウントダウン
+			if (remainTime_ > 0.0f) {
+				remainTime_ -= g_gameTime->GetFrameDeltaTime();
+				// 【修正】指定した時間帯の時だけ isSeparator を true にする
+				if ((remainTime_ <= 100.0f && remainTime_ > 97.0f) ||
+					(remainTime_ <= 50.0f && remainTime_ > 47.0f))
+				{
+					isSeparator = true;
+				}
+				else
+				{
+					isSeparator = false;
+				}
+
+				/** 30秒以下で点滅フラグON */
+				if (remainTime_ <= 30.0f && remainTime_ > 0.0f) {
+					isBlinking_ = true;
+				}
+				else {
+					isBlinking_ = false; // 31秒以上、または0秒の時はOFF
+				}
+
+				if (remainTime_ <= 0.0f) {
+					remainTime_ = 0.0f;
+					isBlinking_ = false;
+
+					// タイムアップ時の処理（シーケンスへの通知など）
+					if (battleSequenceObject_) {
+						battleSequenceObject_->StartTimeUp();
+					}
+				}
+			}
+
+			// ② UIには毎フレーム「表示してほしい時間」を渡すだけ
+			if (timerUIObject_) {
+				timerUIObject_->SetTimer(remainTime_);
+			}
 
 			if (!isSequence)
 			{
@@ -488,9 +543,37 @@ namespace app
 					/** 死亡処理 */
 					if (battleCharacter_->GetCurrentHP() <= 0)
 					{
+						if (!isPlayerDead_)
+						{
+							battleCharacter_->GetStateMachine()->OnDead();
+							isPlayerDead_ = true;
+						}
+						
+						if (isPlayerDead_
+							&& !hasStartedGameOverUI_)
+						{
+							auto* modelRender = battleCharacter_->GetStateMachine()->GetModelRender();
+
+							if (!modelRender->IsPlayingAnimation())
+							{
+								battleSequenceObject_->StartGameOver();
+								hasStartedGameOverUI_ = true;
+							}
+						}
+					}
+				}
+				// タイマーが0になった時の処理
+				if (timerUIObject_->IsTimeUp())
+				{
+					if (!isTimeUp_)
+					{
+						// プレイヤーを死亡状態（または専用のタイムアップ待機状態）にする
 						battleCharacter_->GetStateMachine()->OnDead();
-						/** DEBUG: 後で書き換える */
-						deadTest_ = true;
+
+						// バトルシーケンスにタイムアップを通知する
+						if (battleSequenceObject_) {
+							battleSequenceObject_->StartTimeUp();
+						}
 					}
 				}
 
@@ -517,6 +600,7 @@ namespace app
 			isPause_ = isPause;
 			if (battleCharacter_) battleCharacter_->SetPouse(isPause_);
 			if (eventCharacter_)eventCharacter_->SetPause(isPause_);
+			if (coinGimmick_) coinGimmick_->SetPause(isPause_);
 		}
 
 
