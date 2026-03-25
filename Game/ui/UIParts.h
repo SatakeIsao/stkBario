@@ -268,6 +268,10 @@ namespace app
 			int number_;
 			int requestNumber_;
 			int digit_;
+			/** 初期化時の最大桁数（JSONで設定した桁数） */
+			int maxDigit_;
+			/** ゼロ埋めをするかどうかのフラグ */
+			bool isZeroPadding_ = false;
 			/** 数字表示に必要な画像が入った */
 			std::string assetPath_;
 
@@ -301,7 +305,8 @@ namespace app
 
 			/** 数字を設定 */
 			void SetNumber(const int number) { requestNumber_ = number; }
-
+			/** ゼロ埋めフラグの設定 */
+			void SetZeroPadding(bool isPadding) { isZeroPadding_ = isPadding; }
 			std::vector<SpriteRender*>& GetSpriteRenderList() { return renderList_; }
 
 			void ForEach(const std::function<void(SpriteRender*)>& func)

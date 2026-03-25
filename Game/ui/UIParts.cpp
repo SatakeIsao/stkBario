@@ -198,7 +198,14 @@ namespace app
 		{
 			if (number_ != requestNumber_) {
 				number_ = requestNumber_;
-				digit_ = ComputeDight();
+
+				//ゼロ埋めフラグがONなら最大桁数を維持、OFFなら桁数を計算
+				if (isZeroPadding_) {
+					digit_ = maxDigit_;
+				}
+				else {
+					digit_ = ComputeDight();
+				}
 
 				//不要な桁を削除
 				while (renderList_.size() > digit_) {
@@ -240,6 +247,7 @@ namespace app
 		{
 			assetPath_ = assetName;
 			digit_ = digit;
+			maxDigit_ = digit;
 			number_ = number;
 			w_ = widht;
 			h_ = height;
