@@ -4,6 +4,14 @@
  */
 #pragma once
 
+ // フェードの状態を定義
+enum class FadeState {
+	SlimeAnim,   // スライムが縮小・暗転するフェーズ
+	SlimeScaleUpAnim,
+	BIconAnim,
+	BIconScaleUpAnim,
+	LoadingAnim  // 既存のBロゴが回転するフェーズ
+};
 
 /**
  * Fade処理本体
@@ -13,9 +21,15 @@ class Fade
 private:
 	SpriteRender m_fadeRender;
 	SpriteRender m_iconRender;
+	SpriteRender m_slimeRender;
+	SpriteRender m_IconBFadeRender;
+
 	bool isEnable = false;
+	FadeState m_state = FadeState::SlimeAnim;
 
 	app::ComputeRate m_iconConputeRate;
+	app::ComputeRate m_slimeComputeRate;
+	app::ComputeRate m_BFadeComputeRate;
 
 
 private:
@@ -29,8 +43,15 @@ public:
 
 	
 public:
-	void Enable() { isEnable = true; }
+	void Enable(FadeState initialState);
 	void Disable() { isEnable = false; }
+
+	void StartFadeIn();
+	void StartSlimeFadeIn();
+	bool IsFadedOut() const
+	{
+		return m_state == FadeState::LoadingAnim;
+	}
 
 
 
