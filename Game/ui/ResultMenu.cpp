@@ -6,6 +6,9 @@
 #include "ui/UIAnimation.h"
 #include "ui/HPBar.h"
 #include "scene/SceneManager.h"
+#include "AwardManager.h"
+#include "battle/BattleManager.h"
+#include "sound/SoundManager.h"
 
 namespace 
 {
@@ -59,6 +62,7 @@ namespace app
 
 				// タイマーを強制的に進めてスキップ
 					if (g_pad[0]->IsTrigger(enButtonA)) {
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 						sequenceTimer_ = 2.0f;
 					}
 
@@ -69,10 +73,9 @@ namespace app
 						state_ = ResultState::Time;
 						sequenceTimer_ = 0.0f;
 						auto timeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("timeNumbers"));
-						//auto time2Numbers = menu->GetUI<app::ui::UIDigit>(Hash32("time2Numbers"));
 						timeNumbers->SetZeroPadding(true);
 						if (timeNumbers && seqtimeMinutes_) seqtimeMinutes_->Play(timeNumbers);
-						//if (time2Numbers && seqtimeSeconds_) seqtimeSeconds_->Play(time2Numbers);
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// コイン
 					else if (state_ == ResultState::Time && sequenceTimer_ >= 0.5f) {
@@ -80,6 +83,7 @@ namespace app
 						sequenceTimer_ = 0.0f;
 						auto coinNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
 						if (coinNumbers && seqCoinNumbers_) seqCoinNumbers_->Play(coinNumbers);
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// スライム
 					else if (state_ == ResultState::Coin && sequenceTimer_ >= 0.5f) {
@@ -87,6 +91,7 @@ namespace app
 						sequenceTimer_ = 0.0f;
 						auto slimeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("slimeNumbers"));
 						if (slimeNumbers && seqSlimeNumbers_) seqSlimeNumbers_->Play(slimeNumbers);
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// スコア
 					else if (state_ == ResultState::Slime && sequenceTimer_ >= 0.5f) {
@@ -95,13 +100,15 @@ namespace app
 						auto scoreNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("scoreNumbers"));
 						scoreNumbers->SetZeroPadding(true);
 						if (scoreNumbers && seqScoreNumbers_) seqScoreNumbers_->Play(scoreNumbers);
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// アワード
 					else if (state_ == ResultState::Score && sequenceTimer_ >= 1.0f) {
 						state_ = ResultState::Award;
 						sequenceTimer_ = 0.0f;
-						auto text_award = menu->GetUI<app::ui::UIIcon>(Hash32("text_award_coinMaster"));
-						if (text_award && seqAward_) seqAward_->Play(text_award);
+						// 固定のアイコンではなく、記憶しておいたランダムなアイコンを再生する
+						if (randomAwardIcon_ && seqAward_) seqAward_->Play(randomAwardIcon_);
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// ボタンを表示して完了
 					else if (state_ == ResultState::Award && sequenceTimer_ >=1.0f) {
@@ -169,6 +176,43 @@ namespace app
 			}
 		}
 
+		void ResultMenu::ShowAwardUI(AwardType awardType)
+		{
+			auto* menu = layout_->GetMenu();
+			if (!menu) return;
+
+			// 1. 表示するUIの名前（文字列）を入れる箱を用意
+			const char* uiName = nullptr;
+
+			// 2. 称号の種類に合わせて、UIの名前だけを決定する
+			switch (awardType)
+			{
+			case AwardType::enComplete:         uiName = "text_award_Complete"; break;
+			case AwardType::enCoinMaster:       uiName = "text_award_CoinMaster"; break;
+			case AwardType::enForgetful:        uiName = "text_award_Forgetful"; break;
+			case AwardType::enSlimeKiller:      uiName = "text_award_SlimeKiller"; break;
+			case AwardType::enGentleWorld:      uiName = "text_award_GentleWorld"; break;
+			case AwardType::enLifeIsPrecious:   uiName = "text_award_LifeIsPrecious"; break;
+			case AwardType::enJumpingFrog:      uiName = "text_award_JumpingFrog"; break;
+			case AwardType::enBouncingRabbit:   uiName = "text_award_BouncingRabbit"; break;
+			case AwardType::enRelaxedPerson:    uiName = "text_award_RelaxedPerson"; break;
+			case AwardType::enSpeedStar:        uiName = "text_award_SpeedStar"; break;
+			case AwardType::enSoundPlay:        uiName = "text_award_SoundPlay"; break;
+			case AwardType::enChallengerHeart:  uiName = "text_award_ChallengerHeart"; break;
+			case AwardType::enTimeStopper:      uiName = "text_award_TimeStopper"; break;
+			case AwardType::enBeardedMan:       uiName = "text_award_BeardedMan"; break;
+			case AwardType::enLifeMax:          uiName = "text_award_LifeMax"; break;
+			default: break;
+			}
+
+			// 3. 最後に1回だけ、決定した名前のUIを探して表示をONにする！
+			if (uiName != nullptr)
+			{
+				auto* awardUI = menu->GetUI<app::ui::UIIcon>(Hash32(uiName));
+				if (awardUI) awardUI->isDraw = true;
+			}
+		}
+
 		void ResultMenu::InitializeLogic()
 		{
 			// サウンドバーの位置情報設定
@@ -178,16 +222,16 @@ namespace app
 
 			// アニメーションで出現するまでUIを非表示(スケール0)にしておく
 			auto buttonA = menu->GetUI<app::ui::UIIcon>(Hash32("buttonA"));
-			auto text_award = menu->GetUI<app::ui::UIIcon>(Hash32("text_award_coinMaster"));
 			auto text_next = menu->GetUI<app::ui::UIIcon>(Hash32("text_next"));
+			auto timeNumbersBackground = menu->GetUI<app::ui::UIDigit>(Hash32("timeNumbersBackground"));
 			auto timeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("timeNumbers"));
 			auto coinNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
 			auto slimeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("slimeNumbers"));
 			auto scoreNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("scoreNumbers"));
 
 			if (buttonA) buttonA->color.w = 0.0f;
-			if (text_award) text_award->transform.localScale = Vector3::Zero;
 			if (text_next) text_next->color.w = 0.0f;
+			if (timeNumbersBackground) timeNumbersBackground->transform.localScale = Vector3::Zero;
 			if (timeNumbers) timeNumbers->transform.localScale = Vector3::Zero;
 			if (coinNumbers) coinNumbers->transform.localScale = Vector3::Zero;
 			if (slimeNumbers) slimeNumbers->transform.localScale = Vector3::Zero;
@@ -199,6 +243,13 @@ namespace app
 				coinNumbers->SetNumber(coin);
 			}
 
+			///** 残りタイムを経過タイムに変換 */
+			//if (timeNumbersBackground) {
+			//	const int timer = SceneManager::Get().GetCurrentTimer();
+			//
+			//	const int masterTimer = MAX_TIME - timer;
+			//	timeNumbersBackground->SetNumber(masterTimer);
+			//}
 			/** 残りタイムを経過タイムに変換 */
 			if (timeNumbers) {
 				const int timer = SceneManager::Get().GetCurrentTimer();
@@ -225,7 +276,23 @@ namespace app
 				if (masterTimer <= 30.0f)
 				{
 					test2 = 3000.0f;
+
 					timeNumbers->color = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+					//if (timeNumbersBackground)
+					//{
+					//	timeNumbersBackground->RemoveAnimation(Hash32("ScaleUp_digits"));
+					//	timeNumbersBackground->RemoveAnimation(Hash32("ScaleDown_digits"));
+					//
+					//	// 冒頭でスケールがZeroになっているため、元のサイズ(1.0)に戻す
+					//	timeNumbersBackground->transform.localScale = Vector3(1.3f, 1.3f, 1.0);
+					//
+					//	// UIColorAnimationとしてFadeInをアタッチ
+					//	app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timeNumbersBackground, Hash32("FadeIn_NumberBackground"));
+					//
+					//	// アニメーションを取得して再生
+					//	auto* anim = timeNumbersBackground->FindAnimation(Hash32("FadeIn_NumberBackground"));
+					//	//if (anim) anim->Play();
+					//}
 				}
 				else if (masterTimer <= 60.0f)
 				{
@@ -248,52 +315,56 @@ namespace app
 
 			/** カーソルUI */
 			{
-				auto buttonA = layout_->GetMenu()->GetUI<app::ui::UIIcon>(Hash32("buttonA"));
-				if (buttonA)
+				auto buttonA_Icon = layout_->GetMenu()->GetUI<app::ui::UIIcon>(Hash32("buttonA"));
+				if (buttonA_Icon)
 				{
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(buttonA, Hash32("FadeIn"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(buttonA_Icon, Hash32("FadeIn"));
 
 					seq_ = std::make_unique<app::ui::UIAnimationSequence>();
 					seq_->Add(Hash32("FadeIn"));
 				}
 			}
 
-			/** アワード */
-			{
-				auto text_award_coinMaster = layout_->GetMenu()->GetUI<app::ui::UIIcon>(Hash32("text_award_coinMaster"));
-				if (text_award_coinMaster)
-				{
-					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(text_award_coinMaster, Hash32("ScaleUp_digits"));
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(text_award_coinMaster, Hash32("ScaleDown_digits"));
-					
-					seqAward_ = std::make_unique<app::ui::UIAnimationSequence>();
-					seqAward_->Add(Hash32("ScaleUp_digits"));
-					seqAward_->Add(Hash32("ScaleDown_digits"));
-				}
-			}
 			/** もどるUI */
 			{
-				auto text_next = layout_->GetMenu()->GetUI<app::ui::UIIcon>(Hash32("text_next"));
-				if (text_next)
+				auto text_next_Icon = layout_->GetMenu()->GetUI<app::ui::UIIcon>(Hash32("text_next"));
+				if (text_next_Icon)
 				{
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(text_next, Hash32("FadeIn"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(text_next_Icon, Hash32("FadeIn"));
 
-					seq_ = std::make_unique<app::ui::UIAnimationSequence>();
-					seq_->Add(Hash32("FadeIn"));
+					if (!seq_) {
+						seq_ = std::make_unique<app::ui::UIAnimationSequence>();
+						seq_->Add(Hash32("FadeIn"));
+					}
+				}
+			}
+
+			/** 経過タイム背景表示UI */
+			{
+				auto timeNumbersBackground_Icon = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("timeNumbersBackground"));
+				if (timeNumbersBackground_Icon)
+				{
+					timeNumbersBackground_Icon->SetZeroPadding(true);
+					// アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbersBackground_Icon, Hash32("ScaleUp_BackgroundDigits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbersBackground_Icon, Hash32("ScaleDown_BackgroundDigits"));
+
+					seqtimeBackGroundSeconds_ = std::make_unique<app::ui::UIAnimationSequence>();
+					seqtimeBackGroundSeconds_->Add(Hash32("ScaleUp_BackgroundDigits"));
+					seqtimeBackGroundSeconds_->Add(Hash32("ScaleDown_BackgroundDigits"));
 				}
 			}
 			/** 経過タイム表示UI */
 			{
-				auto timeNumbers = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("timeNumbers"));
-				if (timeNumbers)
+				auto timeNumbers_Icon = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("timeNumbers"));
+				if (timeNumbers_Icon)
 				{
-					timeNumbers->SetZeroPadding(true);
+					timeNumbers_Icon->SetZeroPadding(true);
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbers, Hash32("ScaleUp_digits"));
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbers, Hash32("ScaleDown_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbers_Icon, Hash32("ScaleUp_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(timeNumbers_Icon, Hash32("ScaleDown_digits"));
 
 					seqtimeMinutes_ = std::make_unique<app::ui::UIAnimationSequence>();
 					seqtimeMinutes_->Add(Hash32("ScaleUp_digits"));
@@ -302,12 +373,12 @@ namespace app
 			}
 			/** コイン数字 */
 			{
-				auto coinNumbers = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
-				if (coinNumbers)
+				auto coinNumbers_Icon = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
+				if (coinNumbers_Icon)
 				{
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(coinNumbers, Hash32("ScaleUp_digits"));
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(coinNumbers, Hash32("ScaleDown_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(coinNumbers_Icon, Hash32("ScaleUp_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(coinNumbers_Icon, Hash32("ScaleDown_digits"));
 
 					seqCoinNumbers_ = std::make_unique<app::ui::UIAnimationSequence>();
 					seqCoinNumbers_->Add(Hash32("ScaleUp_digits"));
@@ -316,12 +387,12 @@ namespace app
 			}
 			/** スライム数字 */
 			{
-				auto slimeNumbers = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("slimeNumbers"));
-				if (slimeNumbers)
+				auto slimeNumbers_Icon = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("slimeNumbers"));
+				if (slimeNumbers_Icon)
 				{
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(slimeNumbers, Hash32("ScaleUp_digits"));
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(slimeNumbers, Hash32("ScaleDown_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(slimeNumbers_Icon, Hash32("ScaleUp_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(slimeNumbers_Icon, Hash32("ScaleDown_digits"));
 
 					seqSlimeNumbers_ = std::make_unique<app::ui::UIAnimationSequence>();
 					seqSlimeNumbers_->Add(Hash32("ScaleUp_digits"));
@@ -330,19 +401,74 @@ namespace app
 			}
 			/** スコア数字 */
 			{
-				auto scoreNumbers = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("scoreNumbers"));
-				if (scoreNumbers)
+				auto scoreNumbers_Icon = layout_->GetMenu()->GetUI<app::ui::UIDigit>(Hash32("scoreNumbers"));
+				if (scoreNumbers_Icon)
 				{
-					scoreNumbers->SetZeroPadding(true);
+					scoreNumbers_Icon->SetZeroPadding(true);
 					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(scoreNumbers, Hash32("ScaleUp_digits"));
-					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(scoreNumbers, Hash32("ScaleDown_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(scoreNumbers_Icon, Hash32("ScaleUp_digits"));
+					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(scoreNumbers_Icon, Hash32("ScaleDown_digits"));
 
 					seqScoreNumbers_ = std::make_unique<app::ui::UIAnimationSequence>();
 					seqScoreNumbers_->Add(Hash32("ScaleUp_digits"));
 					seqScoreNumbers_->Add(Hash32("ScaleDown_digits"));
 				}
 			}
+
+			/** アワード (ランダム選出＆アニメーション設定) */
+			if (app::ui::AwardManager::IsAvailable())
+			{
+				AwardType randomAward;
+
+				// 1. 解禁済みの称号をランダムに取得する（※1つも無い場合は if の中に入らない）
+				if (app::ui::AwardManager::Get().GetRandomUnlockedAward(randomAward))
+				{
+					// 2. 該当するUIを取得して変数に保持
+					randomAwardIcon_ = GetRandomAwardUI(randomAward);
+
+					if (randomAwardIcon_)
+					{
+						// 最初は見えないようにスケール0にする
+						randomAwardIcon_->transform.localScale = Vector3::Zero;
+
+						// 選ばれたアイコンにアニメーションをアタッチ！
+						app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(randomAwardIcon_, Hash32("ScaleUp_digits"));
+						app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(randomAwardIcon_, Hash32("ScaleDown_digits"));
+
+						seqAward_ = std::make_unique<app::ui::UIAnimationSequence>();
+						seqAward_->Add(Hash32("ScaleUp_digits"));
+						seqAward_->Add(Hash32("ScaleDown_digits"));
+					}
+				}
+			}
+		}
+
+		app::ui::UIIcon* ResultMenu::GetRandomAwardUI(AwardType awardType)
+		{
+			auto* menu = layout_->GetMenu();
+			if (!menu) return nullptr;
+
+			const char* uiName = nullptr;
+			switch (awardType)
+			{
+			case AwardType::enComplete:         uiName = "text_award_complete"; break;
+			case AwardType::enCoinMaster:       uiName = "text_award_coinMaster"; break;
+			case AwardType::enForgetful:        uiName = "text_award_forgetful"; break;
+			case AwardType::enSlimeKiller:      uiName = "text_award_slimeKiller"; break;
+			case AwardType::enGentleWorld:      uiName = "text_award_gentleWorld"; break;
+			case AwardType::enLifeIsPrecious:   uiName = "text_award_life"; break;
+			case AwardType::enJumpingFrog:      uiName = "text_award_jumpingFrog"; break;
+			case AwardType::enBouncingRabbit:   uiName = "text_award_jumpingRabbit"; break;
+			case AwardType::enRelaxedPerson:    uiName = "text_award_laidBack"; break;
+			case AwardType::enSpeedStar:        uiName = "text_award_speedStar"; break;
+			case AwardType::enSoundPlay:        uiName = "text_award_soundPlay"; break;
+			case AwardType::enChallengerHeart:  uiName = "text_award_challengeHeart"; break;
+			case AwardType::enTimeStopper:      uiName = "text_award_stopTime"; break;
+			case AwardType::enBeardedMan:       uiName = "text_award_beardedMan"; break;
+			case AwardType::enLifeMax:          uiName = "text_award_fullOfEnergy"; break;
+			default: return nullptr;
+			}
+			return menu->GetUI<app::ui::UIIcon>(Hash32(uiName));
 		}
 	}
 }
