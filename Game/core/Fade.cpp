@@ -19,7 +19,7 @@ Fade::Fade()
 	m_fadeRender.SetMulColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	m_iconRender.Init("Assets/ui/LoadingIcon.dds", 128.0f, 128.0f);
-	m_iconRender.SetPosition(Vector3(700.0f, -400.0f, 0.0f));
+	m_iconRender.SetPosition(Vector3(700.0f, -350.0f, 0.0f));
 
 	// スライム画像の初期化（画面中央に配置）
 	m_slimeRender.Init("Assets/ui/loading/slime_Fade.dds", 1920.0f, 1080.0f);
