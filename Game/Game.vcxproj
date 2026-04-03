@@ -232,8 +232,10 @@
     <ClCompile Include="actor\EventCharacter.cpp" />
     <ClCompile Include="actor\Gimmick.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="ui\AwardManager.cpp" />
+    <ClCompile Include="ui\AwardMenu.cpp" />
+    <ClCompile Include="ui\ManualMenu.cpp" />
     <ClCompile Include="ui\TitleMenu.cpp" />
-    <ClCompile Include="ui\AwardManagaer.cpp" />
     <ClCompile Include="ui\ResultMenu.cpp" />
     <ClCompile Include="ui\GameOverMenu.cpp" />
     <ClCompile Include="ui\ReturnToTitleMenu.cpp" />
@@ -300,8 +302,10 @@
     <ClInclude Include="actor\Gimmick.h" />
     <ClInclude Include="actor\Types.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="ui\AwardManager.h" />
+    <ClInclude Include="ui\AwardMenu.h" />
+    <ClInclude Include="ui\ManualMenu.h" />
     <ClInclude Include="ui\TitleMenu.h" />
-    <ClInclude Include="ui\AwardManagaer.h" />
     <ClInclude Include="ui\ResultMenu.h" />
     <ClInclude Include="ui\GameOverMenu.h" />
     <ClInclude Include="ui\ReturnToTitleMenu.h" />
