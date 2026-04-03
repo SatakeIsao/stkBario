@@ -15,6 +15,7 @@
 
 // @todo for test
 #include "ui/UIAnimationParameter.h"
+#include "ui/AwardManager.h"
 
 
 namespace
@@ -42,7 +43,7 @@ namespace app
 		app::collision::GhostBodyManager::Finalize();
 		app::SoundManager::Finalize();
 		app::core::ParameterManager::Finalize();
-		
+		app::ui::AwardManager::Finalize();
 
 		app::memory::Allocator::Get().Shutdown();
 	}
@@ -81,6 +82,8 @@ namespace app
 		m_fadeObject = NewGO<FadeObject>(static_cast<uint8_t>(ObjectPriority::Fade));
 		// シーン管理生成
 		m_sceneManager = NewGO<SceneManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
+
+		app::ui::AwardManager::Initialize();
 
 		//UIアニメーションのJSONファイル読み込み
 		app::ui::UIAnimationParameter::Get().Load("Assets/master/ui_animation.json");

@@ -1,0 +1,15 @@
+[
+    {
+        "comment": "バーカーソルのパラメータ",
+        "barCursolPositionYA": 180.0,
+        "barCursolPositionYB": 33.0,
+        "barCursolPositionYC": -133.0,
+        "barCursolPositionYD": -260.0,
+    
+        "comment": "指カーソルのパラメータ",
+        "panelCursorPosX_Left": -670.0,
+        "panelCursorPosX_Right": 10.0,
+        "panelCursorPosY_Top": 0.0,
+        "panelCursorPosY_Bottom": -300.0
+    }
+]

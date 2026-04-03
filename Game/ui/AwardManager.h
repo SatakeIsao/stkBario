@@ -1,4 +1,7 @@
 #pragma once
+#include <map>
+#include <vector>
+#include <random>
 
 // 称号の種類をEnumで定義しておく
 enum class AwardType {
@@ -14,41 +17,49 @@ enum class AwardType {
     enSpeedStar,          // スピードスター
     enSoundPlay,          // おとあそび
     enChallengerHeart,    // チャレンジのこころ
-    enTimeStopper         // ときをとめる
+    enTimeStopper,        // ときをとめる
+    enBeardedMan,         // ひげ男にあこがれて
+    enLifeMax             // げんきいっぱい
 };
 
 namespace app
 {
 	namespace ui
 	{
-		class AwardManagaer
+		class AwardManager
 		{
         private:
             // 称号ごとの取得状況を管理するマップ (Get/Set用)
-            std::map<AwardType, bool> unlockedAwards;
+            std::map<AwardType, bool> unlockedAwards_;
 
             // ゲーム中にカウント・保持しておくべきデータ
-            int jumpCount = 0;
-            int defeatedSlimes = 0;
-            int collectedCoins = 0;
+            int jumpCount_ = 0;
+            int defeatedSlimes_ = 0;
+            int collectedCoins_ = 0;
+
+            bool usedDokan_ = false;
+            bool usedPauseMenu_ = false;
 
         public:
+            AwardManager();
+            ~AwardManager();
+
             // --- フラグの Get / Set ---
             void SetAward(AwardType type) {
-                unlockedAwards[type] = true;
+                unlockedAwards_[type] = true;
             }
 
             bool GetAward(AwardType type) {
-                return unlockedAwards[type]; // trueなら取得済み
+                return unlockedAwards_[type]; // trueなら取得済み
             }
 
 
             // プレイヤーがジャンプした時にPlayerクラスから呼ぶ
             void AddJumpCount() {
-                jumpCount++;
+                jumpCount_++;
                 // 規定回数に達したらその場でフラグを立てる
-                if (jumpCount == 5)  SetAward(AwardType::enJumpingFrog);
-                if (jumpCount == 10) SetAward(AwardType::enBouncingRabbit);
+                if (jumpCount_ == 5)  SetAward(AwardType::enJumpingFrog);
+                if (jumpCount_ == 10) SetAward(AwardType::enBouncingRabbit);
             }
 
             // オプション画面で音量をいじった時にUIManagerから呼ぶ
@@ -56,29 +67,32 @@ namespace app
                 SetAward(AwardType::enSoundPlay);
             }
 
-            // --- リザルト移行時にBattleManagerから呼んで最終判定する関数 ---
-            void CheckResultAwards(int playerHp, float clearTime, int maxSlimes, int maxCoins) {
-                // HP判定
-                if (playerHp == 1) {
-                    SetAward(AwardType::enLifeIsPrecious);
-                }
-
-                // コイン判定
-                if (collectedCoins == maxCoins) {
-                    SetAward(AwardType::enCoinMaster);
-                }
-                else if (collectedCoins == 0) {
-                    SetAward(AwardType::enForgetful);
-                }
-
-                // タイム判定
-                if (clearTime <= 30.0f) {
-                    SetAward(AwardType::enSpeedStar);
-                }
-                else if (clearTime >= 90.0f && clearTime <= 120.0f) {
-                    SetAward(AwardType::enRelaxedPerson);
-                }
+            void OnDokan() {
+                SetAward(AwardType::enBeardedMan);
             }
+
+            void OnChallengerHeart(){
+                SetAward(AwardType::enChallengerHeart);
+            }
+
+            void OnTimeStopper() {
+                SetAward(AwardType::enTimeStopper);
+            }
+
+            void AddDeadedSlimeCount() {
+                defeatedSlimes_++;
+            }
+
+            // --- リザルト移行時にBattleManagerから呼んで最終判定する関数 ---
+            void CheckResultAwards(int playerHp, float clearTime, int maxSlimes, int maxCoins, int collectedCoins);
+            
+
+            void ResetPlayData() {
+                defeatedSlimes_ = 0;
+            }
+
+            // 解放済みの称号の中からランダムに1つ選んで返す関数
+            bool GetRandomUnlockedAward(AwardType& outAward) const;
 
             /**
              * シングルトン用
@@ -91,7 +105,7 @@ namespace app
             {
                 if (instance_ == nullptr)
                 {
-                    instance_ = new AwardManagaer();
+                    instance_ = new AwardManager();
                 }
             }
 
@@ -99,7 +113,7 @@ namespace app
             /**
              * インスタンスを取得
              */
-            static AwardManagaer& Get()
+            static AwardManager& Get()
             {
                 return *instance_;
             }
@@ -128,7 +142,7 @@ namespace app
 
         private:
             /** シングルトンインスタンス */
-            static AwardManagaer* instance_;
+            static AwardManager* instance_;
 		};
 	}
 }

@@ -5,6 +5,7 @@
 #include "sound/SoundManager.h"
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
+#include "ui/AwardManager.h"
 
 namespace app 
 {
@@ -106,6 +107,11 @@ namespace app
 					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleUp"));
 					auto* openAnim = canvas->FindAnimation(Hash32("ScaleUp"));
 					if (openAnim) openAnim->Play();
+				}
+
+				if (app::ui::AwardManager::IsAvailable())
+				{
+					app::ui::AwardManager::Get().OnTimeStopper();
 				}
 			}
 		}

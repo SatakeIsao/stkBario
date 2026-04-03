@@ -168,6 +168,17 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
+		struct AwardMenuParameter : public IParameter
+		{
+			appParameter(AwardMenuParameter);
+
+			float barCursolPositionY[4]; //右のバー
+
+			float panelCursorPositionX[2];	//0:左　1:右
+			float panelCursorPositionY[2];  //0:上　1:下
+		};
+
+
 		#undef appParameter
 
 		/**

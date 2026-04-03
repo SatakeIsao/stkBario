@@ -4,6 +4,7 @@
 #include "ui/PauseMenu.h"
 #include "ui/ReturnToTitleMenu.h"
 #include "ui/Layout.h"
+#include "ui/AwardManager.h"
 #include "sound/SoundManager.h"
 
 
@@ -281,6 +282,10 @@ namespace app
                     title_->OnClose();
                     nextState_ = PauseState::enClosed;
                     isPlayingAnimation_ = true;
+
+                    if (app::ui::AwardManager::IsAvailable()) {
+                        app::ui::AwardManager::Get().OnChallengerHeart();
+                    }
                 }
                 break;
             }

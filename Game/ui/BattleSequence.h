@@ -83,6 +83,7 @@ namespace app
 			void GetPlayAnimation();
 			void StartGameOver();
 			void StartTimeUp();
+			void StartGameClear();
 
 			bool IsPlaying() const {
 				return currentDown_ != SequenceName::Wait && currentDown_ != SequenceName::Finished;
