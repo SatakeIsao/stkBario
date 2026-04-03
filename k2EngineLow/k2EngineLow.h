@@ -51,7 +51,7 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// 当たり判定描画処理を実行。
 		/// </summary>
-		void DebubDrawWorld();
+		void DebugDrawWorld();
 		/// <summary>
 		/// フレームの開始時に呼ばれる処理。
 		/// </summary>

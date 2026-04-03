@@ -116,10 +116,10 @@ namespace nsK2EngineLow {
 	/// <summary>
 	/// 当たり判定描画処理を実行。
 	/// </summary>
-	void K2EngineLow::DebubDrawWorld()
+	void K2EngineLow::DebugDrawWorld()
 	{
 		auto& renderContext = g_graphicsEngine->GetRenderContext();
 		//当たり判定描画処理を実行。
-		PhysicsWorld::Get().DebubDrawWorld(renderContext);
+		//PhysicsWorld::Get().DebugDrawWorld(renderContext);
 	}
 }
