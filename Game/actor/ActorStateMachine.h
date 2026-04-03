@@ -288,6 +288,8 @@ namespace app
 
 			bool isAttackGhostCreated_ = false;
 
+			bool isDead_ = false;
+
 		public:
 			EventCharacterStateMachine();
 			virtual ~EventCharacterStateMachine();
@@ -308,6 +310,9 @@ namespace app
 			void UpdateState();
 
 		public:
+			void OnDead() { isDead_ = true; }
+			bool IsDead() const { return isDead_; }
+
 			/** 外から踏まれたことを教える */
 			void OnSquashed() 
 			{ 

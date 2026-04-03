@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "EventCharacter.h"
 #include "ActorStatus.h"
+#include "ui/AwardManager.h"
 
 namespace app
 {
@@ -29,10 +30,20 @@ namespace app
 			stateMachine_->Setup(this);
 			status_->Setup();
 
+			// 1. レベルから設定された transform.position を stateMachine に同期
+			stateMachine_->transform.position = transform.position;
+
+			// 2. カプセル作成
 			ghostBody_->CreateCapsule(this, ID(), status_->GetRadius(), status_->GetHeight(), app::collision::ghost::CollisionAttribute::Enemy, app::collision::ghost::CollisionAttributeMask::All);
 
+			// 3. CharacterController の初期位置を現在の座標に設定
 			characterController_->Init(status_->GetRadius(), status_->GetHeight(), transform.position);
 			characterController_->SetGravity(status_->GetGravity());
+
+			// 4. GhostBody の初期座標を計算して設定 (Update内と同じ計算式)
+			Vector3 centerPos = transform.position;
+			centerPos.y += status_->GetRadius() * 2.0f; // 半径分浮かせる
+			ghostBody_->SetPosition(centerPos);
 
 			return true;
 		}
@@ -56,6 +67,20 @@ namespace app
 			Vector3 centerPos = transform.position;
 			centerPos.y += status_->GetRadius() * 2.0f;
 			ghostBody_->SetPosition(centerPos);
+
+			if (transform.localPosition.y <= -100.0f)
+			{
+				if (!stateMachine_->IsDead())
+				{
+					stateMachine_->OnDead(); // 死亡状態にする
+
+					// もし「スライムが自滅・落下した」ことも「スライムキラー」称号の討伐数に
+					// カウントしたい場合は、ここでAwardManagerを呼び出します。
+					if (app::ui::AwardManager::IsAvailable()) {
+						app::ui::AwardManager::Get().AddDeadedSlimeCount();
+					}
+				}
+			}
 
 			SuperClass::Update();
 		}

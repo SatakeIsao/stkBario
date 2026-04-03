@@ -8,6 +8,9 @@
 #include "ActorStatus.h"
 #include "actor/Types.h"
 #include "core/ParameterManager.h"
+#include "battle/BattleManager.h"
+#include "ui/AwardManager.h"
+#include "sound/SoundManager.h"
 
 
 namespace app
@@ -65,6 +68,7 @@ namespace app
 
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run));
+
 
 			//  runBody_ = new app::collision::GhostBody();
 			//  runBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(),10.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
@@ -144,6 +148,18 @@ namespace app
 					attackBody_ = new app::collision::GhostBody();
 					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 20.0f, app::collision::ghost::CollisionAttribute::Enemy, app::collision::ghost::CollisionAttributeMask::All);
 					isAttackBody_ = true;
+
+					// スライムが攻撃した瞬間に自分でエフェクトを出す
+					if (app::battle::BattleManager::Get().GetPlayerHP() > 0) {
+						app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+							enEffectKind_SlimeAttack,
+							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * 30.0f) + Vector3(0.0f, 30.0f, 0.0f),
+							Quaternion::Identity,
+							Vector3(3.0f, 3.0f, 3.0f)
+						);
+
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::PlayerPunch));
+					}
 
 					if (auto* eventMachine = owner_->As<app::actor::EventCharacterStateMachine>())
 					{
@@ -257,6 +273,12 @@ namespace app
 			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend));
 
 			characterStateMachine->GetModelRender()->SetAnimationSpeed(2.5f);
+
+			if (app::ui::AwardManager::IsAvailable()) {
+				app::ui::AwardManager::Get().AddJumpCount();
+			}
+
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Jump));
 		}
 
 
@@ -384,6 +406,19 @@ namespace app
 					// @todo for test
 					const float radius = characterStateMachine->GetStatus()->GetRadius();
 					attackBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
+
+					// パンチが発生した瞬間にエフェクトを再生
+					if (app::battle::BattleManager::IsAvailable() && app::battle::BattleManager::Get().GetEffectManager())
+					{
+						app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+							enEffectKind_SlimeAttack, // ※元のコードの指定のままにしています。プレイヤー用エフェクトがあれば変更してください。
+							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * 30.0f),
+							Quaternion::Identity,
+							Vector3::One
+						);
+
+						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::PlayerPunch));
+					}
 				}, false);
 			attackScheduler_->AddTimer(0.1f, [&]()
 				{
@@ -445,7 +480,13 @@ namespace app
 			scaleCurve_.Play();
 			translateCurve_.Initialize(characterStateMachine->transform.position, characterStateMachine->GetWarpStartPosition(), characterStatus->GetWarpTimeSeconds() * 0.3f, app::util::EasingType::Linear);
 			translateCurve_.Play();
-		}
+
+			if (app::ui::AwardManager::IsAvailable()) {
+				app::ui::AwardManager::Get().OnDokan();
+			}
+
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Warp));
+		} 
 
 
 		void WarpInCharacterState::Update()
@@ -504,6 +545,9 @@ namespace app
 			auto* characterStatus = characterStateMachine->GetStatus();
 			scaleCurve_.Initialize(characterStatus->GetWarpEndScale(), characterStatus->GetWarpStartScale(), characterStatus->GetWarpTimeSeconds(), app::util::EasingType::Linear);
 			scaleCurve_.Play();
+
+
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Warp));
 		}
 
 
@@ -598,6 +642,8 @@ namespace app
 		{
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->OnEnterKnockBack();
+
+			/** SE流す */
 		}
 		
 

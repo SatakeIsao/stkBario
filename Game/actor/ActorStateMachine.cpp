@@ -7,6 +7,8 @@
 #include "ActorStatus.h"
 #include "BattleCharacter.h"
 #include "EventCharacter.h"
+#include "battle/BattleManager.h"
+#include "sound/SoundManager.h"
 
 
 namespace
@@ -195,6 +197,19 @@ namespace app
 		void BattleCharacterStateMachine::OnEnterKnockBack()
 		{
 			GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::KnockBack));
+
+			// プレイヤーがノックバックした時だけ再生
+			if (app::battle::BattleManager::IsAvailable() && app::battle::BattleManager::Get().GetEffectManager())
+			{
+				app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+					enEffectKind_PlayerKnockBack,
+					transform.position,
+					Quaternion::Identity,
+					Vector3::One
+				);
+				//後で変更
+				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeknockBack));
+			}
 		}
 
 
@@ -370,6 +385,14 @@ namespace app
 		{
 			GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::SlimeAnimationKind::knockBack));
 			Jump(80.0f);
+
+			// ノックバックした瞬間にエフェクトを出す
+			app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+				enEffectKind_SlimeKnockBack,
+				transform.position,
+				Quaternion::Identity,
+				Vector3::One
+			);
 		}
 
 
@@ -397,10 +420,40 @@ namespace app
 
 		void EventCharacterStateMachine::UpdateState()
 		{
+			if (isDead_)
+			{
+				RequestChangeState(DeadCharacterState::ID());
+				return; // 落下死の場合はずっとDeadのままにするため、ここで処理を終了
+			}
+
+			/** スライム自身がプレイヤーを探す */
+			Vector3 playerPosition = app::battle::BattleManager::Get().GetPlayerPosition();
+			Vector3 slimePosition = transform.position;
+			Vector3 diffXZ(playerPosition.x - slimePosition.x, 0.0f, playerPosition.z - slimePosition.z);
+			float diff = diffXZ.Length();
+
+			if (diff < 200.0f) {
+				Vector3 DirectionToPlayer = diffXZ;
+				DirectionToPlayer.Normalize();
+				Vector3 slimeForward = Vector3(0.0f, 0.0f, 1.0f);
+				transform.localRotation.Apply(slimeForward);
+				Vector3 forwardXZ(slimeForward.x, 0.0f, slimeForward.z);
+				forwardXZ.Normalize();
+
+				float dot = forwardXZ.Dot(DirectionToPlayer);
+				float threshold = std::cos(60.0f * (Math::PI / 180.0f));
+
+				if (dot > threshold) {
+					// 視野角内に入ったので追従フラグを立てる
+					OnChase(DirectionToPlayer, playerPosition);
+				}
+			}
+
 			/** TODO: スライムの頭上にPlayerの当たり判定が衝突したらぺっちゃんこ */
 			if (IsSquashed())
 			{
 				RequestChangeState(DeadCharacterState::ID());
+				//ぺちゃんこSE流したい
 
 				// Deadステート側で2秒経過して「遷移可能」になったらIdleに戻す
 				if (IsEqualCurrentState(DeadCharacterState::ID())
@@ -415,16 +468,25 @@ namespace app
 			/** TODO: パンチ食らったらknockBack */
 			if (isKnockBack_)
 			{
-				//ノックバックする方向を設定
-				SetMoveDirection(knockBackDirection_);
-				RequestChangeState(KnockBackCharacterState::ID());
-
-				if (IsEqualCurrentState(KnockBackCharacterState::ID())
-					&& CanChangeState())
+				// まだノックバック状態になっていない場合（初回の1回だけ通る）
+				if (!IsEqualCurrentState(KnockBackCharacterState::ID()))
 				{
-					aiTimer_ = 0.0f;
-					isKnockBack_ = false;
-					RequestChangeState(IdleCharacterState::ID());
+					// ノックバックする方向を設定
+					SetMoveDirection(knockBackDirection_);
+					RequestChangeState(KnockBackCharacterState::ID());
+
+					// SEの再生もここに入れることで1回だけ鳴る！
+					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeknockBack));
+				}
+				else // すでにノックバック状態になっている場合
+				{
+					// ノックバックが終わり、別の状態へ遷移可能になったら待機状態に戻す
+					if (CanChangeState())
+					{
+						aiTimer_ = 0.0f;
+						isKnockBack_ = false;
+						RequestChangeState(IdleCharacterState::ID());
+					}
 				}
 				return;
 			}
