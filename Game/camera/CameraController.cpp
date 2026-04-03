@@ -7,6 +7,8 @@ namespace app
 {
 	namespace camera
 	{
+#if defined(APP_DEBUG)
+
 		void DebugCamera::OnEnter()
 		{
 			cameraData_ = CameraManager::Get().GetCurrentCameraData();
@@ -65,5 +67,6 @@ namespace app
 				cameraData_.position = cameraData_.target + toVector;
 			}
         }
+#endif
 	}
 }
