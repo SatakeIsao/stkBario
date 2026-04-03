@@ -6,6 +6,11 @@
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
 
+namespace
+{
+	static app::ui::UIAnimationSequence* seq = nullptr;
+}
+
 namespace app
 {
 	namespace ui
@@ -37,29 +42,6 @@ namespace app
 
 		void TitleMenu::Update()
 		{
-			//auto* canvas = GetCanvas();
-			//if (canvas)
-			//{
-			//	//閉じる
-			//	{
-			//		auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
-			//		if (closeAnim && !closeAnim->IsPlay())
-			//		{
-			//			canvas->RemoveAnimation(Hash32("ScaleDown"));
-			//			closeAnim = nullptr;
-			//			isPause_ = false;
-			//		}
-			//	}
-			//	//開く
-			//	{
-			//		auto* openAnim = canvas->FindAnimation(Hash32("ScaleUp"));
-			//		if (openAnim && !openAnim->IsPlay())
-			//		{
-			//			canvas->RemoveAnimation(Hash32("ScaleUp"));
-			//		}
-			//	}
-			//}
-
 			if (isOpenJustNow_)
 			{
 				isOpenJustNow_ = false;
@@ -70,6 +52,7 @@ namespace app
 				/** Aボタン開いたらメニューが開く */
 				if (g_pad[0]->IsTrigger(enButtonA))
 				{
+					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 					currentState_ = MenuState::enMenu;
 					isOpenJustNow_ = true;
 					/** 関数等でアニメーションを再生 */
@@ -152,38 +135,85 @@ namespace app
 
 			if (textTitle)
 			{
-				textTitle->transform.localScale = Vector3(0.3f, 0.3f, 1.0f);
-				textTitle->transform.localPosition = Vector3(0.0f, 360.0f, 0.0f);
+				textTitle->RemoveAnimation(Hash32("TitleMoveToCenter"));
+				textTitle->RemoveAnimation(Hash32("TitleScaleToCenter"));
+
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textTitle, Hash32("TitleMoveToMenu"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(textTitle, Hash32("TitleScaleToMenu"));
+
+				// 再生
+				auto* moveAnim = textTitle->FindAnimation(Hash32("TitleMoveToMenu"));
+				if (moveAnim) moveAnim->Play();
+
+				auto* scaleAnim = textTitle->FindAnimation(Hash32("TitleScaleToMenu"));
+				if (scaleAnim) scaleAnim->Play();
 			}
 			if (textStart)
 			{
 				textStart->isDraw = true;
+				textStart->RemoveAnimation(Hash32("SlideOut_Start"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textStart, Hash32("SlideIn_Start"));
+				auto* anim = textStart->FindAnimation(Hash32("SlideIn_Start"));
+				if (anim) anim->Play();
 			}
 			if (textHowToPlay)
 			{
 				textHowToPlay->isDraw = true;
+				textHowToPlay->RemoveAnimation(Hash32("SlideOut_HowToPlay"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textHowToPlay, Hash32("SlideIn_HowToPlay"));
+				auto* anim = textHowToPlay->FindAnimation(Hash32("SlideIn_HowToPlay"));
+				if (anim) anim->Play();
 			}
 			if (textAward)
 			{
 				textAward->isDraw = true;
+				textAward->RemoveAnimation(Hash32("SlideOut_Award"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textAward, Hash32("SlideIn_Award"));
+				auto* anim = textAward->FindAnimation(Hash32("SlideIn_Award"));
+				if (anim) anim->Play();
+
 			}
 			if (textExit)
 			{
 				textExit->isDraw = true;
+				textExit->RemoveAnimation(Hash32("SlideOut_Exit"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textExit, Hash32("SlideIn_Exit"));
+				auto* anim = textExit->FindAnimation(Hash32("SlideIn_Exit"));
+				if (anim) anim->Play();
 			}
 			if (cursol)
 			{
-				cursol->isDraw = true;
+				cursol->isDraw = true; // 表示する
+
+				// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+				// アニメーションを取得して再生
+				auto* anim = cursol->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Play();
+				}
 			}
 
 			/** 表示 */
 			if (buttonA)
 			{
 				buttonA->isDraw = false;
+				auto* anim = buttonA->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Stop();
+				}
 			}
 			if (textPush)
 			{
 				textPush->isDraw = false;
+				auto* anim = textPush->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Stop();
+				}
 			}
 		}
 
@@ -200,38 +230,83 @@ namespace app
 
 			if (textTitle)
 			{
-				textTitle->transform.localScale = Vector3(1.0f, 1.0f, 1.0f);
-				textTitle->transform.localPosition = Vector3(0.0f, 50.0f, 0.0f);
+				textTitle->RemoveAnimation(Hash32("TitleMoveToMenu"));
+				textTitle->RemoveAnimation(Hash32("TitleScaleToMenu"));
+
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textTitle, Hash32("TitleMoveToCenter"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(textTitle, Hash32("TitleScaleToCenter"));
+
+				// 再生
+				auto* moveAnim = textTitle->FindAnimation(Hash32("TitleMoveToCenter"));
+				if (moveAnim) moveAnim->Play();
+
+				auto* scaleAnim = textTitle->FindAnimation(Hash32("TitleScaleToCenter"));
+				if (scaleAnim) scaleAnim->Play();
 			}
 			if (textStart)
 			{
-				textStart->isDraw = false;
+				textStart->RemoveAnimation(Hash32("SlideIn_Start"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textStart, Hash32("SlideOut_Start"));
+				auto* anim = textStart->FindAnimation(Hash32("SlideOut_Start"));
+				if (anim) anim->Play();
 			}
 			if (textHowToPlay)
 			{
-				textHowToPlay->isDraw = false;
+				textHowToPlay->RemoveAnimation(Hash32("SlideIn_HowToPlay"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textHowToPlay, Hash32("SlideOut_HowToPlay"));
+				auto* anim = textHowToPlay->FindAnimation(Hash32("SlideOut_HowToPlay"));
+				if (anim) anim->Play();
 			}
 			if (textAward)
 			{
-				textAward->isDraw = false;
+				textAward->RemoveAnimation(Hash32("SlideIn_Award"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textAward, Hash32("SlideOut_Award"));
+				auto* anim = textAward->FindAnimation(Hash32("SlideOut_Award"));
+				if (anim) anim->Play();
 			}
 			if (textExit)
 			{
-				textExit->isDraw = false;
+				textExit->RemoveAnimation(Hash32("SlideIn_Exit"));
+				app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(textExit, Hash32("SlideOut_Exit"));
+				auto* anim = textExit->FindAnimation(Hash32("SlideOut_Exit"));
+				if (anim) anim->Play();
 			}
 			if (cursol)
 			{
+				auto* anim = cursol->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Stop();
+				}
 				cursol->isDraw = false;
 			}
 
-			/** 非表示 */
+			/** 表示 */
 			if (buttonA)
 			{
 				buttonA->isDraw = true;
+				// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(buttonA, Hash32("FadeIn"));
+
+				// アニメーションを取得して再生
+				auto* anim = buttonA->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Play();
+				}
 			}
 			if (textPush)
 			{
 				textPush->isDraw = true;
+				
+				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(textPush, Hash32("FadeIn"));
+
+				// アニメーションを取得して再生
+				auto* anim = textPush->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Play();
+				}
 			}
 		}
 
@@ -310,14 +385,22 @@ namespace app
 		{
 			// サウンドバーの位置情報設定
 			// アニメーションとかいれたり
-			/** キャンバス（UI全体) */
-			//{
-			//	auto* canvas = GetCanvas();
-			//	if (canvas)
-			//	{
-			//		canvas->transform.localScale = Vector3::One;
-			//	}
-			//}
+			/** カーソルUI */
+			{
+				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					// アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+					seq = new app::ui::UIAnimationSequence();
+					seq->Add(Hash32("FadeIn"));
+
+
+					// アニメーションを再生
+					seq->Play(cursol);
+				}
+			}
 		}
 	}
 }
