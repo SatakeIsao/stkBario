@@ -274,7 +274,7 @@ namespace app
 		void CoinGimmick::DeadAction()
 		{
 			// 上に跳ねあがるための初速を設定
-			velocity_.y += 10.0f;
+			velocity_.y += 50.0f;
 			actionScale_ = 1.0f;
 
 			isDead_ = true;

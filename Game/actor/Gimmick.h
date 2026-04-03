@@ -129,6 +129,7 @@ namespace app
 
 			bool isDead_ = false;
 			bool isPause_ = false;
+			bool hasPlayedEffect_ = false;
 
 		public:
 			CoinGimmick();
@@ -146,6 +147,9 @@ namespace app
 			{
 				isPause_ = isPause;
 			}
+
+			bool HasPlayedEffect() const { return hasPlayedEffect_; }
+			void SetPlayedEffect(bool flag) { hasPlayedEffect_ = flag; }
 		public:
 			const Vector3& GetPosition() const;
 			const Quaternion& GetRotation() const;

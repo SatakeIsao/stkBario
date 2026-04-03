@@ -80,12 +80,15 @@ namespace app
 
         private:
             // @todo for test
+            LevelRender levelRender_;
+
             app::actor::BattleCharacter* battleCharacter_ = nullptr;
-            app::actor::EventCharacter* eventCharacter_ = nullptr;
+            //app::actor::EventCharacter* eventCharacter_ = nullptr;
             app::actor::CoinGimmick* coinGimmick_ = nullptr;
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
             std::vector<app::actor::PipeGimmick*> pipeGimmickList_;
             std::vector<app::actor::CoinGimmick*> coinGimmickList_;
+            std::vector<app::actor::EventCharacter*> eventCharacterList_;
             
             std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
 			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
@@ -121,6 +124,12 @@ namespace app
             bool isTimeUp_ = false;
             bool isBlinking_ = false;
             bool isSeparator = false;
+
+            Vector3 goalPosition_ = Vector3::Zero;
+            Quaternion goalRotation_ = Quaternion::Identity;
+            bool hasGoal_ = false;
+            float baseGoalY_ = 0.0f;       // ゴールの初期の高さを記憶する用
+            float goalEffectTimer_ = 0.0f; // クールタイムを計るタイマー
 
         private:
             BattleManager();
@@ -193,6 +202,17 @@ namespace app
             }
 
             void SetPause(bool isPause);
+
+            /** プレイヤーの座標を取得する（スライムの索敵用） */
+            Vector3 GetPlayerPosition() const;
+
+            /** プレイヤーのHPを取得する */
+            int GetPlayerHP() const;
+
+            /** エフェクトマネージャーを取得する（各キャラが自分でエフェクトを出すため） */
+            EffectManagerObject* GetEffectManager() const {
+                return effectManagerObject_;
+            }
 
         private:
             void LoadParameter();

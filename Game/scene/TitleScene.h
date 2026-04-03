@@ -9,8 +9,16 @@ namespace app
 	namespace ui
 	{
 		class TitleMenu;
+		class ManualMenu;
+		class AwardMenu;
 	}
 }
+
+enum class TitleSceneState {
+	TitleMenu,  // タイトルメニュー操作中
+	ManualMenu,  // マニュアルメニュー操作中
+	AwardMenu	//称号メニュー操作中
+};
 
 /** タイトルシーン */
 class TitleScene : public IScene
@@ -24,7 +32,10 @@ private:
 
 	SpriteRender backGroundRender_;
 	app::ui::TitleMenu* titleMenu_ = nullptr;
+	app::ui::ManualMenu* manualMenu_ = nullptr;
+	app::ui::AwardMenu* awardMenu_ = nullptr;
 
+	TitleSceneState state_ = TitleSceneState::TitleMenu;
 
 public:
 	TitleScene();
