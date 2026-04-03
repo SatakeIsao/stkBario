@@ -14,6 +14,7 @@ enum enEffectKind
 	enEffectKind_SlimeKnockBack,
 	enEffectKind_PlayerAttack,
 	enEffectKind_SlimeAttack,
+	enEffectKind_CircleGoal,
 	enEffectKind_Max,
 	enEffectKind_None = enEffectKind_Max,
 };
@@ -35,6 +36,6 @@ static EffectInformation effectInformation[enEffectKind_Max] =
 	EffectInformation(u"Assets/effect/slime_knockback.efk"),
 	EffectInformation(u"Assets/effect/player_attack.efk"),
 	EffectInformation(u"Assets/effect/slime_attack.efk"),
-
+	EffectInformation(u"Assets/effect/circle_goal.efk"),
 };
 
