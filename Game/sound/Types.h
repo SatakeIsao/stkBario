@@ -13,14 +13,30 @@ namespace app
 	{
 		SE = 0,
 		Button = SE,
+		Coin,
+		Warp,
+		Pop,
+		SlimeknockBack,
+		PlayerPunch,
+		Jump,
+		BIconAmim,
+		SlimeAnim,
 		SEMax,
+		//BGM
 		BGM = SEMax,
 		Game = BGM,
+		HurryUp,
+		Title,
 		BGMMax,
-		//Title,
+		//Voice,
 		Voice = BGMMax,
 		Startup00 = Voice,
 		Startup01,
+		Ready,
+		Go,
+		GameClear,
+		GameOver,
+		TimeUp,
 		VoiceMax,
 		Max = VoiceMax,
 		None = Max,
@@ -41,11 +57,26 @@ namespace app
 	{
 		// SE
 		SoundInformation("Assets/sound/se/button.wav"),
+		SoundInformation("Assets/sound/se/coin.wav"),
+		SoundInformation("Assets/sound/se/warp.wav"),
+		SoundInformation("Assets/sound/se/pop.wav"),
+		SoundInformation("Assets/sound/se/slimeknockBack.wav"),
+		SoundInformation("Assets/sound/se/playerPunch.wav"),
+		SoundInformation("Assets/sound/se/jump.wav"),
+		SoundInformation("Assets/sound/se/bIconAnim.wav"),
+		SoundInformation("Assets/sound/se/slimeAnim.wav"),
 		// BGM
-		SoundInformation("Assets/sound/bgm/explore_bgm.wav"),
+		SoundInformation("Assets/sound/bgm/inGame_1.0xSpeed.wav"),
+		SoundInformation("Assets/sound/bgm/inGame_1.5xSpeed.wav"),
+		SoundInformation("Assets/sound/bgm/title.wav"),
 		// Voice
 		SoundInformation("Assets/sound/voice/StartupVoice_00.wav"),
 		SoundInformation("Assets/sound/voice/StartupVoice_01.wav"),
+		SoundInformation("Assets/sound/voice/ReadyVoice.wav"),
+		SoundInformation("Assets/sound/voice/GoVoice.wav"),
+		SoundInformation("Assets/sound/voice/GameClearVoice.wav"),
+		SoundInformation("Assets/sound/voice/GameOverVoice.wav"),
+		SoundInformation("Assets/sound/voice/TimeUpVoice.wav")
 	};
 
 

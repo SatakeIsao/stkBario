@@ -16,6 +16,10 @@ namespace app
 	{
 		m_seList.clear();
 
+		volumeMaster_ = 1.0f;
+		volumeBGM_ = 0.2f;
+		volumeSE_ = 0.5f;
+
 		// サウンドの登録
 		for (int i = 0; i < ARRAYSIZE(soundInformation); ++i) {
 			const auto& info = soundInformation[i];
@@ -99,6 +103,7 @@ namespace app
 		}
 		// 初期化
 		m_bgm->Init(kind);
+		m_bgm->SetVolume(volumeBGM_);
 		m_bgm->Play(true);	// BGMなのでループ再生する
 
 	}

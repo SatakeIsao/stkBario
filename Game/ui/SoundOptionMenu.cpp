@@ -5,6 +5,7 @@
 #include "core/ParameterManager.h"
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
+#include "ui/AwardManager.h"
 
 
 namespace 
@@ -16,7 +17,9 @@ namespace
 	/** 最小音量(0.0～1.0の範囲) */
 	constexpr float VOLUME_MIN = 0.0f;
 	/** デフォルト音量 */
-	constexpr float VOLUME_DEFAULT = 0.50f;
+	constexpr float VOLUME_DEFAULT_MASTER = 0.50f;
+	constexpr float VOLUME_DEFAULT_BGM = 0.20f;
+	constexpr float VOLUME_DEFAULT_SE = 0.50f;
 	/** 数値表示用に0.0～1.0の音量を0～10に変換するための乗数 */
 	constexpr float VOLUME_DISPLAY_MULTIPLIER = 10.0f;
 
@@ -168,6 +171,10 @@ namespace app
 				if (isVolumeChanged)
 				{
 					app::SoundManager::Get().SetVolume(currentVolumeType, targetVolume);
+
+					if (app::ui::AwardManager::IsAvailable()) {
+						app::ui::AwardManager::Get().OnSoundAdjusted();
+					}
 				}
 
 				// 動的に数値をUIに設定
@@ -448,7 +455,6 @@ namespace app
 				auto* canvas = GetCanvas();
 				if (canvas)
 				{
-					//canvas->color.w = 0.0f;
 					canvas->transform.localScale = Vector3::Zero;
 				}
 			}
@@ -482,11 +488,6 @@ namespace app
 					auto* gauge = GetUI<app::ui::UIIcon>(Hash32("VolumeBar_MASTER"));
 					gauge->SetPivot(Vector2(0.0f, 0.5f));
 				}
-				//  //DEBUGTEST_Pivot
-				//  {
-				//  	auto* se = GetUI<app::ui::UIDigit>(Hash32("VolumeDigit_MASTER"));
-				//  	//se->Set
-				//  }
 				// BGM
 				{
 					auto* gauge = GetUI<app::ui::UIIcon>(Hash32("VolumeBar_BGM"));
@@ -500,9 +501,9 @@ namespace app
 			}
 			//初期位置
 			{
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::Master, VOLUME_DEFAULT);
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::BGM, VOLUME_DEFAULT);
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::SE, VOLUME_DEFAULT);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::Master, VOLUME_DEFAULT_MASTER);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::BGM, VOLUME_DEFAULT_BGM);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::SE, VOLUME_DEFAULT_SE);
 			}
 		}
 	}

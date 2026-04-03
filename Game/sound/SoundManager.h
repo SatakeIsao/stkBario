@@ -49,9 +49,9 @@ namespace app
             float volumes[static_cast<uint8_t>(SoundVolumeType::Max)];
             struct
             {
-                float volumeMaster;
-                float volumeBGM;
-                float volumeSE;
+                float volumeMaster_;
+                float volumeBGM_;
+                float volumeSE_;
             };
         };
 

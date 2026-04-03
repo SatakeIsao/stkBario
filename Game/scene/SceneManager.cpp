@@ -7,8 +7,10 @@
 #include "BattleScene.h"
 #include "GameOverScene.h"
 #include "GameClearScene.h"
-
 #include "core/Fade.h"
+#include "sound/SoundManager.h"
+
+
 
 
 SceneManager* SceneManager::m_instance = nullptr;	// 初期化
@@ -18,7 +20,7 @@ SceneManager::SceneManager()
 {
 	AddSceneMap<StartupScene>();
 	AddSceneMap<TitleScene>();
-	AddSceneMap<BootScene>();
+	//AddSceneMap<BootScene>();
 	AddSceneMap<BattleScene>();
 	AddSceneMap<GameOverScene>();
 	AddSceneMap<GameClearScene>();
@@ -44,14 +46,12 @@ void SceneManager::Update()
 			if (nextSceneId_ == GameOverScene::ID()) {
 				// ゲームオーバーならスライム演出
 				Fade::Get().Enable(FadeState::SlimeAnim);
+				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeAnim));
 			}
-			// /** おかしい */
-			// else if(nextSceneId_ = BattleScene::ID()) {
-			// 	Fade::Get().Enable(FadeState::BIconScaleUpAnim);
-			// }
 			else {
 				// それ以外はBロゴ演出
 				Fade::Get().Enable(FadeState::BIconAnim);
+				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::BIconAmim));
 			}
 		}
 	}
@@ -75,7 +75,6 @@ void SceneManager::Update()
 				// 時間が来たら新しいシーンを生成
 				CreateScene(nextSceneId_);
 
-				//if (nextSceneId_ == BattleScene::ID()) {
 				if (nextSceneId_ == GameOverScene::ID()) {
 					Fade::Get().StartSlimeFadeIn();
 				}
@@ -83,18 +82,9 @@ void SceneManager::Update()
 					Fade::Get().StartFadeIn();
 				}
 
-					
-				//}
-				//else {
-				//	Fade::Get().Disable();
-				//}
-
 				m_waitTime = 0.0f;
 				m_elapsedTime = 0.0f;
 				nextSceneId_ = INVALID_SCENE_ID;
-
-				// フェード演出を終了して画面を表示
-				//Fade::Get().Disable();
 			}
 		}
 	}
@@ -148,8 +138,9 @@ bool SceneManagerObject::Start()
 //#endif // APP_DEBUG
 
 	/** デバックテスト */
-	SceneManager::Get().CreateScene(BattleScene::ID());
-
+	SceneManager::Get().CreateScene(TitleScene::ID());
+	//SceneManager::Get().CreateScene(BattleScene::ID());
+	//SceneManager::Get().CreateScene(GameClearScene::ID());
 	return true;
 }
 
