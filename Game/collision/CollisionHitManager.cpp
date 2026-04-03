@@ -242,8 +242,10 @@ namespace app
 			if (colliedPlayerBody != nullptr
 				&& colliedPlayerBody == battleCharacter->GetGhostBody())
 			{
-				coinCharacter->DeadAction();
-				coinCharacter->IsDead();
+				if (!coinCharacter->IsDead())
+				{
+					coinCharacter->DeadAction();
+				}
 			}
 		}
 	}

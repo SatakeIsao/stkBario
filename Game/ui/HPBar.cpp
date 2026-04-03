@@ -114,7 +114,7 @@ namespace app
 					coinDigit->SetZeroPadding(true);
 					coinDigit->SetNumber(currentCoin_);
 
-					if (currentCoin_ >= 5)
+					if (currentCoin_ >= 10)
 					{
 						/** ハイスコアで黄色を増す */
 						coinDigit->color = Vector4(1.3f, 1.3f, 0.0f, 1.0f);
