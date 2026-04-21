@@ -401,20 +401,20 @@ C++のコードに直接「X座標=100、Y座標=200」と書くのをやめ、U
 ただ数字が減っていくだけでは、アクションに集中しているプレイヤーの意識に上りにくいと考えました。そこで、残り時間が「100秒・50秒・30秒」の区切りになった瞬間に、UI全体を少し拡縮させ、一瞬点滅させるアニメーションを取り入れています。
 これにより、プレイヤーが常に画面の端を見ていなくても、視界の隅の動きで「時間が減ってきたな」と直感的に気づける仕組みを作りました。
 
-<img width="alt="Image" src="https://github.com/user-attachments/assets/2b187475-d9f2-4d24-96ed-b8def6932bf6" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/2b187475-d9f2-4d24-96ed-b8def6932bf6" />
 
 #### 2. 「赤点滅」
 残り時間が30秒を切ると、タイマーが赤く点滅し続けるように変化します。
 これは「もう時間がない！」という警告をあおるための工夫です。ゲームの終盤に向けてあえてプレイヤーを焦らせることで、プレイ体験が単調にならず、クリアした時の達成感がより大きくなるようにゲームのメリハリをコントロールしました。
 
-<img width="600"alt="Image" src="https://github.com/user-attachments/assets/be42303c-dcf8-4e71-a633-128f472a044d" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/be42303c-dcf8-4e71-a633-128f472a044d" />
 
 #### 3. 没入感を最優先した画面レイアウト
 タイマーを画面の左端に配置しているのには、理由があります。
 タイマーだけでなく、HPバーやコインの獲得数といったプレイ中の情報は、すべて画面の端に寄せて配置しました。これは、プレイヤーの視線が集中する「画面中央（キャラクターのアクションや敵の動き）」をUIで隠してしまわないようにするためです。
 操作の邪魔をせず、ユーザーがゲームの世界にしっかりと没入できる画面設計を心がけました。
 
-<img width="600"alt="Image" src="https://github.com/user-attachments/assets/7bef137f-11d9-4d80-9089-5bc8f8e0bb3e" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/7bef137f-11d9-4d80-9089-5bc8f8e0bb3e" />
 
 <br />
 
@@ -430,21 +430,21 @@ C++のコードに直接「X座標=100、Y座標=200」と書くのをやめ、U
 * **GO!：** 溜めた力を一気に解放するように文字を「急拡大」させ、同時にアルファ値を下げて、フェードアウトする動きにしました。
 これにより、ユーザーがキャラクターを動かし始める瞬間の「疾走感」をUIの動きで後押ししています。
 
-<img width="600"  src="https://github.com/user-attachments/assets/2dd7d61e-6673-4b82-bb6c-6b6d12ff8910" />
+<img width="600" src="https://github.com/user-attachments/assets/2dd7d61e-6673-4b82-bb6c-6b6d12ff8910" />
 
 #### 2. リザルトアニメーション
 ゲームクリア、ゲームオーバー、タイムアップのそれぞれで、ユーザーが感じるべき感情（達成感や残念感）に合わせた専用のアニメーションを実装しました。
 * **ゲームクリア（達成感）：** 文字をに一気に拡大させた後、少し縮小して元のサイズにピタッと収まる「オーバーシュート」のアニメーションにし、目標を達成した気持ちよさと勢いを表現しました。
 
-<img width="600"alt="Image" src="https://github.com/user-attachments/assets/f95b9dbe-1fcf-46b5-9c9a-8286363b71e1" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/f95b9dbe-1fcf-46b5-9c9a-8286363b71e1" />
 
 * **ゲームオーバー（残念感）：** 文字が上から落ちてきて重たく「バウンド」するアニメーションにすることで、失敗してしまった時のがっかり感を表現しています。
 
-<img src="<img width= 600"alt="Image" src="https://github.com/user-attachments/assets/cc38c18b-2882-4b7d-b46f-3a445757b956" />f" width="600">
+<img width= "600" alt="Image" src="https://github.com/user-attachments/assets/cc38c18b-2882-4b7d-b46f-3a445757b956" />
 
 * **タイムアップ（急停止）：** 文字が右から左へ勢いよくスライドし、急ブレーキを踏んだように止まるアニメーションにし、「不意に時間が切れてしまった！」というハッとする感覚を演出しました。
 
-<img width="600"alt="Image" src="https://github.com/user-attachments/assets/c128f1b8-3861-470d-a360-54a70373760a" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/c128f1b8-3861-470d-a360-54a70373760a" />
 
 #### 3. 演出を支える自作のアニメーションシステム
 これらの複雑なシーケンス演出は、毎フレーム座標やスケールを手書きするのではなく、自作した `UIAnimation` クラスと `TaskSchedulerSystem` を組み合わせて制御しています。
