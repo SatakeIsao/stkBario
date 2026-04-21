@@ -102,15 +102,11 @@ namespace app
 		private:
 			std::unique_ptr <app::ui::Layout> layout_;
 			BounceState bounceState_ = BounceState::enStop;
-			//std::unique_ptr<app::ui::UIAnimationSequence> seq_;
 
 			float bounceTime_ = 0.0f;
 			float timer_ = 0.0f;
-			int currentCoin_ = 0;
-			bool hasCoinDeadEffect_ = false;
-			bool isBouncing_ = false;
+
 			bool isCounting_ = true;
-			bool isBlinking_ = false;
 
 			bool hasPulsed100_ = false;
 			bool hasPulsed50_ = false;

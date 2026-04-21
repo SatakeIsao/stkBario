@@ -517,7 +517,7 @@ namespace app
 				}
 			}
 
-			// ② UIには毎フレーム「表示してほしい時間」を渡すだけ
+			// UIには毎フレーム「表示してほしい時間」を渡すだけ
 			if (timerUIObject_) {
 				timerUIObject_->SetTimer(remainTime_);
 			}

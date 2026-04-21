@@ -131,7 +131,7 @@ static constexpr uint32_t ID() {return Hash32(#name);}
 		};
 
 
-		/**  */
+		/** ポーズメニュー */
 		struct MasterPauseMenuParameter : public IParameter
 		{
 			appParameter(MasterPauseMenuParameter);
