@@ -14,6 +14,11 @@
 #include "DebugScene.h"
 #endif // APP_DEBUG
 
+namespace
+{
+	constexpr float B_BUTTON_HOLD_THRESHOLD = 1.0f;
+}
+
 TitleScene::TitleScene()
 {
 }
@@ -103,9 +108,18 @@ void TitleScene::Update()
 	// ② マニュアルメニュー操作中の処理
 	else if (state_ == TitleSceneState::ManualMenu)
 	{
-		// 例: Bボタンでタイトルメニューに戻る
-		if (g_pad[0]->IsTrigger(enButtonB))
+		if (g_pad[0]->IsPress(enButtonB)) // Bボタンが押され続けている間
 		{
+			bButtonHoldTime_ += g_gameTime->GetFrameDeltaTime(); // 経過時間を加算
+		}
+		else
+		{
+			bButtonHoldTime_ = 0.0f; // 離したらリセット
+		}
+		// Bボタンでタイトルメニューに戻る
+		if (bButtonHoldTime_ >= B_BUTTON_HOLD_THRESHOLD)
+		{
+			bButtonHoldTime_ = 0.0f;
 			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
 			// 状態を戻す

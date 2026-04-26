@@ -37,6 +37,8 @@ private:
 
 	TitleSceneState state_ = TitleSceneState::TitleMenu;
 
+	float bButtonHoldTime_ = 0.0f;
+
 public:
 	TitleScene();
 	virtual ~TitleScene();
