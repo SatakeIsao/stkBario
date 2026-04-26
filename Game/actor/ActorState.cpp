@@ -140,7 +140,7 @@ namespace app
 		{
 			stateTimer_ = 0.0f;
 
-			////ここで攻撃用のゴーストオブジェクトを作成
+			// 攻撃用のゴーストオブジェクトを作成
 			attackScheduler_ = std::make_unique<app::core::TaskSchedulerSystem>();
 			attackScheduler_->AddTimer(0.1f, [&]()
 				{
@@ -402,7 +402,7 @@ namespace app
 					auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
 					attackBody_ = new app::collision::GhostBody();
-					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 20.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 30.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 					// @todo for test
 					const float radius = characterStateMachine->GetStatus()->GetRadius();
 					attackBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
