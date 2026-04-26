@@ -425,21 +425,34 @@ namespace app
 			// ポーズ中やシーケンス中は進めないなどの処理
 			if (currentPause || isSequence) return;
 
+			if (!isPlayerDead_ && battleCharacter_ != nullptr)
+			{
+				constexpr float FALL_DEATH_Y = -300.0f;
+				if (battleCharacter_->transform.localPosition.y <= FALL_DEATH_Y)
+				{
+					// ゲームオーバーシーケンス起動
+					if (battleSequenceObject_ != nullptr)
+					{
+						battleSequenceObject_->StartGameOver();
+					}
+				}
+			}
+
 			if (hasGoal_)
 			{
-				// 1. エフェクトの発生位置を毎フレーム上に移動させる（例：1秒間に 50.0f 上昇）
+				// エフェクトの発生位置を毎フレーム上に移動
 				goalPosition_.y += 50.0f * g_gameTime->GetFrameDeltaTime();
 
-				// ある程度の高さまで行ったら元の高さに戻す（例：初期位置から +150.0f まで）
+				// ある程度の高さまで行ったら元の高さに戻す
 				if (goalPosition_.y > baseGoalY_ + 100.0f)
 				{
 					goalPosition_.y = baseGoalY_;
 				}
 
-				// 2. クールタイムのタイマーを進める
+				// クールタイムのタイマーを進める
 				goalEffectTimer_ -= g_gameTime->GetFrameDeltaTime();
 
-				// 3. タイマーが 0 以下になったらエフェクトを再生する
+				// タイマーが 0 以下になったらエフェクトを再生する
 				if (goalEffectTimer_ <= 0.0f)
 				{
 					if (effectManagerObject_) {
@@ -467,7 +480,7 @@ namespace app
 					Vector3 diff = playerPos - targetGoalPos;
 					float distance = diff.Length();
 
-					// 距離が一定以内（例：100.0f）ならクリア！
+					// 距離が一定以内ならクリア！
 					if (distance < 50.0f)
 					{
 						if (battleSequenceObject_) {
@@ -477,7 +490,7 @@ namespace app
 				}
 			}
 
-			// ① BattleManagerでカウントダウン
+			// BattleManagerでカウントダウン
 			if (remainTime_ > 0.0f) {
 				remainTime_ -= g_gameTime->GetFrameDeltaTime();
 				// 指定した時間帯の時だけ isSeparator を true
@@ -564,21 +577,6 @@ namespace app
 							app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Coin));
 						}
 					}
-
-					///** デバッグテスト */
-					//if (g_pad[0]->IsTrigger(enButtonLB1))
-					//{
-					//	totalCoin_--;
-					//	if (totalCoin_ <= 0) totalCoin_ = 0;
-					//}
-					//if (g_pad[0]->IsTrigger(enButtonRB1))
-					//{
-					//	totalCoin_++;
-					//	coinUIObject_->GetPlayAnimation();
-					//	if (totalCoin_ >= 20) totalCoin_ = 20;
-					//}
-					///*************************/
-					//coinUIObject_->SetCoinNumber(totalCoin_);
 				}
 
 
