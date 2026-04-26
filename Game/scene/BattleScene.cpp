@@ -49,35 +49,29 @@ void BattleScene::Render(RenderContext& rc)
 
 bool BattleScene::RequestScene(uint32_t& id, float& waitTime)
 {
-	//app::ui::ReturnToTitleMenu* title;
-	//title = new app::ui::ReturnToTitleMenu;
-	//app::ui::SoundOptionMenu* sound;
-	//sound = new app::ui::SoundOptionMenu;
-
 	/** ゲームオーバーアイコンのアニメーション終了したら */
 	if (app::battle::BattleManager::Get().IsGameOverAnimFinished()
-		|| app::battle::BattleManager::Get().IsTimeUpAnimFinished()
-		|| g_pad[0]->IsTrigger(enButtonLB2))
+		|| app::battle::BattleManager::Get().IsTimeUpAnimFinished())
 	{
 		id = GameOverScene::ID();
 		waitTime = 3.0f;
 		return true;
 	}
-	/** デバッグテスト */
-	if (app::battle::BattleManager::Get().IsGameClearAnimFinished()
-		|| g_pad[0]->IsTrigger(enButtonRB2))
+	/** ゲームクリアアイコンのアニメーション終了したら */
+	if (app::battle::BattleManager::Get().IsGameClearAnimFinished())
 	{
 		// 遷移前に現在のコイン数を取得し、SceneManagerに預ける
 		int currentCoin = app::battle::BattleManager::Get().GetTotalCoin();
 		SceneManager::Get().SetTotalCoin(currentCoin);
-
+	
 		int currentTimer = app::battle::BattleManager::Get().GetRemainTime();
 		SceneManager::Get().SetCurrentTimer(currentTimer);
-
+	
 		id = GameClearScene::ID();
 		waitTime = 3.0f;
 		return true;
 	}
+
 	if (app::core::PauseManager::Get().IsReturnToTitleRequested())
 	{
 		id = TitleScene::ID();
