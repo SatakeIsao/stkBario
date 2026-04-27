@@ -84,9 +84,8 @@ using namespace Microsoft::WRL;
 #include "Bloom.h"
 #include "FontRender.h"
 #include "SpriteRender.h"
-//#include "SkyCube.h"
+#include "CircularGaugeRender.h"
 #include "LevelRender.h"
-//#include "MyRenderer.h"
 //
 #include "graphics/GaussianBlur.h"
 

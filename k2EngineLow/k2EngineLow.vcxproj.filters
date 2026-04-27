@@ -250,6 +250,7 @@
     <ClCompile Include="SpriteRender.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="LevelRender.cpp" />
+    <ClCompile Include="CircularGaugeRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -549,6 +550,7 @@
     <ClInclude Include="SpriteRender.h" />
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="LevelRender.h" />
+    <ClInclude Include="CircularGaugeRender.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

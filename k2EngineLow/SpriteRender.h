@@ -123,5 +123,4 @@ namespace nsK2EngineLow
 		Quaternion m_rotation = Quaternion::Identity;
 		Vector2	m_pivot = Sprite::DEFAULT_PIVOT;
 	};
-
 }

@@ -8,10 +8,18 @@ namespace app
 		class ManualMenu : public IGameObject
 		{
 		private:
-			std::unique_ptr <app::ui::Layout> layout_;
-			int cursolIndex_ = 0;
-			//ManualMenu currentState_ = ManualMenu::enTitle;
+			/** 長押しゲージ */
+			CircularGaugeRender holdGauge_;
+			/** Bアイコン */
+			SpriteRender bIcon_;
 
+			std::unique_ptr <app::ui::Layout> layout_;
+			/** 長押し経過時間 */
+			float holdTimer_ = 0.0f;
+			/** 長押し完了までの時間（秒） */
+			float holdMaxTime_ = 0.95f;
+
+			int cursolIndex_ = 0;
 			bool isOpenJustNow_ = false;
 		public:
 			ManualMenu();
@@ -22,16 +30,18 @@ namespace app
 			void OnOpen();
 			void OnClose();
 			void PlaySelectedAnimation();
+			
+			// 外部から長押し進捗を渡す（0.0〜1.0）
+			void SetHoldProgress(float progress)
+			{
+				holdGauge_.SetFillAmount(progress);
+			}
 
 			int GerCurrentIndex() const
 			{
 				return cursolIndex_;
 			}
 
-			//bool IsReadyToSelect() const
-			//{
-			//	return currentState_ == ManualMenu::enMenu && !isOpenJustNow_;
-			//}
 		public:
 			virtual void InitializeLogic();
 		};
