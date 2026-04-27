@@ -42,6 +42,7 @@ namespace nsK2EngineLow {
 			DXGI_FORMAT_UNKNOWN,
 		};	//レンダリングするカラーバッファのフォーマット。
 		D3D12_TEXTURE_ADDRESS_MODE textureAddressMode = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;	// テクスチャアドレッシングモード。
+		bool m_noTexture = false;   // テクスチャを使用しない場合はtrueを指定する。
 	};
 	/// <summary>
 	/// スプライトクラス。
