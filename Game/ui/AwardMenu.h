@@ -9,11 +9,6 @@ namespace app
 		{
 		private:
 			std::unique_ptr <app::ui::Layout> layout_;
-			/** 右バー用 */
-			//int barCursorIndex_ = 0;
-			///** 4つのパネル用 */
-			//int panelCursorIndex_ = 0;
-			//ManualMenu currentState_ = ManualMenu::enTitle;
 
 			int currentRow_ = 0;    // カーソルがいる行 (0〜7：全8行)
 			int currentCol_ = 0;    // カーソルがいる列 (0:左, 1:右)
@@ -37,11 +32,6 @@ namespace app
 			{
 				return currentRow_;
 			}
-
-			//bool IsReadyToSelect() const
-			//{
-			//	return currentState_ == ManualMenu::enMenu && !isOpenJustNow_;
-			//}
 		public:
 			virtual void InitializeLogic();
 		};
