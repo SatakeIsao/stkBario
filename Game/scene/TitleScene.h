@@ -38,6 +38,11 @@ private:
 	TitleSceneState state_ = TitleSceneState::TitleMenu;
 
 	float bButtonHoldTime_ = 0.0f;
+	/** サブメニューを開いた直後のフレームは入力を無視するフラグ */
+	bool isSubMenuJustOpened_ = false;
+	/* サブメニューから戻るときに使うカーソル位置の保存 */
+	int savedCursolIndex_ = 0;
+
 
 public:
 	TitleScene();
@@ -48,4 +53,9 @@ public:
 	virtual void Render(RenderContext& rc) override;
 
 	virtual bool RequestScene(uint32_t& id, float& waitTime)  override;
+
+
+private:
+	/** カーソルインデックスに応じた選択処理を直接実行する */
+	void ExecuteTitleMenuSelection(int index);
 };

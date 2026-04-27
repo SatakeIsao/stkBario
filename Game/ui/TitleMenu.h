@@ -39,6 +39,13 @@ namespace app
 				return cursolIndex_;
 			}
 
+			void OpenImmediate()
+			{
+				currentState_ = MenuState::enMenu;
+				isOpenJustNow_ = true;
+				OnOpen();
+			}
+
 			bool IsReadyToSelect() const
 			{
 				return currentState_ == MenuState::enMenu && !isOpenJustNow_;
