@@ -13,7 +13,10 @@ namespace app
     using SoundHandle = uint32_t;
     /** ハンドル無効値 */
     static constexpr SoundHandle INVALID_SOUND_HANDLE = 0xffffffff;
-
+    /** デフォルト音量 */
+    static constexpr float VOLUME_DEFAULT_MASTER = 0.50f;
+    static constexpr float VOLUME_DEFAULT_BGM = 0.20f;
+    static constexpr float VOLUME_DEFAULT_SE = 0.50f;
 
     /**
      * サウンド管理クラス
@@ -124,6 +127,10 @@ namespace app
             if (m_instance == nullptr)
             {
                 m_instance = new SoundManager();
+                // デフォルト音量を初回のみ設定
+                m_instance->SetVolume(SoundVolumeType::Master, VOLUME_DEFAULT_MASTER);
+                m_instance->SetVolume(SoundVolumeType::BGM, VOLUME_DEFAULT_BGM);
+                m_instance->SetVolume(SoundVolumeType::SE, VOLUME_DEFAULT_SE);
             }
         }
 
