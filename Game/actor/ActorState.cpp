@@ -402,7 +402,7 @@ namespace app
 					auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
 					attackBody_ = new app::collision::GhostBody();
-					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 30.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 45.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 					// @todo for test
 					const float radius = characterStateMachine->GetStatus()->GetRadius();
 					attackBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
@@ -411,7 +411,7 @@ namespace app
 					if (app::battle::BattleManager::IsAvailable() && app::battle::BattleManager::Get().GetEffectManager())
 					{
 						app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
-							enEffectKind_SlimeAttack, // ※元のコードの指定のままにしています。プレイヤー用エフェクトがあれば変更してください。
+							enEffectKind_SlimeAttack,
 							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * 30.0f),
 							Quaternion::Identity,
 							Vector3::One
