@@ -111,6 +111,12 @@ namespace app
             float countDownTimer_ = 3.0f;
             // 残り時間;
             float remainTime_ = 120.0f;
+            // ゴールの初期の高さを記憶する用
+            float baseGoalY_ = 0.0f;
+            // クールタイムを計るタイマー
+            float goalEffectTimer_ = 0.0f;
+
+            // コインの総数
             int totalCoin_ = 0;
             std::unique_ptr<app::ui::Layout> layout_;
 
@@ -124,12 +130,11 @@ namespace app
             bool isTimeUp_ = false;
             bool isBlinking_ = false;
             bool isSeparator = false;
+            bool isInputEnabled_ = false;
 
             Vector3 goalPosition_ = Vector3::Zero;
             Quaternion goalRotation_ = Quaternion::Identity;
             bool hasGoal_ = false;
-            float baseGoalY_ = 0.0f;       // ゴールの初期の高さを記憶する用
-            float goalEffectTimer_ = 0.0f; // クールタイムを計るタイマー
 
         private:
             BattleManager();
@@ -199,6 +204,12 @@ namespace app
             bool IsSeparator() const
             {
                 return isSeparator;
+            }
+
+            /** 入力受付可能か（バトルシーケンス終了後のみtrue） */
+            bool IsInputEnabled() const 
+            {
+                return isInputEnabled_; 
             }
 
             void SetPause(bool isPause);

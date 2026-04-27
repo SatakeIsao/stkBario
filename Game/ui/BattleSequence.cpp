@@ -243,7 +243,6 @@ namespace app
 								gameClearTimer_ = 0.0f; // タイマーリセット
 							
 								// ここでリザルト画面への遷移や、フェードアウトアニメーションを再生する
-								//currentDown_ = SequenceName::Finished;
 								app::battle::BattleManager::Get().SetGameClearAnimFinished(true);
 
 								if (app::ui::AwardManager::IsAvailable()) {

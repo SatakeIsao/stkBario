@@ -88,6 +88,10 @@ namespace app
 			bool IsPlaying() const {
 				return currentDown_ != SequenceName::Wait && currentDown_ != SequenceName::Finished;
 			}
+			bool IsGoFinished() const
+			{
+				return currentDown_ == SequenceName::Finished;
+			}
 		};
 	}
 }

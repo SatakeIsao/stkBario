@@ -398,6 +398,14 @@ namespace app
 
 		void BattleManager::Update()
 		{
+			if (!isInputEnabled_ && battleSequenceObject_ != nullptr)
+			{
+				if (battleSequenceObject_->IsGoFinished())
+				{
+					isInputEnabled_ = true;
+				}
+			}
+
 			/** 現在のメニューポーズ状態 */
 			bool currentPause = app::core::PauseManager::Get().IsPause();
 			/** シーケンス中か */
@@ -406,7 +414,7 @@ namespace app
 				isSequence = battleSequenceObject_->IsPlaying();
 			}
 
-			// キャラクターたちに適用するポーズ状態（手動ポーズ中、またはシーケンス中ならポーズさせる）
+			// キャラクターたちに適用するポーズ状態
 			bool targetPauseState = currentPause || isSequence;
 
 			if (isPause_ != targetPauseState)
@@ -417,7 +425,7 @@ namespace app
 			// シーケンス中は手動ポーズ（メニュー表示）を禁止する
 			app::core::PauseManager::Get().SetCanPause(!isSequence);
 			
-			if(currentPause)
+			if (currentPause)
 			{
 				return;
 			}
@@ -463,7 +471,7 @@ namespace app
 							Vector3(3.0f, 3.0f, 3.0f)
 						);
 					}
-					// クールタイムをリセット（例：0.5秒ごとに発生させる）
+					// クールタイムをリセット
 					goalEffectTimer_ = 1.3f;
 				}
 
@@ -472,11 +480,11 @@ namespace app
 					// プレイヤーの座標
 					Vector3 playerPos = battleCharacter_->transform.position;
 
-					// 判定用のゴール座標（エフェクトは上に登っていくため、基準の高さ baseGoalY_ を使う）
+					// 判定用のゴール座標
 					Vector3 targetGoalPos = goalPosition_;
 					targetGoalPos.y = baseGoalY_;
 
-					// 距離を計算（XZ平面だけの距離でもOKですが、今回は直線距離）
+					// 距離を計算
 					Vector3 diff = playerPos - targetGoalPos;
 					float distance = diff.Length();
 
@@ -557,8 +565,6 @@ namespace app
 							&& !coin->HasPlayedEffect())
 						{
 							coin->SetPlayedEffect(true);
-							// ※HasCoinDeadEffectはコインIDごとに管理するか、
-							// あるいはコイン側に「演出済みフラグ(hasPlayedEffect_等)」を持たせると安全です。
 
 							// エフェクト再生
 							effectManagerObject_->PlayEffect(
@@ -571,7 +577,6 @@ namespace app
 							// コインを加算してUIに反映
 							totalCoin_++;
 							coinUIObject_->SetCoinNumber(totalCoin_);
-							//coinUIObject_->SetCoinDeadEffect(true); // 複数コイン対応のため工夫が必要かもしれません
 							coinUIObject_->GetPlayAnimation();
 
 							app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Coin));

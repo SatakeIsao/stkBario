@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "BattleCharacter.h"
 #include "EventCharacter.h"
+#include "battle/BattleManager.h"
 
 
 namespace
@@ -31,13 +32,22 @@ namespace app
 
 		void CharacterSteering::Update()
 		{
-			auto inputVector = Vector3(GetPad()->GetLStickXF(), 0.0f, GetPad()->GetLStickYF());
+			bool isPressA = false;
+			bool isPressB = false;
+			bool isPressDown = false;
+			auto inputVector = Vector3::Zero; // デフォルトゼロ
+
+			// GOアニメが終わるまでLスティック入力を無視
+			if (!app::battle::BattleManager::IsAvailable()
+				|| app::battle::BattleManager::Get().IsInputEnabled())
+			{
+				isPressA = GetPad()->IsTrigger(enButtonA);
+				isPressB = GetPad()->IsTrigger(enButtonB);
+				isPressDown = GetPad()->IsTrigger(enButtonDown);
+				inputVector = Vector3(GetPad()->GetLStickXF(), 0.0f, GetPad()->GetLStickYF());
+			}
+
 			inputVector.Normalize();
-
-			const bool isPressA = GetPad()->IsTrigger(enButtonA);
-			const bool isPressB = GetPad()->IsTrigger(enButtonB);
-			const bool isPressDown = GetPad()->IsTrigger(enButtonDown);
-
 			// BattleCharacter
 			{
 				BattleCharacter* battleCharacter = dynamic_cast<BattleCharacter*>(target_);
