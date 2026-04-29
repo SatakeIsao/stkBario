@@ -59,9 +59,9 @@ namespace nsK2EngineLow {
 		//太陽光
 		//ディレクションライトのデータを作成する
 		//ライトは斜め上から当たっている
-		m_light.dirDirection.x = 1.0f;
-		m_light.dirDirection.y = -1.0f;
-		m_light.dirDirection.z = -1.0f;
+		m_light.dirDirection.x = 0.5f;
+		m_light.dirDirection.y = -2.0f;
+		m_light.dirDirection.z = -0.5f;
 
 		//正規化する
 		m_light.dirDirection.Normalize();
@@ -85,10 +85,9 @@ namespace nsK2EngineLow {
 		m_light.ptPosition.y = 50.0f;
 		m_light.ptPosition.z = 50.0f;
 
-		m_light.ptColor.x = 15.0f; //もとは１５
+		m_light.ptColor.x = 15.0f;
 		m_light.ptColor.y = 0.0f;
 		m_light.ptColor.z = 0.0f;
-
 
 		m_light.ptRange = 100.0f;
 	}
