@@ -22,7 +22,7 @@ namespace app
 
 			/** 触らせない */
 		private:
-			std::map<uint32_t, std::function<ICharacterState*()>> stateFuncList_;
+			std::map<uint32_t, std::function<ICharacterState* ()>> stateFuncList_;
 			std::unique_ptr<ICharacterState> currentState_ = nullptr;
 			/** ステート関連 */
 			uint32_t currentStateId_ = INVALID_STATE_ID;
@@ -241,7 +241,7 @@ namespace app
 			/** ノックバックしたことを教える */
 			void OnKnockBack()
 			{
-				if (IsEqualCurrentState(KnockBackCharacterState::ID())){
+				if (IsEqualCurrentState(KnockBackCharacterState::ID())) {
 					return;
 				}
 				isKnockBack_ = true;
@@ -290,6 +290,15 @@ namespace app
 
 			bool isDead_ = false;
 
+			/** ライフ（パンチ3回で死亡） */
+			int hp_ = 3;
+			/** 死亡スケール縮小が完了したか（外部からの削除タイミング検知用） */
+			bool isDeadScaleFinished_ = false;
+			/** 踏まれてHP0になって死んだか（ぺっちゃんこ縮小の判定用） */
+			bool isSquashedDead_ = false;
+			/** パンチでHP0になって死んだか（吹き飛びながら縮小の判定用） */
+			bool isKnockBackDead_ = false;
+
 		public:
 			EventCharacterStateMachine();
 			virtual ~EventCharacterStateMachine();
@@ -314,12 +323,24 @@ namespace app
 			bool IsDead() const { return isDead_; }
 
 			/** 外から踏まれたことを教える */
-			void OnSquashed() 
-			{ 
+			void OnSquashed()
+			{
+				// 既に死亡済み・Squash中は無視
+				if (isDead_) { return; }
+				if (IsEqualCurrentState(SquashCharacterState::ID())) { return; }
+
+				hp_--;
+				if (hp_ <= 0)
+				{
+					hp_ = 0;
+					isDead_ = true;
+					isSquashedDead_ = true;	// 踏まれてHP0 → ぺっちゃんこ縮小フラグ
+				}
 				isSquashed_ = true;
 				aiTimer_ = 0.0f;
 			}
 			bool IsSquashed() const { return isSquashed_; }
+			bool IsSquashedDead() const { return isSquashedDead_; }
 
 			/** 視野角に入ったことを教える */
 			void OnViewAngle(const Vector3& targetPos) {
@@ -327,21 +348,35 @@ namespace app
 				targetPosition_ = targetPos;
 			}
 
-			bool IsViewAngle() const {return isViewAngle_;}
+			bool IsViewAngle() const { return isViewAngle_; }
 
 			/** 追跡開始を教える */
-			void OnChase(const Vector3& direction,const Vector3& targetPos) {
+			void OnChase(const Vector3& direction, const Vector3& targetPos) {
 				isChasing_ = true;
 				chaseDirection_ = direction;
 				targetPosition_ = targetPos;
 			}
 
 			/**
-			 * DEBUG: 書く場所変更予定だが一旦ここで実装
-			 * パンチ食らったことを教える⇒ノックバックに変更したい
+			 * パンチを食らった時に呼ぶ。
+			 * HP を 1 減算し、0以下になれば死亡状態へ遷移する。
+			 * HP が残っている場合はノックバック状態へ遷移する。
 			 */
 			void OnKnockBack(const Vector3& direction)
 			{
+				// 既に死亡済み・ノックバック中は無視
+				if (isDead_) { return; }
+				if (IsEqualCurrentState(KnockBackCharacterState::ID())) { return; }
+
+				hp_--;
+				if (hp_ <= 0)
+				{
+					// HP 切れ → 死亡
+					hp_ = 0;
+					isDead_ = true;
+					isKnockBackDead_ = true;	// パンチで死亡 → 吹き飛びながら縮小
+				}
+				// HP残あり・HP0問わずノックバックは発生する
 				isKnockBack_ = true;
 				knockBackDirection_ = direction;
 			}
@@ -349,6 +384,15 @@ namespace app
 			{
 				return isKnockBack_;
 			}
+
+			/** 現在のHPを取得する */
+			int GetHP() const { return hp_; }
+
+			/** 死亡スケール縮小が完了したか（EventCharacter が削除タイミングを検知するために使う） */
+			bool IsDeadScaleFinished() const { return isDeadScaleFinished_; }
+			void SetDeadScaleFinished(bool value) { isDeadScaleFinished_ = value; }
+
+			bool IsKnockBackDead() const { return isKnockBackDead_; }
 
 			//ゴーストが生成されたことを通知
 			void NontifyAttackGhostCreated()

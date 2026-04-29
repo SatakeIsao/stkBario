@@ -231,6 +231,29 @@ namespace app
 
 
 
+		class SquashCharacterState : public ICharacterState
+		{
+			appState(SquashCharacterState);
+
+
+		private:
+			float timer_ = 0.0f;
+			// ぺっちゃんこ維持時間
+			static constexpr float SQUASH_DURATION = 2.0f;
+
+		public:
+			SquashCharacterState(IStateMachine* owner);
+			~SquashCharacterState();
+			void Enter() override;
+			void Update() override;
+			void Exit() override;
+
+			virtual bool CanChangeState() const;
+		};
+
+
+
+
 		class DeadCharacterState : public ICharacterState
 		{
 			appState(DeadCharacterState);
@@ -238,6 +261,16 @@ namespace app
 
 		private:
 			float timer_ = 0.0f;
+			/** スケール縮小アニメーション用（スライムのDead専用） */
+			float shrinkTimer_ = 0.0f;
+			/** 縮小にかける秒数 */
+			static constexpr float SHRINK_DURATION = 1.0f;
+			/** Enter時の開始スケール */
+			Vector3 startScale_ = Vector3::One;
+			/** ノックバック中に死亡した場合、移動を継続するためのタイマー */
+			float knockBackTimer_ = 0.0f;
+			/** ノックバックしながら死亡したか */
+			bool isKnockBackDead_ = false;
 
 		public:
 			DeadCharacterState(IStateMachine* owner);

@@ -19,13 +19,11 @@ namespace app
 	{
 		IdleCharacterState::IdleCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		IdleCharacterState::~IdleCharacterState()
-		{
-		}
+		{}
 
 
 		void IdleCharacterState::Enter()
@@ -54,13 +52,11 @@ namespace app
 
 		RunCharacterState::RunCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		RunCharacterState::~RunCharacterState()
-		{
-		}
+		{}
 
 
 		void RunCharacterState::Enter()
@@ -127,13 +123,11 @@ namespace app
 
 		AttackCharacterState::AttackCharacterState(IStateMachine* owner)
 			:ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		AttackCharacterState::~AttackCharacterState()
-		{
-		}
+		{}
 
 
 		void AttackCharacterState::Enter()
@@ -168,14 +162,14 @@ namespace app
 
 					// @todo for test
 					const float radius = characterStateMachine->GetStatus()->GetRadius();
-					
+
 					Vector3 forward = characterStateMachine->GetMoveDirection();
-					
+
 					if (forward.LengthSq() < 0.01f) {
 						forward = Vector3::Front;
 					}
 					attackBody_->SetPosition(characterStateMachine->transform.position + forward * (radius + radius) + Vector3(0.0f, radius, 0.0f));
-			}, false);
+				}, false);
 
 			// DEBUG; 削除はEnterではしない
 			//ゴースト削除タイマー
@@ -224,7 +218,7 @@ namespace app
 		{
 			attackScheduler_.reset(nullptr);
 
-			if (attackBody_ != nullptr) 
+			if (attackBody_ != nullptr)
 			{
 				delete attackBody_;
 				attackBody_ = nullptr;
@@ -236,13 +230,13 @@ namespace app
 		bool AttackCharacterState::CanChangeState() const
 		{
 			/** TODO; ある程度の距離外になったら　　アニメーション再生は廃止したいな
-			     あくまで攻撃ステートは攻撃用のゴーストオブジェクトを付与してるだけ
+				 あくまで攻撃ステートは攻撃用のゴーストオブジェクトを付与してるだけ
 				 ゴーストの付与の切り替えかな
 			 */
 
 
-			return stateTimer_ >3.0f;
-			
+			return stateTimer_ > 3.0f;
+
 			//auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			//auto* modelRender = characterStateMachine->GetModelRender();
 			//return !modelRender->IsPlayingAnimation();
@@ -254,13 +248,11 @@ namespace app
 
 		JumpCharacterState::JumpCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		JumpCharacterState::~JumpCharacterState()
-		{
-		}
+		{}
 
 
 		void JumpCharacterState::Enter()
@@ -348,13 +340,11 @@ namespace app
 
 		FallingCharacterState::FallingCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		FallingCharacterState::~FallingCharacterState()
-		{
-		}
+		{}
 
 
 		void FallingCharacterState::Enter()
@@ -374,8 +364,7 @@ namespace app
 
 
 		void FallingCharacterState::Exit()
-		{
-		}
+		{}
 
 
 
@@ -385,13 +374,11 @@ namespace app
 
 		PunchCharacterState::PunchCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		PunchCharacterState::~PunchCharacterState()
-		{
-		}
+		{}
 
 
 		void PunchCharacterState::Enter()
@@ -437,7 +424,7 @@ namespace app
 		void PunchCharacterState::Exit()
 		{
 			attackScheduler_.reset(nullptr);
-			if (attackBody_ != nullptr) 
+			if (attackBody_ != nullptr)
 			{
 				delete attackBody_;
 				attackBody_ = nullptr;
@@ -460,13 +447,11 @@ namespace app
 
 		WarpInCharacterState::WarpInCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		WarpInCharacterState::~WarpInCharacterState()
-		{
-		}
+		{}
 
 
 		void WarpInCharacterState::Enter()
@@ -486,7 +471,7 @@ namespace app
 			}
 
 			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Warp));
-		} 
+		}
 
 
 		void WarpInCharacterState::Update()
@@ -529,13 +514,11 @@ namespace app
 
 		WarpOutCharacterState::WarpOutCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		WarpOutCharacterState::~WarpOutCharacterState()
-		{
-		}
+		{}
 
 
 		void WarpOutCharacterState::Enter()
@@ -563,8 +546,7 @@ namespace app
 
 
 		void WarpOutCharacterState::Exit()
-		{
-		}
+		{}
 
 
 		bool WarpOutCharacterState::CanChangeState() const
@@ -583,45 +565,197 @@ namespace app
 
 		DeadCharacterState::DeadCharacterState(IStateMachine* owner)
 			:ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		DeadCharacterState::~DeadCharacterState()
-		{
-		}
+		{}
 
 
 		void DeadCharacterState::Enter()
 		{
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-			//キャラクター固有の死亡処理を実行
 			characterStateMachine->OnEnterDead();
 
 			timer_ = 0.0f;
+			shrinkTimer_ = 0.0f;
+			knockBackTimer_ = 0.0f;
+
+			// Squashから遷移した場合は (1,0.1,1)、通常死亡は (1,1,1) が入る
+			startScale_ = characterStateMachine->transform.scale;
+
+			// ノックバック中に死亡したか（パンチでHP0限定）
+			isKnockBackDead_ = false;
+			if (auto* eventMachine = owner_->As<EventCharacterStateMachine>())
+			{
+				isKnockBackDead_ = eventMachine->IsKnockBackDead();
+			}
+
+			// Jump(80.0f) による上昇が始まる前に着地判定が走らないよう
+			// knockBackTimer_ を少し進めておく（0.1f 未満は着地チェックしない）
+			if (isKnockBackDead_)
+			{
+				knockBackTimer_ = 0.0f; // 着地チェックは 0.1f 以降から行う
+			}
 		}
 
 
 		void DeadCharacterState::Update()
 		{
 			timer_ += g_gameTime->GetFrameDeltaTime();
+
+			// スケール縮小はスライム（EventCharacterStateMachine）のみ
+			auto* eventMachine = owner_->As<EventCharacterStateMachine>();
+			if (eventMachine == nullptr) { return; }
+
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+
+			// ノックバック死の場合：KnockBackStateと同じ移動ロジックで吹っ飛びを継続
+			if (isKnockBackDead_)
+			{
+				knockBackTimer_ += g_gameTime->GetFrameDeltaTime();
+
+				float deceleration = 1.0f - knockBackTimer_;
+				if (deceleration < 0.0f) { deceleration = 0.0f; }
+
+				float currentSpeed = 500.0f * deceleration;
+				characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), currentSpeed);
+
+				// 着地 or 一定時間で移動終了
+				bool isLanded = false;
+				if (knockBackTimer_ > 0.1f)
+				{
+					isLanded = characterStateMachine->GetCharacterController()->IsOnGround();
+				}
+				if (isLanded || knockBackTimer_ > 2.0f)
+				{
+					isKnockBackDead_ = false;
+				}
+			}
+
+			shrinkTimer_ += g_gameTime->GetFrameDeltaTime();
+			const float t = min(shrinkTimer_ / SHRINK_DURATION, 1.0f);
+			if (t < 1.0f)
+			{
+				if (eventMachine->IsSquashedDead())
+				{
+					// 踏まれてHP0 → ぺっちゃんこ(1,0.1,1)のまま XZ を縮小
+					// Y は 0.1 固定で徐々に消える
+					const float xz = startScale_.x * (1.0f - t);
+					const float y = startScale_.y;				// Y は変えない
+					characterStateMachine->transform.scale = Vector3(xz, y, xz);
+				}
+				else
+				{
+					// パンチ死など通常死亡 → XYZ 均等縮小
+					characterStateMachine->transform.scale = Vector3(
+						startScale_.x * (1.0f - t),
+						startScale_.y * (1.0f - t),
+						startScale_.z * (1.0f - t)
+					);
+				}
+			}
+			else
+			{
+				characterStateMachine->transform.scale = Vector3::Zero;
+				eventMachine->SetDeadScaleFinished(true);
+			}
 		}
 
 
 		void DeadCharacterState::Exit()
-		{ 
+		{
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-			// DEBUG_TEST: キャラクター固有の志望解除のを実行
 			characterStateMachine->OnExitDead();
 		}
 
 
 		bool DeadCharacterState::CanChangeState() const
 		{
+			// スライム: 縮小完了で遷移可能
+			if (owner_->As<EventCharacterStateMachine>() != nullptr)
+			{
+				return shrinkTimer_ >= SHRINK_DURATION;
+			}
+			// プレイヤーなど: 従来通り 2 秒後
 			return timer_ > 2.0f;
 		}
 
-		
+
+
+
+		/*************************************/
+
+
+		SquashCharacterState::SquashCharacterState(IStateMachine* owner)
+			: ICharacterState(owner)
+		{}
+
+
+		SquashCharacterState::~SquashCharacterState()
+		{}
+
+
+		void SquashCharacterState::Enter()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+
+			// ぺっちゃんこスケールに即座にセット
+			characterStateMachine->transform.scale = Vector3(1.0f, 0.1f, 1.0f);
+
+			// アニメーション再生
+			characterStateMachine->GetModelRender()->PlayAnimation(
+				static_cast<uint8_t>(app::actor::SlimeAnimationKind::Dead));
+
+			// エフェクト
+			if (app::battle::BattleManager::IsAvailable() && app::battle::BattleManager::Get().GetEffectManager())
+			{
+				app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+					enEffectKind_SlimeKnockBack,
+					characterStateMachine->transform.position,
+					Quaternion::Identity,
+					Vector3::One
+				);
+			}
+
+			// SE
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeSquash));
+
+			timer_ = 0.0f;
+		}
+
+
+		void SquashCharacterState::Update()
+		{
+			timer_ += g_gameTime->GetFrameDeltaTime();
+		}
+
+
+		void SquashCharacterState::Exit()
+		{
+			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
+			auto* eventMachine = owner_->As<EventCharacterStateMachine>();
+
+			// Dead に遷移する場合はスケールをそのまま維持する
+			// （ぺっちゃんこ状態を DeadCharacterState の縮小開始点として使うため）
+			if (eventMachine != nullptr && eventMachine->IsDead())
+			{
+				// スケールはそのまま（(1, 0.1, 1) を維持）
+				return;
+			}
+
+			// 復活する場合のみスケールを元に戻してSEを鳴らす
+			characterStateMachine->transform.scale = Vector3::One;
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeRevival));
+		}
+
+
+		bool SquashCharacterState::CanChangeState() const
+		{
+			return timer_ >= SQUASH_DURATION;
+		}
+
+
 
 
 		/*************************************/
@@ -629,13 +763,11 @@ namespace app
 
 		KnockBackCharacterState::KnockBackCharacterState(IStateMachine* owner)
 			: ICharacterState(owner)
-		{
-		}
+		{}
 
 
 		KnockBackCharacterState::~KnockBackCharacterState()
-		{
-		}
+		{}
 
 
 		void KnockBackCharacterState::Enter()
@@ -645,7 +777,7 @@ namespace app
 
 			/** SE流す */
 		}
-		
+
 
 		void KnockBackCharacterState::Update()
 		{
