@@ -24,6 +24,10 @@ namespace app
 				float height = 10.0f;
 				float rotationSpeedX = 1.0f;
 				float rotationSpeedY = 1.0f;
+				/** 見下ろし制限 */
+				float pitchMin = Math::DegToRad(0.0f);
+				/** 見上げ制限 */
+				float pitchMax = Math::DegToRad(60.0f);
 			};
 
 
@@ -31,6 +35,7 @@ namespace app
 			Config config_;
 			app::actor::Character* targetCharacter_ = nullptr;
 			Vector3 toVector_ = Vector3::Zero;
+			float pitch = 0.0f;
 
 
 		public:

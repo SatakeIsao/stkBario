@@ -6,7 +6,7 @@
         "fov": 60,
         "nearClip": 0.1,
         "farClip": 10000.0,
-        "rotationX": 0.01,
-        "rotationY": 0.01
+        "rotationX": -0.05,
+        "rotationY": 0.05
     }
 ]
