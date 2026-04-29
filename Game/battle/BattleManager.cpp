@@ -172,7 +172,7 @@ namespace app
 				skyCube_->SetScale(400.0f);
 				skyCube_->SetPosition({ 1000.0f,0.0f,2500.0f });
 				//スカイキューブの種類を設定
-				skyCube_->SetType((nsK2EngineLow::EnSkyCubeType)enSkyCubeType_Day);
+				skyCube_->SetType((nsK2EngineLow::EnSkyCubeType)enSkyCubeType_DayToon_3);
 			}
 			// ステージ配置
 			{
@@ -271,6 +271,7 @@ namespace app
 							slime->AddState<app::actor::RunCharacterState>();
 							slime->AddState<app::actor::AttackCharacterState>();
 							slime->AddState<app::actor::PunchCharacterState>();
+							slime->AddState<app::actor::SquashCharacterState>();
 							slime->AddState<app::actor::DeadCharacterState>();
 							slime->AddState <app::actor::KnockBackCharacterState>();
 						}
@@ -284,11 +285,26 @@ namespace app
 					/** ゴール */
 					if (objData.ForwardMatchName(L"Goal") == true) {
 						// エフェクトはここでは再生せず、座標と回転だけを保存する
-						goalPosition_ = objData.position;
-						goalPosition_.y -= 100.0f;
-						goalRotation_ = objData.rotation;
-						baseGoalY_ = goalPosition_.y;
-						hasGoal_ = true;
+						{
+							goalPosition_ = objData.position;
+							goalPosition_.y -= 100.0f;
+							goalRotation_ = objData.rotation;
+							baseGoalY_ = goalPosition_.y;
+							hasGoal_ = true;
+						}
+						// ゴールポール
+						{
+							app::actor::StaticGimmick* stage = NewGO<app::actor::StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "Goal");
+							stage->transform.position = (objData.position);
+							// Y座標を100.0f下げる処理を追加
+							stage->transform.position.y -= 100.0f;
+
+							stage->transform.rotation = (objData.rotation);
+
+							stage->transform.scale = (objData.scale);
+							stage->Initialize("Assets/ModelData/stage/goalFlag.tkm");
+							testGimmickList_.push_back(stage);
+						}
 					}
 					//if (objData.EqualObjectName(L"PipeGimmick001") == true) {
 					//	app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
@@ -362,32 +378,33 @@ namespace app
 				app::camera::CameraManager::Get().Register(app::camera::GameCamera::ID(), gameCameraController_);
 				app::camera::CameraManager::Get().SwitchCamera(gameCameraController_);
 			}
-			//HPバー
+			// HPバー
 			{
 				// HPバー生成
 				hpBarObject_ = NewGO<app::ui::HPBarObject>(static_cast<uint8_t>(ObjectPriority::Default));
 			}
-			//コインUI
+			// コインUI
 			{
 				coinUIObject_ = NewGO <app::ui::CoinUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
 			}
-			//タイマーUI
+			// タイマーUI
 			{
 				timerUIObject_ = NewGO <app::ui::TimerUIObject>(static_cast<uint32_t>(ObjectPriority::Default));
 			}
 			
-			//ポーズマネージャーオブジェクト
+			// ポーズマネージャーオブジェクト
 			{
 				pauseManagerObject_ = NewGO<app::core::PauseManagerObject>(static_cast<uint8_t>(ObjectPriority::Pause));
 			}
-			//バトルシーケンスマネージャーオブジェクト
+			// バトルシーケンスマネージャーオブジェクト
 			{
 				battleSequenceObject_ = NewGO<app::ui::BattleSequence>(static_cast<uint8_t>(ObjectPriority::Default));
 			}
-			//BGM再生
+			// BGM再生
 			{
 				app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
 			}
+			// 称号マネージャー
 			{
 				if (app::ui::AwardManager::IsAvailable()) {
 					app::ui::AwardManager::Get().ResetPlayData();
@@ -650,6 +667,24 @@ namespace app
 
 					}
 					notifyList_.clear();
+				}
+
+				// スケール縮小完了した死亡スライムをリストから除去して削除する
+				{
+					auto it = eventCharacterList_.begin();
+					while (it != eventCharacterList_.end())
+					{
+						app::actor::EventCharacter* slime = *it;
+						if (slime != nullptr && slime->IsPendingRemove())
+						{
+							DeleteGO(slime);
+							it = eventCharacterList_.erase(it);
+						}
+						else
+						{
+							++it;
+						}
+					}
 				}
 			}
 
