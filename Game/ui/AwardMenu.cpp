@@ -7,6 +7,10 @@
 #include "ui/UIAnimation.h"
 #include "AwardManager.h"
 
+namespace
+{
+	static app::ui::UIAnimationSequence* seq = nullptr;
+}
 
 namespace app
 {
@@ -137,10 +141,36 @@ namespace app
 
 		void AwardMenu::OnOpen()
 		{
+			auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
+
+			if (fingerCursor)
+			{
+				fingerCursor->isDraw = true; // 表示する
+
+				// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(fingerCursor, Hash32("FadeIn"));
+
+				// アニメーションを取得して再生
+				auto* anim = fingerCursor->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Play();
+				}
+			}
 		}
 
 		void AwardMenu::OnClose()
 		{
+			auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
+			if (fingerCursor)
+			{
+				auto* anim = fingerCursor->FindAnimation(Hash32("FadeIn"));
+				if (anim)
+				{
+					anim->Stop();
+				}
+				fingerCursor->isDraw = false;
+			}
 		}
 
 		void AwardMenu::PlaySelectedAnimation()
@@ -347,14 +377,22 @@ namespace app
 		{
 			// サウンドバーの位置情報設定
 			// アニメーションとかいれたり
-			/** キャンバス（UI全体) */
-			//{
-			//	auto* canvas = GetCanvas();
-			//	if (canvas)
-			//	{
-			//		canvas->transform.localScale = Vector3::One;
-			//	}
-			//}
+			/** カーソルUI */
+			{
+				auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
+				if (fingerCursor)
+				{
+					// アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(fingerCursor, Hash32("FadeIn"));
+
+					seq = new app::ui::UIAnimationSequence();
+					seq->Add(Hash32("FadeIn"));
+
+
+					// アニメーションを再生
+					seq->Play(fingerCursor);
+				}
+			}
 		}
 	}
 }
