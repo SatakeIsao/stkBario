@@ -118,8 +118,6 @@ namespace app
 
 		void PipeGimmick::Update()
 		{
-
-
 			IGimmick::Update();
 		}
 
@@ -141,7 +139,7 @@ namespace app
 
 			// モデル読み込み
 			modelRender_ = std::make_unique<ModelRender>();
-			modelRender_->Init(path);
+			modelRender_->Init(path, nullptr, 0, enModelUpAxisZ, true, false);
 			modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
 			modelRender_->Update();
 
@@ -255,7 +253,7 @@ namespace app
 
 			// モデル読み込み
 			modelRender_ = std::make_unique<ModelRender>();
-			modelRender_->Init(path);
+			modelRender_->Init(path, nullptr, 0, enModelUpAxisZ, true, false);
 			modelRender_->SetTRS(transform.position, transform.rotation, transform.scale);
 			modelRender_->Update();
 

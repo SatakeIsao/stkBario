@@ -122,6 +122,12 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     }
     
     psIn.pos = mul(worldMatrix, vsIn.pos); //モデルの頂点をワールド座標系に変換
+
+    // Normal Offset Shadow: 法線方向に頂点をずらしてシャドウマップに書き込む
+    // 丸いスライムなど曲面モデルのセルフシャドウを根本的に防ぐ
+    float3 worldNormal = normalize(mul(worldMatrix, float4(vsIn.normal, 0.0f)).xyz);
+    psIn.pos.xyz += worldNormal * 3.0f;  // 3.0f はオフセット量（大きくしすぎると影がズレる）
+
     psIn.worldPos = psIn.pos;
     psIn.pos = mul(mView, psIn.pos); //ワールド座標系からカメラ座標系に変換
     psIn.pos = mul(mProj, psIn.pos); //カメラ座標系からスクリーン座標系に変換

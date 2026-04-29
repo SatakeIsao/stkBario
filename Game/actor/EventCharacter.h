@@ -23,6 +23,8 @@ namespace app
 			std::unique_ptr<app::collision::GhostBody> ghostBody_ = nullptr;
 			Vector3 forward_ = g_vec3Front;
 			bool isPause_ = false;
+			/** スケール縮小完了後にBattleManagerがリストから取り除くためのフラグ */
+			bool pendingRemove_ = false;
 
 		public:
 			EventCharacter();
@@ -56,6 +58,21 @@ namespace app
 			void SetPause(bool isPause)
 			{
 				isPause_ = isPause;
+			}
+
+			/** 当たり判定を即座に無効化 */
+			void DisableCollision()
+			{
+				ghostBody_.reset();
+			}
+
+			/**
+			 * 死亡スケール縮小が完了し、BattleManager のリストから
+			 * 取り除いて delete してよい状態かを返す
+			 */
+			bool IsPendingRemove() const 
+			{
+				return pendingRemove_; 
 			}
 		};
 	}

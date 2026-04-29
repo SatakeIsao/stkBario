@@ -19,16 +19,45 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	Matrix viewMatrix;
 	Matrix projectionMatrix;
 
+	// ライト方向を真上寄りにする（Y成分を大きく）
+	// → ブロック側面への投影角度が深くなりセルフシャドウが減る
+	const Vector3 lightDir = Vector3(0.5f, -2.0f, -0.5f);
+	const float lightDistance = 3000.0f;
+	const float ORTHO_SIZE = 2000.0f;
+	const float SHADOW_MAP_SIZE = 4096.0f;
+
+	// テクセル1つ分のワールド空間サイズ
+	const float texelSize = ORTHO_SIZE / SHADOW_MAP_SIZE;
+
+	// ターゲットのXZのみ追従、Yは固定
+	Vector3 cameraTarget = g_camera3D->GetTarget();
+	Vector3 lightTarget = Vector3(cameraTarget.x, 0.0f, cameraTarget.z);
+
+	// ライトターゲットをテクセルサイズ単位にスナップ
+	lightTarget.x = floorf(lightTarget.x / texelSize + 0.5f) * texelSize;
+	lightTarget.z = floorf(lightTarget.z / texelSize + 0.5f) * texelSize;
+
+	// lightDir を正規化して逆方向にカメラを置く
+	Vector3 lightDirNorm = lightDir;
+	lightDirNorm.Normalize();
+	Vector3 lightCameraPos = lightTarget + Vector3(-lightDirNorm.x, -lightDirNorm.y, -lightDirNorm.z) * lightDistance;
+
 	viewMatrix.MakeLookAt(
-		g_camera3D->GetTarget() + Vector3{ 1500.0f, 1500.0f, 1500.0f },
-		g_camera3D->GetTarget(),
+		lightCameraPos,
+		lightTarget,
 		Vector3::AxisY
 	);
+
+	// Far を固定値にして深度バッファの精度を確保
+	// g_camera3D->GetFar()（10000）だと near:far = 1:100 になり精度が低下する
+	const float SHADOW_NEAR = 100.0f;
+	const float SHADOW_FAR = 6000.0f;	// lightDistance(3000) * 2 で十分カバーできる
+
 	projectionMatrix.MakeOrthoProjectionMatrix(
-		2000.0f,
-		2000.0f,
-		1.0f,
-		g_camera3D->GetFar()
+		ORTHO_SIZE,
+		ORTHO_SIZE,
+		SHADOW_NEAR,
+		SHADOW_FAR
 	);
 
 
