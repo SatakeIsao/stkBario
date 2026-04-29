@@ -96,8 +96,7 @@ namespace app
 		}
 
 		CharacterStateMachine::~CharacterStateMachine()
-		{
-		}
+		{}
 
 
 		void CharacterStateMachine::Update()
@@ -163,13 +162,11 @@ namespace app
 
 
 		BattleCharacterStateMachine::BattleCharacterStateMachine()
-		{
-		}
+		{}
 
 
 		BattleCharacterStateMachine::~BattleCharacterStateMachine()
-		{
-		}
+		{}
 
 
 		void BattleCharacterStateMachine::Initialize()
@@ -214,19 +211,18 @@ namespace app
 
 
 		void BattleCharacterStateMachine::OnExitKnockBack()
-		{
-		}
+		{}
 
 
 		void BattleCharacterStateMachine::OnEnterDead()
 		{
 			GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Dead));
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::PlayerDead));
 		}
 
 
 		void BattleCharacterStateMachine::OnExitDead()
-		{
-		}
+		{}
 
 
 		void BattleCharacterStateMachine::UpdateState()
@@ -340,13 +336,11 @@ namespace app
 
 
 		EventCharacterStateMachine::EventCharacterStateMachine()
-		{
-		}
+		{}
 
 
 		EventCharacterStateMachine::~EventCharacterStateMachine()
-		{
-		}
+		{}
 
 
 		void EventCharacterStateMachine::Initialize()
@@ -359,7 +353,7 @@ namespace app
 		}
 
 
-		void EventCharacterStateMachine::Update() 
+		void EventCharacterStateMachine::Update()
 		{
 			UpdateState();
 			SuperClass::Update();
@@ -369,15 +363,29 @@ namespace app
 		void EventCharacterStateMachine::OnEnterDead()
 		{
 			GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::SlimeAnimationKind::Dead));
-			// ぺっちゃんこ
-			transform.scale = Vector3(1.0f, 0.1f, 1.0f);
+			// スケールの縮小は DeadCharacterState::Update() が毎フレーム行う
+
+			// Dead遷移と同時に当たり判定を消す（縮小中に被弾しないように）
+			if (auto* eventCharacter = dynamic_cast<app::actor::EventCharacter*>(GetCharacter()))
+			{
+				eventCharacter->DisableCollision();
+			}
+
+			// エフェクト再生
+			app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
+				enEffectKind_SlimeKnockBack,
+				transform.position,
+				Quaternion::Identity,
+				Vector3::One
+			);
+			// SE流す
+			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeSquash));
 		}
 
 
 		void EventCharacterStateMachine::OnExitDead()
 		{
-			// 元に戻す
-			transform.scale = Vector3::One;
+			// Dead からは復活しない（削除されるため何もしない）
 		}
 
 
@@ -397,8 +405,7 @@ namespace app
 
 
 		void EventCharacterStateMachine::OnExitKnockBack()
-		{
-		}
+		{}
 
 
 		uint32_t EventCharacterStateMachine::GetCharacterID() const
@@ -414,16 +421,45 @@ namespace app
 
 
 		void EventCharacterStateMachine::OnExitAttack()
-		{
-		}
+		{}
 
 
 		void EventCharacterStateMachine::UpdateState()
 		{
+			/** 踏まれた（Squash） → 復活 or 即死亡 */
+			if (IsSquashed())
+			{
+				// まだSquashステートに入っていなければ遷移
+				if (!IsEqualCurrentState(SquashCharacterState::ID()))
+				{
+					RequestChangeState(SquashCharacterState::ID());
+				}
+
+				// HP0の場合はSquash待機せず即Deadへ
+				if (isDead_)
+				{
+					if (IsEqualCurrentState(SquashCharacterState::ID()))
+					{
+						isSquashed_ = false;
+						RequestChangeState(DeadCharacterState::ID());
+					}
+					return;
+				}
+
+				// HP残あり → 2秒待って復活
+				if (IsEqualCurrentState(SquashCharacterState::ID()) && CanChangeState())
+				{
+					isSquashed_ = false;
+					RequestChangeState(IdleCharacterState::ID());
+				}
+				return;
+			}
+
+			// 落下死など、Squashを経由しない死亡
 			if (isDead_)
 			{
 				RequestChangeState(DeadCharacterState::ID());
-				return; // 落下死の場合はずっとDeadのままにするため、ここで処理を終了
+				return;
 			}
 
 			/** スライム自身がプレイヤーを探す */
@@ -444,43 +480,35 @@ namespace app
 				float threshold = std::cos(60.0f * (Math::PI / 180.0f));
 
 				if (dot > threshold) {
-					// 視野角内に入ったので追従フラグを立てる
 					OnChase(DirectionToPlayer, playerPosition);
 				}
 			}
 
-			/** TODO: スライムの頭上にPlayerの当たり判定が衝突したらぺっちゃんこ */
-			if (IsSquashed())
-			{
-				RequestChangeState(DeadCharacterState::ID());
-				//ぺちゃんこSE流したい
-
-				// Deadステート側で2秒経過して「遷移可能」になったらIdleに戻す
-				if (IsEqualCurrentState(DeadCharacterState::ID())
-					&& CanChangeState())
-				{
-					isSquashed_ = false;
-					RequestChangeState(IdleCharacterState::ID());
-				}
-				return;
-			}
-
-			/** TODO: パンチ食らったらknockBack */
+			/** パンチ食らったらknockBack */
 			if (isKnockBack_)
 			{
 				// まだノックバック状態になっていない場合（初回の1回だけ通る）
+				// → KnockBackState::Enter で Jump(80.0f) と OnEnterKnockBack を確実に呼ぶため
+				//   1フレーム目は必ず KnockBackState に入る
 				if (!IsEqualCurrentState(KnockBackCharacterState::ID()))
 				{
-					// ノックバックする方向を設定
 					SetMoveDirection(knockBackDirection_);
 					RequestChangeState(KnockBackCharacterState::ID());
-
-					// SEの再生もここに入れることで1回だけ鳴る！
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::SlimeknockBack));
 				}
-				else // すでにノックバック状態になっている場合
+				else // KnockBackState に入った（Enter済み）
 				{
-					// ノックバックが終わり、別の状態へ遷移可能になったら待機状態に戻す
+					// HP0ならノックバック中でも即Deadへ（吹き飛びながら縮小）
+					// ※ Enter で Jump が呼ばれた後なので垂直速度は確定している
+					if (isDead_)
+					{
+						isKnockBack_ = false;
+						aiTimer_ = 0.0f;
+						RequestChangeState(DeadCharacterState::ID());
+						return;
+					}
+
+					// HP残あり → ノックバックが終わったら待機状態に戻す
 					if (CanChangeState())
 					{
 						aiTimer_ = 0.0f;
@@ -490,7 +518,7 @@ namespace app
 				}
 				return;
 			}
-			
+
 			if (IsEqualCurrentState(AttackCharacterState::ID()))
 			{
 				if (CanChangeState()) {
@@ -500,51 +528,33 @@ namespace app
 				return;
 			}
 
-			/** TODO: 敵の視野角にPlayerが入ったら追従して */
+			/** 敵の視野角にPlayerが入ったら追従 */
 			if (isChasing_)
 			{
 				isChasing_ = false;
 
-				if (IsEqualCurrentState(IdleCharacterState::ID())
-					&&aiTimer_> 5.0f)
+				Vector3 toPlayer = targetPosition_ - transform.position;
+				toPlayer.y = 0.0f;
+				float distance = toPlayer.Length();
+
+				if (distance <= 40.0f) {
+					SetMoveDirection(chaseDirection_);
+					RequestChangeState(AttackCharacterState::ID());
+				}
+				else if (distance <= 200.0f) {
+					SetMoveDirection(chaseDirection_);
+					RequestChangeState(RunCharacterState::ID());
+					aiTimer_ = 5.0f;
+				}
+				else
 				{
-
+					RequestChangeState(RunCharacterState::ID());
+					aiTimer_ = 0.0f;
 				}
-				else {
-					Vector3 toPlayer = targetPosition_ - transform.position;
-					toPlayer.y = 0.0f;
-					float distance = toPlayer.Length();
-
-					if (distance <= 40.0f) {
-						SetMoveDirection(chaseDirection_);
-						RequestChangeState(AttackCharacterState::ID());
-					}
-					else if (distance <= 200.0f) {
-						SetMoveDirection(chaseDirection_);
-						RequestChangeState(RunCharacterState::ID());
-						aiTimer_ = 5.0f;
-					}
-					/** DEBUG: いらないかも */
-					else
-					{
-						RequestChangeState(RunCharacterState::ID());
-						aiTimer_ = 0.0f;
-					}
-					return;
-				}
-
-				//TODO: もとの下の流れに戻したい
-				
-				
-				
-				//aiTimer_ = 5.0f;
-				//isChasing_ = false;
-				//return;
+				return;
 			}
 
-			app::actor::BattleCharacter* player = nullptr;
-
-			/** デバッグテスト: 待機⇒左に走る⇒右に走る⇒待機のモーション */
+			/** 待機 → 左に走る → 右に走る → 待機のパトロール */
 			if (IsEqualCurrentState(IdleCharacterState::ID()))
 			{
 				aiTimer_ += g_gameTime->GetFrameDeltaTime();
@@ -556,7 +566,7 @@ namespace app
 				return;
 			}
 
-			if (IsEqualCurrentState(RunCharacterState::ID())) 
+			if (IsEqualCurrentState(RunCharacterState::ID()))
 			{
 				aiTimer_ += g_gameTime->GetFrameDeltaTime();
 
