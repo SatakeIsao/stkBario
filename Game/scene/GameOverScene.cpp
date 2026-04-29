@@ -27,6 +27,7 @@ bool GameOverScene::Start()
 	//ゲームオーバーマネージャーオブジェクト
 	{
 		gameOverMenu_ = NewGO<app::ui::GameOverMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
+		gameOverMenu_->InitializeLogic();
 	}
 	return true;
 }

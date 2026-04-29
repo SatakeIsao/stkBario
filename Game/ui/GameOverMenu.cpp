@@ -6,6 +6,11 @@
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
 
+namespace
+{
+	static app::ui::UIAnimationSequence* seq = nullptr;
+}
+
 namespace app
 {
 	namespace ui
@@ -30,6 +35,7 @@ namespace app
 
 		GameOverMenu::~GameOverMenu()
 		{
+			app::core::ParameterManager::Get().UnloadParameter<app::core::GameOverMenuParameter>();
 		}
 		
 		void GameOverMenu::Update()
@@ -105,10 +111,45 @@ namespace app
 
 		void GameOverMenu::OnOpen()
 		{
+			// カーソル
+			{
+				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					cursol->isDraw = true;
+					// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+					// アニメーションを取得して再生
+					auto anim = cursol->FindAnimation(Hash32("FadeIn"));
+					if (anim)
+					{
+						anim->Play();
+					}
+				}
+			}
 		}
 
 		void GameOverMenu::OnClose()
 		{
+			// カーソル
+			{
+				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					cursol->isDraw = true;
+					// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+					// アニメーションを取得して再生
+					auto anim = cursol->FindAnimation(Hash32("FadeIn"));
+					if (anim)
+					{
+						anim->Stop();
+					}
+					cursol->isDraw = false;
+				}
+			}
 		}
 
 		void GameOverMenu::PlaySelectedAnimation()
@@ -150,14 +191,19 @@ namespace app
 		{
 			// サウンドバーの位置情報設定
 			// アニメーションとかいれたり
-			/** キャンバス（UI全体) */
-			//{
-			//	auto* canvas = GetCanvas();
-			//	if (canvas)
-			//	{
-			//		canvas->transform.localScale = Vector3::One;
-			//	}
-			//}
+			/** カーソル */
+			{
+				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					// アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+					seq = new app::ui::UIAnimationSequence();
+					seq->Add(Hash32("FadeIn"));
+					// アニメーションを再生
+					seq->Play(cursol);
+				}
+			}
 		}
 	}
 }

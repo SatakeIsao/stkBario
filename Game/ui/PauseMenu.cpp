@@ -7,6 +7,11 @@
 #include "ui/UIAnimation.h"
 #include "ui/AwardManager.h"
 
+namespace
+{
+	static app::ui::UIAnimationSequence* seq = nullptr;
+}
+
 namespace app 
 {
 	namespace ui
@@ -95,7 +100,7 @@ namespace app
 		{
 			isPause_ = true;
 
-			//キャンバス
+			// キャンバス
 			{
 				auto* canvas = GetCanvas();
 				if (canvas)
@@ -114,6 +119,23 @@ namespace app
 					app::ui::AwardManager::Get().OnTimeStopper();
 				}
 			}
+			//カーソル
+			{
+				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					cursol->isDraw = true;
+					// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+					// アニメーションを取得して再生
+					auto anim = cursol->FindAnimation(Hash32("FadeIn"));
+					if (anim)
+					{
+						anim->Play();
+					}
+				}
+			}
 		}
 
 		void PauseMenu::OnClose()
@@ -129,6 +151,24 @@ namespace app
 					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(canvas, Hash32("ScaleDown"));
 					auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
 					if (closeAnim) closeAnim->Play();
+				}
+			}
+			//カーソル
+			{
+				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					cursol->isDraw = true;
+					// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+
+					// アニメーションを取得して再生
+					auto anim = cursol->FindAnimation(Hash32("FadeIn"));
+					if (anim)
+					{
+						anim->Stop();
+					}
+					cursol->isDraw = false;
 				}
 			}
 		}
@@ -178,6 +218,19 @@ namespace app
 				if (canvas)
 				{
 					canvas->transform.localScale = Vector3::Zero;
+				}
+			}
+			/** カーソル */
+			{
+				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
+				if (cursol)
+				{
+					// アニメーションをアタッチ
+					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
+					seq = new app::ui::UIAnimationSequence();
+					seq->Add(Hash32("FadeIn"));
+					// アニメーションを再生
+					seq->Play(cursol);
 				}
 			}
 		}
