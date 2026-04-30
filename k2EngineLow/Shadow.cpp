@@ -19,12 +19,15 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	Matrix viewMatrix;
 	Matrix projectionMatrix;
 
-	// ライト方向を真上寄りにする（Y成分を大きく）
-	// → ブロック側面への投影角度が深くなりセルフシャドウが減る
+	// ライト方向を真上寄り
+	// ブロック側面への投影角度が深くなりセルフシャドウ減少
 	const Vector3 lightDir = Vector3(0.5f, -2.0f, -0.5f);
+	// ライトの距離
 	const float lightDistance = 3000.0f;
-	const float ORTHO_SIZE = 2000.0f;
-	const float SHADOW_MAP_SIZE = 4096.0f;
+	// 並行投影の範囲
+	const float ORTHO_SIZE = 1000.0f;
+	// シャドウマップのサイズ
+	const float SHADOW_MAP_SIZE = 2048.0f;
 
 	// テクセル1つ分のワールド空間サイズ
 	const float texelSize = ORTHO_SIZE / SHADOW_MAP_SIZE;
@@ -37,7 +40,7 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	lightTarget.x = floorf(lightTarget.x / texelSize + 0.5f) * texelSize;
 	lightTarget.z = floorf(lightTarget.z / texelSize + 0.5f) * texelSize;
 
-	// lightDir を正規化して逆方向にカメラを置く
+	// lightDir を正規化して逆方向にカメラ配置
 	Vector3 lightDirNorm = lightDir;
 	lightDirNorm.Normalize();
 	Vector3 lightCameraPos = lightTarget + Vector3(-lightDirNorm.x, -lightDirNorm.y, -lightDirNorm.z) * lightDistance;
@@ -49,9 +52,8 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	);
 
 	// Far を固定値にして深度バッファの精度を確保
-	// g_camera3D->GetFar()（10000）だと near:far = 1:100 になり精度が低下する
 	const float SHADOW_NEAR = 100.0f;
-	const float SHADOW_FAR = 6000.0f;	// lightDistance(3000) * 2 で十分カバーできる
+	const float SHADOW_FAR = 6000.0f;
 
 	projectionMatrix.MakeOrthoProjectionMatrix(
 		ORTHO_SIZE,
@@ -90,18 +92,14 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 		renderer->OnRenderShadowMap(rc, m_viewProjectionMatrix);//m_lightCamera.GetViewProjectionMatrix());
 	}
 	rc.WaitUntilFinishDrawingToRenderTarget(m_shadowMap);
-
-
-
-
 }
 
 void nsK2EngineLow::Shadow::InitRenderTarget()
 {
 	float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	m_shadowMap.Create(
-		4096,
-		4096,
+		2048,
+		2048,
 		1,
 		1,
 		//DXGI_FORMAT_R8G8B8A8_UNORM,
