@@ -1,25 +1,25 @@
-#pragma once
+ï»¿#pragma once
 #pragma once
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// ƒŒƒ“ƒ_ƒ‰[‚ÌŠî’êƒNƒ‰ƒXB
+	/// ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã®åŸºåº•ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class IRenderer : public Noncopyable {
 	public:
-		//ƒ‚ƒfƒ‹‚Ì•`‰æ
+		//ãƒ¢ãƒ‡ãƒ«ã®æç”»
 		virtual void OnRenderModel(RenderContext& rc)
 		{
 
 		}
 
-		//ƒVƒƒƒhƒEƒ}ƒbƒv‚Ö‚Ì•`‰æˆ—
+		//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã¸ã®æç”»å‡¦ç†
 		virtual void OnRenderShadowMap(RenderContext& rc, const Matrix& lvpMatrix)
 		{
 
 		}
 
-		//2D•`‰æ
+		//2Dæç”»
 		virtual void OnRender2D(RenderContext& rc)
 		{
 

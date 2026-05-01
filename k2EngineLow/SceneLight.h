@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 namespace nsK2EngineLow {
 	
 	static const int MAX_DIRECTIONAL_LIGHT = 4;
 	static const int MAX_POINT_LIGHT = 32;
 	static const int MAX_SPOT_LIGHT = 32;
-	////ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg‚Ì\‘¢‘Ì
+	////ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆã®æ§‹é€ ä½“
 	//struct DirectionLight
 	//{
 	//	Vector3 direction;
@@ -15,112 +15,112 @@ namespace nsK2EngineLow {
 	//	float pad1;
 	//};
 
-	////ƒ|ƒCƒ“ƒgƒ‰ƒCƒg‚Ì\‘¢‘Ì
+	////ãƒã‚¤ãƒ³ãƒˆãƒ©ã‚¤ãƒˆã®æ§‹é€ ä½“
 	//struct SPointLight
 	//{
 	////private: 
-	//	Vector3 position;		//À•W
-	//	int isUse = false;					//g—p’†ƒtƒ‰ƒO
-	//	Vector3 color;			//ƒ‰ƒCƒg‚ÌƒJƒ‰[
+	//	Vector3 position;		//åº§æ¨™
+	//	int isUse = false;					//ä½¿ç”¨ä¸­ãƒ•ãƒ©ã‚°
+	//	Vector3 color;			//ãƒ©ã‚¤ãƒˆã®ã‚«ãƒ©ãƒ¼
 	//	float pad2;
-	//	float range = 0.0f;	//Œ¸Šƒpƒ‰ƒ[ƒ^BX‚É‰e‹¿”ÍˆÍAY‚É‚Í‰e‹¿—¦‚É—İæ‚·‚éƒpƒ‰ƒ[ƒ^
+	//	float range = 0.0f;	//æ¸›è¡°ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã€‚Xã«å½±éŸ¿ç¯„å›²ã€Yã«ã¯å½±éŸ¿ç‡ã«ç´¯ä¹—ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	//	float pad3;
 	//};
 
-	////ƒXƒ|ƒbƒgƒ‰ƒCƒg‚Ì\‘¢‘Ì
+	////ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆã®æ§‹é€ ä½“
 	//struct SSpotLight
 	//{
 	////private:
-	//	Vector3 position = g_vec3Zero;	//À•W
-	//	int isUse = false;				//g—p’†ƒtƒ‰ƒO
-	//	Vector3 color = g_vec3One;		//ƒ‰ƒCƒg‚ÌƒJƒ‰[
-	//	float range;					//‰e‹¿”ÍˆÍ
-	//	Vector3 direction = g_vec3Down; //Ëo•ûŒü
-	//	float angle;					//ËoŠp“x
-	//	Vector3 pow = { 1.0f,1.0f,0.0f };//‰e‹¿—¦‚É—İæ‚·‚éƒpƒ‰ƒ[ƒ^
-	//									 //x‚ª‹——£‚É‚æ‚é‰e‹¿—¦‚ÉæZ‚·‚éƒpƒ‰ƒ[ƒ^
-	//									 //y‚ªŠp“x‚É‚æ‚é‰e‹¿—¦‚ÉæZ‚·‚éƒpƒ‰ƒ[ƒ^
+	//	Vector3 position = g_vec3Zero;	//åº§æ¨™
+	//	int isUse = false;				//ä½¿ç”¨ä¸­ãƒ•ãƒ©ã‚°
+	//	Vector3 color = g_vec3One;		//ãƒ©ã‚¤ãƒˆã®ã‚«ãƒ©ãƒ¼
+	//	float range;					//å½±éŸ¿ç¯„å›²
+	//	Vector3 direction = g_vec3Down; //å°„å‡ºæ–¹å‘
+	//	float angle;					//å°„å‡ºè§’åº¦
+	//	Vector3 pow = { 1.0f,1.0f,0.0f };//å½±éŸ¿ç‡ã«ç´¯ä¹—ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+	//									 //xãŒè·é›¢ã«ã‚ˆã‚‹å½±éŸ¿ç‡ã«ä¹—ç®—ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+	//									 //yãŒè§’åº¦ã«ã‚ˆã‚‹å½±éŸ¿ç‡ã«ä¹—ç®—ã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	//	float pad4;
 
 	//
 	//};
 
-	//ƒ‰ƒCƒg‚Ì\‘¢‘Ì
+	//ãƒ©ã‚¤ãƒˆã®æ§‹é€ ä½“
 	struct Light
 	{
-		//ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg—p‚Ìƒƒ“ƒo•Ï”
-		Vector3 dirDirection; //ƒ‰ƒCƒg‚Ì•ûŒü
+		//ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆç”¨ã®ãƒ¡ãƒ³ãƒå¤‰æ•°
+		Vector3 dirDirection; //ãƒ©ã‚¤ãƒˆã®æ–¹å‘
 		float pad1;
-		Vector3 color;		  //ƒ‰ƒCƒg‚ÌƒJƒ‰[
+		Vector3 color;		  //ãƒ©ã‚¤ãƒˆã®ã‚«ãƒ©ãƒ¼
 		float pad2;
 
 		Vector3 lightPos;
 		float padlight;
 		
-		//DirectionLight directionalLight[MAX_DIRECTIONAL_LIGHT];	//ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg‚Ì”z—ñ
-		//SPointLight pointLights[MAX_POINT_LIGHT];				//ƒ|ƒCƒ“ƒgƒ‰ƒCƒg‚Ì”z—ñ[
+		//DirectionLight directionalLight[MAX_DIRECTIONAL_LIGHT];	//ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆã®é…åˆ—
+		//SPointLight pointLights[MAX_POINT_LIGHT];				//ãƒã‚¤ãƒ³ãƒˆãƒ©ã‚¤ãƒˆã®é…åˆ—[
 		//DirectionLight directionalLight;
 		//PointLight pointLight;
 		
-		//ƒ|ƒCƒ“ƒgƒ‰ƒCƒg—p‚Ìƒƒ“ƒo•Ï”
+		//ãƒã‚¤ãƒ³ãƒˆãƒ©ã‚¤ãƒˆç”¨ã®ãƒ¡ãƒ³ãƒå¤‰æ•°
 		Vector3 ptPosition;
 		float pad3;
 		Vector3 ptColor;
 		float ptRange;
 
-		//ƒXƒ|ƒbƒgƒ‰ƒCƒg—p‚Ìƒƒ“ƒo•Ï”
-		Vector3 spPosition;	//ˆÊ’u
+		//ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆç”¨ã®ãƒ¡ãƒ³ãƒå¤‰æ•°
+		Vector3 spPosition;	//ä½ç½®
 		float pad4;
-		Vector3 spColor;	//ƒ‰ƒCƒg‚ÌƒJƒ‰[
-		float spRange;		//‰e‹¿”ÍˆÍ
-		Vector3 spDirection;//Ëo•ûŒü
-		float spAngle;		//ËoŠp“x
+		Vector3 spColor;	//ãƒ©ã‚¤ãƒˆã®ã‚«ãƒ©ãƒ¼
+		float spRange;		//å½±éŸ¿ç¯„å›²
+		Vector3 spDirection;//å°„å‡ºæ–¹å‘
+		float spAngle;		//å°„å‡ºè§’åº¦
 
 
-		Vector3 eyePos;		//‹“_‚ÌˆÊ’u
-		float specPow;		//ƒXƒyƒLƒ…ƒ‰‚Ìi‚è
-		Vector3 ambientLight;	//ŠÂ‹«Œõ
+		Vector3 eyePos;		//è¦–ç‚¹ã®ä½ç½®
+		float specPow;		//ã‚¹ãƒšã‚­ãƒ¥ãƒ©ã®çµã‚Š
+		Vector3 ambientLight;	//ç’°å¢ƒå…‰
 		float pad5;
 
-		//’n–ÊF‚Æ“V‹…FA’n–Ê‚Ì–@ü‚ğ’Ç‰Á
-		Vector3 groundColor;	//’n–ÊF
+		//åœ°é¢è‰²ã¨å¤©çƒè‰²ã€åœ°é¢ã®æ³•ç·šã‚’è¿½åŠ 
+		Vector3 groundColor;	//åœ°é¢è‰²
 		float pad7;
-		Vector3 skyColor;		//“V‹…F
+		Vector3 skyColor;		//å¤©çƒè‰²
 		float pad8;
-		Vector3 groundNormal;	//’n–Ê‚Ì–@ü
+		Vector3 groundNormal;	//åœ°é¢ã®æ³•ç·š
 		float pad9;
 
 		Matrix mLVP;
 	};
 
-	//ƒV[ƒ“ƒ‰ƒCƒgƒNƒ‰ƒX
+	//ã‚·ãƒ¼ãƒ³ãƒ©ã‚¤ãƒˆã‚¯ãƒ©ã‚¹
 	class SceneLight : public Noncopyable
 	{
 	public:
 		SceneLight();
 
-		//‰Šú‰»
+		//åˆæœŸåŒ–
 		void Init();
-		//ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg
+		//ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆ
 		void InitDirectionLight();
-		//ƒ|ƒCƒ“ƒgƒ‰ƒCƒg
+		//ãƒã‚¤ãƒ³ãƒˆãƒ©ã‚¤ãƒˆ
 		void InitPointLight();
-		//ƒXƒ|ƒbƒgƒ‰ƒCƒg
+		//ã‚¹ãƒãƒƒãƒˆãƒ©ã‚¤ãƒˆ
 		void InitSpotLight();
-		//ŠÂ‹«Œõ
+		//ç’°å¢ƒå…‰
 		void InitAmbientLight();
-		//”¼‹…ƒ‰ƒCƒg
+		//åŠçƒãƒ©ã‚¤ãƒˆ
 		void InitHemisphereLight();
-		//ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg‚ğ‰ñ‚·
+		//ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆã‚’å›ã™
 		void DirRot();
-		//ƒV[ƒ“ƒ‰ƒCƒg‚ğæ“¾
+		//ã‚·ãƒ¼ãƒ³ãƒ©ã‚¤ãƒˆã‚’å–å¾—
 		Light& GetSceneLight()
 		{
 			return m_light;
 		}
 		
 
-		//XVˆ—
+		//æ›´æ–°å‡¦ç†
 		void Update();
 
 		
@@ -131,12 +131,12 @@ namespace nsK2EngineLow {
 		}
 
 	private:
-		Light m_light;	//ƒV[ƒ“ƒ‰ƒCƒg
+		Light m_light;	//ã‚·ãƒ¼ãƒ³ãƒ©ã‚¤ãƒˆ
 		Camera m_lightCamera;
 		//Shadow m_shadow;
-		//ModelInitData bgModelInitData;	//‰e‚ğó‚¯‚é”wŒi‚ğ‰Šú‰»
-		//DirectionLight m_dirLight; //ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒ‰ƒCƒg
-		//SPointLight m_pointLight; //ƒ|ƒCƒ“ƒgƒ‰ƒCƒg
+		//ModelInitData bgModelInitData;	//å½±ã‚’å—ã‘ã‚‹èƒŒæ™¯ã‚’åˆæœŸåŒ–
+		//DirectionLight m_dirLight; //ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ©ã‚¤ãƒˆ
+		//SPointLight m_pointLight; //ãƒã‚¤ãƒ³ãƒˆãƒ©ã‚¤ãƒˆ
 	};
 }
 

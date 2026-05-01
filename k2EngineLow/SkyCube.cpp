@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "SkyCube.h"
 
 namespace nsK2EngineLow
@@ -33,9 +33,9 @@ namespace nsK2EngineLow
 	bool SkyCube::Start()
 	{
 		ModelInitData initData;
-		//tkmƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğw’è‚·‚é
+		// tkmãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’æŒ‡å®š
 		initData.m_tkmFilePath = "Assets/ModelData/preset/sky.tkm";
-		//ƒVƒF[ƒ_[ƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğw’è‚·‚é
+		// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’æŒ‡å®š
 		initData.m_fxFilePath = "Assets/Shader/skyCube.fx";
 		initData.m_vsEntryPointFunc = "VSMain";
 		initData.m_psEntryPointFunc = "PSMain";
