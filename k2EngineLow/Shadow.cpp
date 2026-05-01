@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "Shadow.h"
 
 
@@ -6,6 +6,10 @@ void nsK2EngineLow::Shadow::Init()
 {
 	InitRenderTarget();
 	InitLightCamera();
+
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‚’ã¼ã‹ã™ãŸã‚ã®ã‚¬ã‚¦ã‚·ã‚¢ãƒ³ãƒ–ãƒ©ãƒ¼ã‚’åˆæœŸåŒ–
+	m_shadowBlur.Init(&m_shadowMap.GetRenderTargetTexture());
+
 	SpriteInitData spriteInitData;
 	spriteInitData.m_textures[0] = &m_shadowMap.GetRenderTargetTexture();
 	spriteInitData.m_fxFilePath = "Assets/Shader/sprite.fx";
@@ -19,28 +23,28 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	Matrix viewMatrix;
 	Matrix projectionMatrix;
 
-	// ƒ‰ƒCƒg•ûŒü‚ğ^ãŠñ‚è
-	// ƒuƒƒbƒN‘¤–Ê‚Ö‚Ì“Š‰eŠp“x‚ª[‚­‚È‚èƒZƒ‹ƒtƒVƒƒƒhƒEŒ¸­
+	// ãƒ©ã‚¤ãƒˆæ–¹å‘ã‚’çœŸä¸Šå¯„ã‚Š
+	// ãƒ–ãƒ­ãƒƒã‚¯å´é¢ã¸ã®æŠ•å½±è§’åº¦ãŒæ·±ããªã‚Šã‚»ãƒ«ãƒ•ã‚·ãƒ£ãƒ‰ã‚¦æ¸›å°‘
 	const Vector3 lightDir = Vector3(0.5f, -2.0f, -0.5f);
-	// ƒ‰ƒCƒg‚Ì‹——£
+	// ãƒ©ã‚¤ãƒˆã®è·é›¢
 	const float lightDistance = 3000.0f;
-	// •Às“Š‰e‚Ì”ÍˆÍ
-	const float ORTHO_SIZE = 1000.0f;
-	// ƒVƒƒƒhƒEƒ}ƒbƒv‚ÌƒTƒCƒY
-	const float SHADOW_MAP_SIZE = 2048.0f;
+	// ä¸¦è¡ŒæŠ•å½±ã®ç¯„å›²
+	const float ORTHO_SIZE = 4000.0f;
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã®ã‚µã‚¤ã‚º
+	const float SHADOW_MAP_SIZE = 4096.0f;
 
-	// ƒeƒNƒZƒ‹1‚Â•ª‚Ìƒ[ƒ‹ƒh‹óŠÔƒTƒCƒY
+	// ãƒ†ã‚¯ã‚»ãƒ«1ã¤åˆ†ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‚µã‚¤ã‚º
 	const float texelSize = ORTHO_SIZE / SHADOW_MAP_SIZE;
 
-	// ƒ^[ƒQƒbƒg‚ÌXZ‚Ì‚İ’Ç]AY‚ÍŒÅ’è
+	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®XZã®ã¿è¿½å¾“ã€Yã¯å›ºå®š
 	Vector3 cameraTarget = g_camera3D->GetTarget();
 	Vector3 lightTarget = Vector3(cameraTarget.x, 0.0f, cameraTarget.z);
 
-	// ƒ‰ƒCƒgƒ^[ƒQƒbƒg‚ğƒeƒNƒZƒ‹ƒTƒCƒY’PˆÊ‚ÉƒXƒiƒbƒv
-	lightTarget.x = floorf(lightTarget.x / texelSize + 0.5f) * texelSize;
-	lightTarget.z = floorf(lightTarget.z / texelSize + 0.5f) * texelSize;
+	// ãƒ©ã‚¤ãƒˆã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ãƒ†ã‚¯ã‚»ãƒ«ã‚µã‚¤ã‚ºå˜ä½ã«ã‚¹ãƒŠãƒƒãƒ—
+	//lightTarget.x = floorf(lightTarget.x / texelSize + 0.5f) * texelSize;
+	//lightTarget.z = floorf(lightTarget.z / texelSize + 0.5f) * texelSize;
 
-	// lightDir ‚ğ³‹K‰»‚µ‚Ä‹t•ûŒü‚ÉƒJƒƒ‰”z’u
+	// lightDir ã‚’æ­£è¦åŒ–ã—ã¦é€†æ–¹å‘ã«ã‚«ãƒ¡ãƒ©é…ç½®
 	Vector3 lightDirNorm = lightDir;
 	lightDirNorm.Normalize();
 	Vector3 lightCameraPos = lightTarget + Vector3(-lightDirNorm.x, -lightDirNorm.y, -lightDirNorm.z) * lightDistance;
@@ -51,7 +55,7 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 		Vector3::AxisY
 	);
 
-	// Far ‚ğŒÅ’è’l‚É‚µ‚Ä[“xƒoƒbƒtƒ@‚Ì¸“x‚ğŠm•Û
+	// Far ã‚’å›ºå®šå€¤ã«ã—ã¦æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã®ç²¾åº¦ã‚’ç¢ºä¿
 	const float SHADOW_NEAR = 100.0f;
 	const float SHADOW_FAR = 6000.0f;
 
@@ -63,20 +67,20 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	);
 
 
-	////ƒrƒ…[s—ñ‚ÌZo
+	////ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã®ç®—å‡º
 	//viewMatrix.MakeLookAt(
 	//	m_lightCamera.GetPosition(), 
 	//	m_lightCamera.GetTarget(), 
 	//	m_lightCamera.GetUp());
 
-	////•½s“Š‰es—ñ‚ÌŒvZ
+	////å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã®è¨ˆç®—
 	//projectionMatrix.MakeOrthoProjectionMatrix(
 	//	m_lightCamera.GetWidth(),
 	//	m_lightCamera.GetHeight(),
 	//	m_lightCamera.GetNear(),
 	//	m_lightCamera.GetFar());
 
-	//ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“‚Ìs—ñ
+	//ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã®è¡Œåˆ—
 	m_viewProjectionMatrix = viewMatrix * projectionMatrix;
 
 
@@ -84,26 +88,30 @@ void nsK2EngineLow::Shadow::Render(RenderContext& rc, std::vector<IRenderer*>& r
 	m_lightCamera.SetPosition(g_camera3D->GetTarget() + Vector3{ 0.0f, 600.0f, 300.0f });
 	m_lightCamera.Update();*/
 
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã«æç”»
 	rc.WaitUntilToPossibleSetRenderTarget(m_shadowMap);
 	rc.SetRenderTargetAndViewport(m_shadowMap);
 	rc.ClearRenderTargetView(m_shadowMap);
 	for (auto& renderer : renderObjects)
 	{
-		renderer->OnRenderShadowMap(rc, m_viewProjectionMatrix);//m_lightCamera.GetViewProjectionMatrix());
+		renderer->OnRenderShadowMap(rc, m_viewProjectionMatrix);
 	}
 	rc.WaitUntilFinishDrawingToRenderTarget(m_shadowMap);
+
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‚’ã¼ã‹ã™ãŸã‚ã®ã‚¬ã‚¦ã‚·ã‚¢ãƒ³ãƒ–ãƒ©ãƒ¼ã‚’å®Ÿè¡Œ
+	m_shadowBlur.ExecuteOnGPU(rc, 5.0f);
 }
 
 void nsK2EngineLow::Shadow::InitRenderTarget()
 {
 	float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	m_shadowMap.Create(
-		2048,
-		2048,
+		4096,
+		4096,
 		1,
 		1,
 		//DXGI_FORMAT_R8G8B8A8_UNORM,
-		DXGI_FORMAT_R32_FLOAT,
+		DXGI_FORMAT_R32G32_FLOAT,
 		DXGI_FORMAT_D32_FLOAT,
 		clearColor
 	);
