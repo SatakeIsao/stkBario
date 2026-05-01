@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "ModelRender.h"
 
 namespace nsK2EngineLow {
@@ -7,7 +7,7 @@ namespace nsK2EngineLow {
         m_animationClips(nullptr),
         m_numAnimationClips(0),
         m_animationSpeed(1.0f),
-        m_isShadowCaster(false) // ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Å‰Šú’l‚ð–¾Ž¦
+        m_isShadowCaster(false) // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§åˆæœŸå€¤ã‚’æ˜Žç¤º
     {}
 
     ModelRender::~ModelRender()
@@ -17,36 +17,36 @@ namespace nsK2EngineLow {
         const char* tkmFilePath,
         AnimationClip* animationClips,
         int numAnimationClips,
-        EnModelUpAxis enModelUpAxis, // ƒ^ƒCƒ|C³
+        EnModelUpAxis enModelUpAxis, // ã‚¿ã‚¤ãƒä¿®æ­£
         bool isShadowCaster,
         bool isShadowReceiver)
     {
-        m_isShadowCaster = isShadowCaster; // ƒƒ“ƒo•Ï”‚Ö‚Ì•Û‘¶˜R‚ê‚ðC³
+        m_isShadowCaster = isShadowCaster; // ãƒ¡ãƒ³ãƒå¤‰æ•°ã¸ã®ä¿å­˜æ¼ã‚Œã‚’ä¿®æ­£
 
-        // 1. ƒXƒPƒ‹ƒgƒ“‚ÆƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‰Šú‰»
+        // 1. ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®åˆæœŸåŒ–
         InitSkeleton(tkmFilePath);
         InitAnimation(animationClips, numAnimationClips, enModelUpAxis);
 
-        // 2. ƒ‚ƒfƒ‹‰Šú‰»ƒf[ƒ^‚ÌƒZƒbƒgƒAƒbƒv
+        // 2. ãƒ¢ãƒ‡ãƒ«åˆæœŸåŒ–ãƒ‡ãƒ¼ã‚¿ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
         ModelInitData initData;
         initData.m_tkmFilePath = tkmFilePath;
         initData.m_fxFilePath = "Assets/Shader/model.fx";
 
-        // ƒ‰ƒCƒgî•ñ‚ÌƒZƒbƒgƒAƒbƒv
-        // NOTE: Init“à‚ÅƒJƒƒ‰‚ðNew‚·‚é‚Ì‚Í•sŽ©‘R‚È‚Ì‚ÅA
-        // –{—ˆ‚ÍƒV[ƒ“‘S‘Ì‚Ìƒ‰ƒCƒgŠÇ—ƒNƒ‰ƒX‚©‚çs—ñ‚ð‚à‚ç‚¤‚Ì‚ª—‘z“I‚Å‚·B
+        // ãƒ©ã‚¤ãƒˆæƒ…å ±ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+        // NOTE: Initå†…ã§ã‚«ãƒ¡ãƒ©ã‚’Newã™ã‚‹ã®ã¯ä¸è‡ªç„¶ãªã®ã§ã€
+        // æœ¬æ¥ã¯ã‚·ãƒ¼ãƒ³å…¨ä½“ã®ãƒ©ã‚¤ãƒˆç®¡ç†ã‚¯ãƒ©ã‚¹ã‹ã‚‰è¡Œåˆ—ã‚’ã‚‚ã‚‰ã†ã®ãŒç†æƒ³çš„ã§ã™ã€‚
         initData.m_expandConstantBuffer = &g_sceneLight->GetLightData();
         initData.m_expandConstantBufferSize = sizeof(g_sceneLight->GetLightData());
 
-        // ƒGƒ“ƒgƒŠƒ|ƒCƒ“ƒg‚ÌŒˆ’è
+        // ã‚¨ãƒ³ãƒˆãƒªãƒã‚¤ãƒ³ãƒˆã®æ±ºå®š
         initData.m_vsEntryPointFunc = "VSMain";
         initData.m_vsSkinEntryPointFunc = "VSSkinMain";
 
-        // ƒVƒƒƒhƒEƒŒƒV[ƒo[i‰e‚ðŽó‚¯‚é‘¤j‚ÌÝ’è
+        // ã‚·ãƒ£ãƒ‰ã‚¦ãƒ¬ã‚·ãƒ¼ãƒãƒ¼ï¼ˆå½±ã‚’å—ã‘ã‚‹å´ï¼‰ã®è¨­å®š
         if (isShadowReceiver)
         {
             initData.m_psEntryPointFunc = "PSShadowReceverMain";
-            // ƒVƒƒƒhƒEƒ}ƒbƒv‚ðƒeƒNƒXƒ`ƒƒƒŒƒWƒXƒ^0‚ÉƒZƒbƒg
+            // ã‚·ãƒ£ãƒ‰ã‚¦ãƒžãƒƒãƒ—ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¬ã‚¸ã‚¹ã‚¿0ã«ã‚»ãƒƒãƒˆ
             initData.m_expandShaderResoruceView[0] =
                 &(g_renderingEngine->GetShadowMap().GetRenderTargetTexture());
         }
@@ -55,18 +55,18 @@ namespace nsK2EngineLow {
             initData.m_psEntryPointFunc = "PSNormalMain";
         }
 
-        // ƒXƒLƒjƒ“ƒO‚Ì—L–³‚É‚æ‚éƒVƒF[ƒ_[Ø‚è‘Ö‚¦
+        // ã‚¹ã‚­ãƒ‹ãƒ³ã‚°ã®æœ‰ç„¡ã«ã‚ˆã‚‹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼åˆ‡ã‚Šæ›¿ãˆ
         if (animationClips != nullptr) {
             initData.m_skeleton = &m_skeleton;
         }
         else {
-            // ƒAƒjƒ[ƒVƒ‡ƒ“‚ª‚È‚¢ê‡‚ÍƒXƒLƒjƒ“ƒO‚È‚µ‚ÌVS‚ðŽg‚¤
+            // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒãªã„å ´åˆã¯ã‚¹ã‚­ãƒ‹ãƒ³ã‚°ãªã—ã®VSã‚’ä½¿ã†
             initData.m_vsSkinEntryPointFunc = "VSMain";
         }
 
         m_model.Init(initData);
 
-        // 3. ƒVƒƒƒhƒEƒLƒƒƒXƒ^[i‰e‚ð—Ž‚Æ‚·‘¤j‚È‚ç‰eê—pƒ‚ƒfƒ‹‚à‰Šú‰»
+        // 3. ã‚·ãƒ£ãƒ‰ã‚¦ã‚­ãƒ£ã‚¹ã‚¿ãƒ¼ï¼ˆå½±ã‚’è½ã¨ã™å´ï¼‰ãªã‚‰å½±å°‚ç”¨ãƒ¢ãƒ‡ãƒ«ã‚‚åˆæœŸåŒ–
         if (m_isShadowCaster)
         {
             InitShadowModel(tkmFilePath, enModelUpAxis);
@@ -114,14 +114,14 @@ namespace nsK2EngineLow {
 
     void ModelRender::Update()
     {
-        // ƒ[ƒ‹ƒhs—ñ‚ÌXV
+        // ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã®æ›´æ–°
         m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 
         if (m_isShadowCaster) {
             m_shadowModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
         }
 
-        // ƒXƒPƒ‹ƒgƒ“‚ÆƒAƒjƒ[ƒVƒ‡ƒ“‚ÌXV
+        // ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®æ›´æ–°
         m_skeleton.Update(m_model.GetWorldMatrix());
 
         if (m_animationClips != nullptr) {
@@ -131,7 +131,7 @@ namespace nsK2EngineLow {
 
     void ModelRender::Draw(RenderContext& rc)
     {
-        // ƒŒƒ“ƒ_ƒŠƒ“ƒOƒGƒ“ƒWƒ“‚ÉŽ©g‚ð“o˜^
+        // ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¨ãƒ³ã‚¸ãƒ³ã«è‡ªèº«ã‚’ç™»éŒ²
         g_renderingEngine->AddRenderObject(this);
     }
 

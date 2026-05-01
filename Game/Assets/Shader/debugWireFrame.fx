@@ -1,40 +1,40 @@
-/*!
- * @brief	ƒfƒoƒbƒOƒ‚[ƒhƒVƒF[ƒ_[B
+ï»¿/*!
+ * @brief	ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã€‚
  */
 
 
 /////////////////////////////////////////////////////////////
-// ’è”ƒoƒbƒtƒ@B
+// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
 /////////////////////////////////////////////////////////////
 /*!
- * @brief	’¸“_ƒVƒF[ƒ_[—p‚Ì’è”ƒoƒbƒtƒ@B
+ * @brief	é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
  */
 cbuffer VSCb : register(b0){
 	float4x4 mVP;
 };
 
 /*!
- * @brief	’¸“_\‘¢‘ÌB
+ * @brief	é ‚ç‚¹æ§‹é€ ä½“ã€‚
  */
 struct VSInput
 {
-	//float4 Position : SV_Position;			//’¸“_À•WB
-	//SV_Position‚Í“™ƒZƒ}ƒ“ƒeƒBƒNƒX‚ÆŒÄ‚Î‚ê‚é
-	//ƒZƒ}ƒ“ƒeƒBƒNƒX‚Ì–¼‘O‚ÍSV‚ª‚Â‚©‚È‚¯‚ê‚Î‚È‚ñ‚Å‚à‚¢‚¢
-	float3 position : Position;			//’¸“_À•WB
-	float3 color : Color;				//ƒJƒ‰[B
+	//float4 Position : SV_Position;			//é ‚ç‚¹åº§æ¨™ã€‚
+	//SV_Positionã¯ç­‰ã‚»ãƒãƒ³ãƒ†ã‚£ã‚¯ã‚¹ã¨å‘¼ã°ã‚Œã‚‹
+	//ã‚»ãƒãƒ³ãƒ†ã‚£ã‚¯ã‚¹ã®åå‰ã¯SVãŒã¤ã‹ãªã‘ã‚Œã°ãªã‚“ã§ã‚‚ã„ã„
+	float3 position : Position;			//é ‚ç‚¹åº§æ¨™ã€‚
+	float3 color : Color;				//ã‚«ãƒ©ãƒ¼ã€‚
 };
 
-//SV_Position‚Å•Ô‚·—p‚Ì\‘¢‘Ì
+//SV_Positionã§è¿”ã™ç”¨ã®æ§‹é€ ä½“
 struct PSInput
 {
-	//‚±‚Ì\‘¢‘Ì‚ÍSV_Position‚ª•K—v
-	//•Ï”–¼‚Æ©•ª‚Å–¼•t‚¯‚½ƒZƒ}ƒ“ƒeƒBƒNƒX‚ÍVSInput‚Æ‚©‚Ô‚Á‚Ä‚à‚¨‚‹
-	float4 position : SV_Position;		//’¸“_À•WB
-	float3 color : Color;				//ƒJƒ‰[B
+	//ã“ã®æ§‹é€ ä½“ã¯SV_PositionãŒå¿…è¦
+	//å¤‰æ•°åã¨è‡ªåˆ†ã§åä»˜ã‘ãŸã‚»ãƒãƒ³ãƒ†ã‚£ã‚¯ã‚¹ã¯VSInputã¨ã‹ã¶ã£ã¦ã‚‚ãŠï½‹
+	float4 position : SV_Position;		//é ‚ç‚¹åº§æ¨™ã€‚
+	float3 color : Color;				//ã‚«ãƒ©ãƒ¼ã€‚
 };
 
-//VSMain‚Ì–ß‚è’l‚ÍSV_Position‚ª•K—v
+//VSMainã®æˆ»ã‚Šå€¤ã¯SV_PositionãŒå¿…è¦
 PSInput VSMain(VSInput input)
 {
 	PSInput output;
@@ -43,15 +43,15 @@ PSInput VSMain(VSInput input)
 	output.color = input.color;
 	return output;
 }
-//PSMain‚Ì–ß‚è’l‚ÍSV_Target‚ª•K—v
-//–ß‚è’l‚ÍFifloat4j‚Å‚ ‚é•K—v‚ª‚ ‚é
+//PSMainã®æˆ»ã‚Šå€¤ã¯SV_TargetãŒå¿…è¦
+//æˆ»ã‚Šå€¤ã¯è‰²ï¼ˆfloat4ï¼‰ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚‹
 float4 PSMain(PSInput input) : SV_Target
 {
-	//output.position‚Í‚±‚ÌŠÖ”‚É—ˆ‚é‚Ü‚Å‚Ég‚¢I‚í‚Á‚Ä‚é
-	//•Ê‚Ég‚Á‚Ä‚¢‚¢‚æ
+	//output.positionã¯ã“ã®é–¢æ•°ã«æ¥ã‚‹ã¾ã§ã«ä½¿ã„çµ‚ã‚ã£ã¦ã‚‹
+	//åˆ¥ã«ä½¿ã£ã¦ã„ã„ã‚ˆ
 
-	//float4‚É‚·‚é
-	//1‚ÍƒAƒ‹ƒtƒ@
+	//float4ã«ã™ã‚‹
+	//1ã¯ã‚¢ãƒ«ãƒ•ã‚¡
     return float4(1.0, 0, 0, 1);
 	//return float4(input.color,1);
 }

@@ -1,49 +1,49 @@
-#pragma once
+ï»¿#pragma once
 
 namespace nsK2EngineLow
 {
     /**
-     * ‰~Œ`ƒQ[ƒWƒXƒvƒ‰ƒCƒgƒŒƒ“ƒ_ƒ‰[B
-     * fillAmount: 0.0=‹ó, 1.0=1ü, 2.0=2ü•ªB
-     * startAngle: ƒ‰ƒWƒAƒ“’PˆÊA0=ã(12•ûŒü), PI/2=‰E, PI=‰ºB
-     * arcSpan   : ƒ‰ƒWƒAƒ“’PˆÊAMath::PI2=^‰~, Math::PI=”¼‰~B
-     * innerRadius: 0=“h‚è‚Â‚Ô‚µ‰~, 0.4=ƒŠƒ“ƒOóƒQ[ƒWB
+     * å††å½¢ã‚²ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã€‚
+     * fillAmount: 0.0=ç©º, 1.0=1å‘¨, 2.0=2å‘¨åˆ†ã€‚
+     * startAngle: ãƒ©ã‚¸ã‚¢ãƒ³å˜ä½ã€0=ä¸Š(12æ™‚æ–¹å‘), PI/2=å³, PI=ä¸‹ã€‚
+     * arcSpan   : ãƒ©ã‚¸ã‚¢ãƒ³å˜ä½ã€Math::PI2=çœŸå††, Math::PI=åŠå††ã€‚
+     * innerRadius: 0=å¡—ã‚Šã¤ã¶ã—å††, 0.4=ãƒªãƒ³ã‚°çŠ¶ã‚²ãƒ¼ã‚¸ã€‚
      */
     class CircularGaugeRender : public IRenderer
     {
     public:
         /**
-         * b1ƒŒƒWƒXƒ^—p‚Ì’è”ƒoƒbƒtƒ@\‘¢‘ÌB
-         * circularGauge.fx‚Æˆê’v‚³‚¹‚é•K—v‚ ‚èB
+         * b1ãƒ¬ã‚¸ã‚¹ã‚¿ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡æ§‹é€ ä½“ã€‚
+         * circularGauge.fxã¨ä¸€è‡´ã•ã›ã‚‹å¿…è¦ã‚ã‚Šã€‚
          */
         struct GaugeCBData
         {
-            // 1ü–Ú‚Ì“h‚è‚Â‚Ô‚µF
+            // 1å‘¨ç›®ã®å¡—ã‚Šã¤ã¶ã—è‰²
             Vector4 fillColor   = { 0.635f, 0.894f, 0.929f, 1.0f };
-            // 2ü–Ú‚Ì“h‚è‚Â‚Ô‚µF
+            // 2å‘¨ç›®ã®å¡—ã‚Šã¤ã¶ã—è‰²
             Vector4 fillColor2  = { 1.0f, 0.8f, 0.0f, 1.0f };
-            // ‹óƒGƒŠƒA‚ÌF
+            // ç©ºã‚¨ãƒªã‚¢ã®è‰²
             Vector4 emptyColor  = { 0.2f, 0.2f, 0.2f, 1.0f };
-            // ŠJnŠp“x (ƒ‰ƒWƒAƒ“)
+            // é–‹å§‹è§’åº¦ (ãƒ©ã‚¸ã‚¢ãƒ³)
             float startAngle  = 0.0f;
-            // “h‚è‚Â‚Ô‚µ—Ê (0.0 - 2.0)
+            // å¡—ã‚Šã¤ã¶ã—é‡ (0.0 - 2.0)
             float fillAmount  = 1.0f;
-            // ŒÊ‚Ì’·‚³ (Math::PI2 = ^‰~)
+            // å¼§ã®é•·ã• (Math::PI2 = çœŸå††)
             float arcSpan     = 6.28318530f;
-            // “àŒa (0=‰~, 0.4=ƒŠƒ“ƒO)
+            // å†…å¾„ (0=å††, 0.4=ãƒªãƒ³ã‚°)
             float innerRadius = 0.4f;
-            // ŠOŒa (1.0=‘S‘ÌA0.8=­‚µ¬‚³‚ß)
+            // å¤–å¾„ (1.0=å…¨ä½“ã€0.8=å°‘ã—å°ã•ã‚)
             float outerRadius = 1.0f;
-            // ƒpƒfƒBƒ“ƒO    
+            // ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°    
             float _pad[3] = {};
         };
 
-        void Init(const char* filePath,								//ƒtƒ@ƒCƒ‹ƒpƒX
-            const float w,											//‰æ‘œ‚Ì‰¡•
-            const float h,											//‰æ‘œ‚Ìc•
-            AlphaBlendMode alphaBlendMode = AlphaBlendMode_Trans);	//ƒfƒtƒHƒ‹ƒg‚Í”¼“§–¾‡¬
+        void Init(const char* filePath,								//ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹
+            const float w,											//ç”»åƒã®æ¨ªå¹…
+            const float h,											//ç”»åƒã®ç¸¦å¹…
+            AlphaBlendMode alphaBlendMode = AlphaBlendMode_Trans);	//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯åŠé€æ˜åˆæˆ
 
-        /** ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€İ’è */
+        /** ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ è¨­å®š */
         void SetPosition(const Vector3& pos) { m_spriteRender.SetPosition(pos); }
         const Vector3& GetPosition() const { return m_spriteRender.GetPosition(); }
 
@@ -57,7 +57,7 @@ namespace nsK2EngineLow
         void SetPivot(const Vector2& pivot) { m_spriteRender.SetPivot(pivot); }
         const Vector2& GetPivot() const { return m_spriteRender.GetPivot(); }
 
-        /** ƒQ[ƒWƒpƒ‰ƒ[ƒ^İ’è */
+        /** ã‚²ãƒ¼ã‚¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š */
         void  SetFillAmount(float v) { m_gaugeCB.fillAmount = v; }
         float GetFillAmount() const { return m_gaugeCB.fillAmount; }
 
@@ -80,28 +80,28 @@ namespace nsK2EngineLow
 
         GaugeCBData& GetGaugeCBData() { return m_gaugeCB; }
 
-        /** XVˆ— */
+        /** æ›´æ–°å‡¦ç† */
         void Update()
         {
             m_spriteRender.Update();
         }
 
-        /** •`‰æ“o˜^ */
+        /** æç”»ç™»éŒ² */
         void Draw(RenderContext& rc)
         {
             m_spriteRender.Draw(rc);
         }
 
-        /** 2DƒŒƒ“ƒ_ƒŠƒ“ƒOƒpƒX‚Å‚ÌÀ•`‰æB*/
+        /** 2Dãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ‘ã‚¹ã§ã®å®Ÿæç”»ã€‚*/
         void OnRender2D(RenderContext& rc) override
         {
             m_spriteRender.OnRender2D(rc);
         }
 
     private:
-        // “à•”‚Åg—p‚·‚éSpriteRenderƒCƒ“ƒXƒ^ƒ“ƒX
+        // å†…éƒ¨ã§ä½¿ç”¨ã™ã‚‹SpriteRenderã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
         SpriteRender m_spriteRender;
-        // ƒQ[ƒW—p‚Ì’è”ƒoƒbƒtƒ@ƒf[ƒ^
+        // ã‚²ãƒ¼ã‚¸ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ãƒ‡ãƒ¼ã‚¿
         GaugeCBData  m_gaugeCB;
     };
 

@@ -1,5 +1,4 @@
-
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "RaytracingWorld.h"
 #include "graphics/Material.h"
 
@@ -39,9 +38,9 @@ namespace nsK2EngineLow {
 
 		void World::CommitRegistGeometry(RenderContext& rc)
 		{
-			//BLAS‚ğ\’zB
+			//BLASã®ãƒ“ãƒ«ãƒ‰
 			m_blasBuffer.Init(rc, m_instances);
-			//TLAS‚ğ\’zB
+			//TLASã®ãƒ“ãƒ«ãƒ‰
 			m_topLevelASBuffers.Init(rc, m_instances, m_blasBuffer.Get());
 		}
 	}//namespace raytracing

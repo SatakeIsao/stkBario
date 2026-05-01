@@ -1,5 +1,5 @@
-/*!
-* @brief	ƒLƒƒƒ‰ƒNƒ^‚ÌƒRƒŠƒWƒ‡ƒ“ƒRƒ“ƒgƒ[ƒ‹B
+ï»¿/*!
+* @brief	ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã€‚
 */
 
 #include "k2EngineLowPreCompile.h"
@@ -9,7 +9,7 @@ namespace nsK2EngineLow
 {
     namespace
     {
-        /** ’n–Ê”»’è */
+        /** åœ°é¢åˆ¤å®š */
         struct SweepResultGround : public btCollisionWorld::ConvexResultCallback {
             bool isHit = false;
             Vector3 hitPos;
@@ -24,9 +24,9 @@ namespace nsK2EngineLow
                 }
 
                 Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
-                float angle = acosf(hitNormalTmp.y); // ã(0,1,0)‚Æ‚ÌŠp“x
+                float angle = acosf(hitNormalTmp.y); // ä¸Š(0,1,0)ã¨ã®è§’åº¦
 
-                // ’n–Ê”»’è (–@ü‚ªã‚ğŒü‚¢‚Ä‚¢‚é)
+                // åœ°é¢åˆ¤å®š (æ³•ç·šãŒä¸Šã‚’å‘ã„ã¦ã„ã‚‹)
                 if (fabsf(angle) < Math::PI * 0.3f) {
                     isHit = true;
                     Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
@@ -43,7 +43,7 @@ namespace nsK2EngineLow
         };
 
 
-        /** •Ç”»’è */
+        /** å£åˆ¤å®š */
         struct SweepResultWall : public btCollisionWorld::ConvexResultCallback {
             bool isHit = false;
             Vector3 hitPos;
@@ -58,7 +58,7 @@ namespace nsK2EngineLow
                 }
 
                 Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
-                // •Ç”»’è (–@ü‚ª‰¡‚ğŒü‚¢‚Ä‚¢‚é = ã‚Æ‚ÌŠp“x‚ª‘å‚«‚¢)
+                // å£åˆ¤å®š (æ³•ç·šãŒæ¨ªã‚’å‘ã„ã¦ã„ã‚‹ = ä¸Šã¨ã®è§’åº¦ãŒå¤§ãã„)
                 float angle = fabsf(acosf(hitNormalTmp.y));
                 if (angle >= Math::PI * 0.3f) {
                     isHit = true;
@@ -76,7 +76,7 @@ namespace nsK2EngineLow
             }
         };
 
-        /** “Vˆä—p */
+        /** å¤©äº•ç”¨ */
         struct SweepResultCeiling : public btCollisionWorld::ConvexResultCallback
         {
             bool isHit = false;
@@ -92,8 +92,8 @@ namespace nsK2EngineLow
                 }
 
                 Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
-                // ‰º•ûŒü‚Æ–@ü‚Ì‚È‚·Šp“x‚ğƒ`ƒFƒbƒNA‚ ‚é‚¢‚Í’Pƒ‚É y ‚ªƒ}ƒCƒiƒXi‰ºŒü‚«j‚©
-                if (hitNormalTmp.y < -0.5f) { // –@ü‚ª‰º‚ğŒü‚¢‚Ä‚¢‚é“Vˆä
+                // ä¸‹æ–¹å‘ã¨æ³•ç·šã®ãªã™è§’åº¦ã‚’ãƒã‚§ãƒƒã‚¯ã€ã‚ã‚‹ã„ã¯å˜ç´”ã« y ãŒãƒã‚¤ãƒŠã‚¹ï¼ˆä¸‹å‘ãï¼‰ã‹
+                if (hitNormalTmp.y < -0.5f) { // æ³•ç·šãŒä¸‹ã‚’å‘ã„ã¦ã„ã‚‹ï¼å¤©äº•
                     isHit = true;
                     Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
                     Vector3 vDist;
@@ -159,35 +159,35 @@ namespace nsK2EngineLow
 
     const Vector3& CharacterController::Execute(const Vector3& targetPosition, float deltaTime)
     {
-        // ‘OƒtƒŒ[ƒ€‚ÌÀ•W‚ğ•Û‘¶
+        // å‰ãƒ•ãƒ¬ãƒ¼ãƒ ã®åº§æ¨™ã‚’ä¿å­˜
         prevPosition_ = position_;
 
-        // ƒeƒŒƒ|[ƒgƒŠƒNƒGƒXƒg‚ÌŠm”F
+        // ãƒ†ãƒ¬ãƒãƒ¼ãƒˆãƒªã‚¯ã‚¨ã‚¹ãƒˆã®ç¢ºèª
         if (isRequestTeleport_) {
-            // ƒeƒŒƒ|[ƒgˆ—
-            // •¨—‰‰Z‚ğƒXƒLƒbƒv‚µ‚ÄÀ•W‚ğ‹­§“K—p
+            // ãƒ†ãƒ¬ãƒãƒ¼ãƒˆå‡¦ç†
+            // ç‰©ç†æ¼”ç®—ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¦åº§æ¨™ã‚’å¼·åˆ¶é©ç”¨
 
             position_ = targetPosition;
 
-            // “à•”•¨—ó‘Ô‚ÌƒŠƒZƒbƒg
-            verticalVelocity_ = 0.0f; // —‰º‚Ì¨‚¢‚È‚Ç‚ğÁ‚·
-            isOnGround_ = true;       // ˆÀ‘S‚Ì‚½‚ßˆê’UÚ’nˆµ‚¢‚É‚·‚éi‚ ‚é‚¢‚Í‹ó’†ˆµ‚¢‚É‚µ‚½‚¢ê‡‚Ífalsej
+            // å†…éƒ¨ç‰©ç†çŠ¶æ…‹ã®ãƒªã‚»ãƒƒãƒˆ
+            verticalVelocity_ = 0.0f; // è½ä¸‹ã®å‹¢ã„ãªã©ã‚’æ¶ˆã™
+            isOnGround_ = true;       // å®‰å…¨ã®ãŸã‚ä¸€æ—¦æ¥åœ°æ‰±ã„ã«ã™ã‚‹ï¼ˆã‚ã‚‹ã„ã¯ç©ºä¸­æ‰±ã„ã«ã—ãŸã„å ´åˆã¯falseï¼‰
             isJump_ = false;
 
-            // ƒtƒ‰ƒO‚ğÁ”ï‚µ‚ÄI—¹
+            // ãƒ•ãƒ©ã‚°ã‚’æ¶ˆè²»ã—ã¦çµ‚äº†
             isRequestTeleport_ = false;
         }
         else {
-            // ’Êí‚Ì•¨—ˆÚ“®ˆ—
+            // é€šå¸¸ã®ç‰©ç†ç§»å‹•å‡¦ç†
 
-            // d—Í‚Ì“K—p
+            // é‡åŠ›ã®é©ç”¨
             verticalVelocity_ += gravity_ * deltaTime;
 
             Vector3 nextPosition = position_;
             Vector3 intendedXZPos = targetPosition;
-            intendedXZPos.y = position_.y; // Y‚Íd—ÍŒvZ‚É”C‚¹‚é‚½‚ß‚±‚±‚Å‚ÍˆÛ
+            intendedXZPos.y = position_.y; // Yã¯é‡åŠ›è¨ˆç®—ã«ä»»ã›ã‚‹ãŸã‚ã“ã“ã§ã¯ç¶­æŒ
 
-            // XZ•½–Êi•Çj‚ÌˆÚ“®‰ğŒˆ
+            // XZå¹³é¢ï¼ˆå£ï¼‰ã®ç§»å‹•è§£æ±º
             {
                 int loopCount = 0;
                 Vector3 currentIterPos = position_;
@@ -201,7 +201,7 @@ namespace nsK2EngineLow
                         break;
                     }
 
-                    // SweepTestİ’è
+                    // SweepTestè¨­å®š
                     Vector3 posTmp = currentIterPos;
                     posTmp.y += height_ * 0.5f + radius_ + height_ * 0.1f;
 
@@ -215,7 +215,7 @@ namespace nsK2EngineLow
                     PhysicsWorld::Get().ConvexSweepTest(collider_, start, end, callback);
 
                     if (callback.isHit) {
-                        // •ÇÕ“ËF‰Ÿ‚µ–ß‚µŒvZ
+                        // å£è¡çªï¼šæŠ¼ã—æˆ»ã—è¨ˆç®—
                         Vector3 vT0(intendedXZPos.x, 0.0f, intendedXZPos.z);
                         Vector3 vT1(callback.hitPos.x, 0.0f, callback.hitPos.z);
                         Vector3 vMerikomi = vT0 - vT1;
@@ -244,16 +244,16 @@ namespace nsK2EngineLow
             position_.x = nextPosition.x;
             position_.z = nextPosition.z;
 
-            // Y²i“VˆäE°j‚Ì‰ğŒˆ
+            // Yè»¸ï¼ˆå¤©äº•ãƒ»åºŠï¼‰ã®è§£æ±º
             if (verticalVelocity_ > 0.0f) {
-                // ã¸’†i“Vˆä”»’èj
+                // ä¸Šæ˜‡ä¸­ï¼ˆå¤©äº•åˆ¤å®šï¼‰
                 float upAmount = verticalVelocity_ * deltaTime;
                 float checkY = position_.y + height_ * 0.5f + radius_;
 
                 Vector3 start(position_.x, checkY, position_.z);
                 Vector3 end(position_.x, checkY + upAmount, position_.z);
 
-                SweepResultCeiling callback; // ¦‘O‰ñ‚Ì’è‹`‚ğQÆ
+                SweepResultCeiling callback; // â€»å‰å›ã®å®šç¾©ã‚’å‚ç…§
                 callback.me = rigidBody_.GetBody();
                 callback.startPos = position_;
                 callback.startPos.y = checkY;
@@ -274,7 +274,7 @@ namespace nsK2EngineLow
             }
             else
             {
-                // —‰º’†i°”»’èj
+                // è½ä¸‹ä¸­ï¼ˆåºŠåˆ¤å®šï¼‰
                 float downAmount = fabsf(verticalVelocity_ * deltaTime);
                 float checkDist = (isOnGround_) ? 0.5f : downAmount + 0.1f;
                 float checkY = position_.y + height_ * 0.5f + radius_;
@@ -301,8 +301,8 @@ namespace nsK2EngineLow
             }
         }
 
-        // „‘ÌiColliderj‚ÌˆÊ’u‚ğXV
-        // ƒeƒŒƒ|[ƒg‚à’Êí‚àAÅI“I‚È m_position ‚ğ”½‰f‚³‚¹‚é
+        // å‰›ä½“ï¼ˆColliderï¼‰ã®ä½ç½®ã‚’æ›´æ–°
+        // ãƒ†ãƒ¬ãƒãƒ¼ãƒˆæ™‚ã‚‚é€šå¸¸æ™‚ã‚‚ã€æœ€çµ‚çš„ãª m_position ã‚’åæ˜ ã•ã›ã‚‹
         btRigidBody* btBody = rigidBody_.GetBody();
         btBody->setActivationState(DISABLE_DEACTIVATION);
         btTransform& trans = btBody->getWorldTransform();

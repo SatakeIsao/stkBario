@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Shadow.h"
 #include "Bloom.h"
 
@@ -28,43 +28,43 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒXƒvƒ‰ƒCƒgƒŒƒ“ƒ_[‚ğƒRƒ“ƒeƒi‚ÌŒã‚ë‚É‚­‚Á‚Â‚¯‚é
+		/// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ¬ãƒ³ãƒ€ãƒ¼ã‚’ã‚³ãƒ³ãƒ†ãƒŠã®å¾Œã‚ã«ãã£ã¤ã‘ã‚‹
 		/// </summary>
-		/// <param name="spriteRender">ƒXƒvƒ‰ƒCƒgƒŒƒ“ƒ_[</param>
+		/// <param name="spriteRender">ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ¬ãƒ³ãƒ€ãƒ¼</param>
 		void AddSpriteRenderObject(IRenderer* spriteRender)
 		{
 			m_renderObjects.push_back(spriteRender);
 		}
 		/// <summary>
-		/// ƒtƒHƒ“ƒgƒŒƒ“ƒ_[‚ğƒRƒ“ƒeƒi‚ÌŒã‚ë‚É‚­‚Á‚Â‚¯‚é
+		/// ãƒ•ã‚©ãƒ³ãƒˆãƒ¬ãƒ³ãƒ€ãƒ¼ã‚’ã‚³ãƒ³ãƒ†ãƒŠã®å¾Œã‚ã«ãã£ã¤ã‘ã‚‹
 		/// </summary>
-		/// <param name="fontRender">ƒtƒHƒ“ƒgƒŒƒ“ƒ_[</param>
+		/// <param name="fontRender">ãƒ•ã‚©ãƒ³ãƒˆãƒ¬ãƒ³ãƒ€ãƒ¼</param>
 		void AddFontRenderObject(IRenderer* fontRender)
 		{
 			m_renderObjects.push_back(fontRender);
 		}
 
 		//void InitFinalSprite();
-		//ƒ‚ƒfƒ‹‚Ì•`‰æ
+		//ãƒ¢ãƒ‡ãƒ«ã®æç”»
 		void ModelDraw(RenderContext& rc);
-		//2Dƒ‚ƒfƒ‹‚Ì•`‰æ
+		//2Dãƒ¢ãƒ‡ãƒ«ã®æç”»
 		void Render2DSprite(RenderContext& rc);
-		//–‘O2Dƒ‚ƒfƒ‹‚Ì•`‰æ
+		//äº‹å‰2Dãƒ¢ãƒ‡ãƒ«ã®æç”»
 		//void PreRender2D(RenderContext& rc);
-		//ƒVƒƒƒhƒEƒ}ƒbƒv•`‰æˆ—
+		//ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æç”»å‡¦ç†
 		//void RenderShadowDraw(RenderContext& rc);
-		//Às
+		//å®Ÿè¡Œ
 		void Execute(RenderContext& rc);
 
 		void CopyMainRenderTargetToFrameBuffer(RenderContext& rc);
 
 		void SpriteFontDraw(RenderContext& rc);
-		////ƒ‰ƒCƒgƒrƒ…[ƒXƒNƒŠ[ƒ“‚Ìİ’è
+		////ãƒ©ã‚¤ãƒˆãƒ“ãƒ¥ãƒ¼ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®è¨­å®š
 		//void SetLVP(Matrix mat)
 		//{
 		//	m_sceneLight.SetLVP(mat);
 		//}
-		//æ“¾Œn‚ÌŠÖ”
+		//å–å¾—ç³»ã®é–¢æ•°
 		SceneLight& GetLightingCB()
 		{
 			return m_sceneLight;
@@ -81,7 +81,7 @@ namespace nsK2EngineLow {
 			return shadow.GetLigCamera();
 		}*/
 
-		//ƒ‰ƒCƒgƒJƒƒ‰‚Ìƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
+		//ãƒ©ã‚¤ãƒˆã‚«ãƒ¡ãƒ©ã®ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
 		const Matrix& GetLigCameraViewProjection()
 		{
 			return m_shadow.GetLigCameraViewProjection();
@@ -103,11 +103,11 @@ namespace nsK2EngineLow {
 		RenderTarget m_2DRenderTarget;
 		Sprite m_mainSprite;
 		Sprite m_2DSprite;
-		//ƒVƒƒƒhƒE—p
+		//ã‚·ãƒ£ãƒ‰ã‚¦ç”¨
 		//RenderTarget m_shadowMapTarget;
 		Camera m_lightCamera;
 		Shadow m_shadow;
-		//ƒuƒ‹[ƒ€—p
+		//ãƒ–ãƒ«ãƒ¼ãƒ ç”¨
 		Bloom m_bloom;
 		//RenderTarget* luminanceRenderTarget;
 		Sprite m_copyToFrameBufferSprite;
@@ -115,7 +115,7 @@ namespace nsK2EngineLow {
 
 		Matrix m_viewProjectionMatrix;
 		std::vector<ModelRender*> m_modelRenderObject;
-		std::vector<IRenderer* > m_renderObjects;	//•`‰æƒIƒuƒWƒFƒNƒg‚ÌƒŠƒXƒg
+		std::vector<IRenderer* > m_renderObjects;	//æç”»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒªã‚¹ãƒˆ
 	};
 
 }
