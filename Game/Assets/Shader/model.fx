@@ -126,7 +126,7 @@ Texture2D<float4> g_texture : register(t0);             //モデルテクスチ�
 Texture2D<float4> g_normalMap : register(t1);           //法線マップ
 Texture2D<float4> g_speclarMap : register(t2);          //スペキュラマップ
 //Texture2D<float4> g_aoMap : register(t10);            //AOマップ
-Texture2D<float> g_shadowMap : register(t10);           //シャドウマップ（SampleCmpLevelZero用にfloat型）
+Texture2D<float4> g_shadowMap : register(t10);           //シャドウマップ（SampleCmpLevelZero用にfloat型）
 
 StructuredBuffer<float4x4> g_boneMatrix : register(t3);	//ボーン行列。
 
@@ -199,7 +199,9 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     
     float4 worldPos = mul(mWorld, vsIn.pos);
     psIn.posInLVP = mul(mLVP, worldPos);    //ライトビュースクリーン空間の座標を計算する
-    
+    //psIn.posInLVP.z = length(worldPos.xyz - lightPos) / 1000.0f;
+
+
     return psIn;
 }
 
@@ -563,32 +565,52 @@ float CalcShadowMap(SPSIn psIn)
     // ライトビュースクリーン空間でのZ値を計算
     float zInLVP = psIn.posInLVP.z / psIn.posInLVP.w;
     // ちらつき防止のオフセット
-    float bias = 0.003f;
+    float bias = 0.0005f;
     zInLVP -= bias;
     
     // UV座標がシャドウマップの範囲内のみ影判定
     if (shadowMapUV.x > 0.0f && shadowMapUV.x < 1.0f 
         && shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f)
     {
-        // SampleCmpLevelZero で遮蔽率を取得
-        // この値が比較するテクセルの値より大きければ1.0、小さければ0.0
-        // それを4テクセル分行い、4テクセルの平均を返す
-        float shadow = g_shadowMap.SampleCmpLevelZero(
-            g_shadowSampler,    // 使用するサンプラーステート
-            shadowMapUV,        // シャドウマップにアクセスするUV座標
-            zInLVP              // このピクセルのライト空間Z値
-        );
-        
-        // シャドウカラーと通常カラーを遮蔽率で明るさ設定
-        float shadowColor = 0.5f;
-        shadowAttn = lerp(1.0f, shadowColor, shadow);
-        
-        // シャドウマップの境界で影をフェードアウト
-        // 端に近づくにつれて、影を薄くして自然に。
-        float2 t = shadowMapUV - 0.5f;
-        t = pow(abs(t) / 0.5f, 0.8f);
-        shadowAttn = lerp(shadowAttn, 1.0f, t.x);
-        shadowAttn = lerp(shadowAttn, 1.0f, t.y);
+       // テクセルサイズ（4096解像度の場合）
+        float texelSize = 1.0f / 4096.0f;
+
+        float totalAttn = 0.0f;
+
+        // 4×4の16点サンプリング
+        for (int x = -2; x <= 1; x++)
+        {
+            for (int y = -2; y <= 1; y++)
+            {
+                float2 offset = float2(x, y) * texelSize;
+                float2 shadowValue = g_shadowMap.Sample(g_sampler, shadowMapUV + offset).xy;
+    
+                float attn = 1.0f;
+                if (zInLVP > shadowValue.r)
+                {
+                    float md = zInLVP - shadowValue.r;
+                    float depth_sq = shadowValue.r * shadowValue.r;
+                    float variance = min(max(shadowValue.g - depth_sq, 0.0001f), 1.0f);
+                    // md はクリップ空間（0〜1）の差なので非常に小さい
+                    // スケールを掛けて増幅することで影を濃くする
+                    float md_scaled = md * 1.5f;
+                    float lit_factor = variance / (variance + md_scaled * md_scaled);
+
+                    // lit_factor=0.0f（完全に影）→ 0.5f（影の色）
+                    // lit_factor=1.0f（完全に明るい）→ 1.0f
+                    // attn = lerp(0.15f, 1.0f, lit_factor);
+                    // しきい値で二値判定して固定値を使う
+                    if (lit_factor < 0.9f)
+                    {
+                        attn = 0.5f;  // 常に固定の濃さ
+                    }
+                }
+                totalAttn += attn;
+            }
+        }
+
+        // 16点の平均
+        shadowAttn = totalAttn / 16.0f;
     }
     return shadowAttn;
 }
