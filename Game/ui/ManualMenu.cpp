@@ -36,7 +36,7 @@ namespace app
 			// アイコン
 			{
 				bIcon_.Init("Assets/ui/pause/volume/buttonB.DDS", p->bIconButtonSizeX, p->bIconButtonSizeY);
-				bIcon_.SetPosition(Vector3(p->bIconPositionX, p->bIconPositionY, p->bIconPositionZ));
+				bIcon_.SetPosition(Vector3(p->bIconPositionX, p->bIconPositionY, 0.0f));
 				bIcon_.SetScale(Vector3(p->bIconScaleX, p->bIconScaleY, p->bIconScaleZ));
 			}
 		}
