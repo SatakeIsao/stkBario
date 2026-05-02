@@ -9,6 +9,7 @@
 #include "EventCharacter.h"
 #include "battle/BattleManager.h"
 #include "sound/SoundManager.h"
+#include "core/ParameterManager.h"
 
 
 namespace
@@ -392,7 +393,9 @@ namespace app
 		void EventCharacterStateMachine::OnEnterKnockBack()
 		{
 			GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::SlimeAnimationKind::knockBack));
-			Jump(80.0f);
+
+			auto* aiParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterEventCharacterAIParameter>();
+			Jump(aiParam->knockbackJumpPower);
 
 			// ノックバックした瞬間にエフェクトを出す
 			app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
@@ -405,7 +408,8 @@ namespace app
 
 
 		void EventCharacterStateMachine::OnExitKnockBack()
-		{}
+		{
+		}
 
 
 		uint32_t EventCharacterStateMachine::GetCharacterID() const
@@ -426,6 +430,8 @@ namespace app
 
 		void EventCharacterStateMachine::UpdateState()
 		{
+			auto* aiParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterEventCharacterAIParameter>();
+		
 			/** 踏まれた（Squash） → 復活 or 即死亡 */
 			if (IsSquashed())
 			{
@@ -468,7 +474,7 @@ namespace app
 			Vector3 diffXZ(playerPosition.x - slimePosition.x, 0.0f, playerPosition.z - slimePosition.z);
 			float diff = diffXZ.Length();
 
-			if (diff < 200.0f) {
+			if (diff < aiParam->chaseDetectionRange) {
 				Vector3 DirectionToPlayer = diffXZ;
 				DirectionToPlayer.Normalize();
 				Vector3 slimeForward = Vector3(0.0f, 0.0f, 1.0f);
@@ -477,7 +483,7 @@ namespace app
 				forwardXZ.Normalize();
 
 				float dot = forwardXZ.Dot(DirectionToPlayer);
-				float threshold = std::cos(60.0f * (Math::PI / 180.0f));
+				float threshold = std::cos(aiParam->chaseFieldOfViewDeg * (Math::PI / 180.0f));
 
 				if (dot > threshold) {
 					OnChase(DirectionToPlayer, playerPosition);
@@ -488,8 +494,6 @@ namespace app
 			if (isKnockBack_)
 			{
 				// まだノックバック状態になっていない場合（初回の1回だけ通る）
-				// → KnockBackState::Enter で Jump(80.0f) と OnEnterKnockBack を確実に呼ぶため
-				//   1フレーム目は必ず KnockBackState に入る
 				if (!IsEqualCurrentState(KnockBackCharacterState::ID()))
 				{
 					SetMoveDirection(knockBackDirection_);
@@ -499,7 +503,6 @@ namespace app
 				else // KnockBackState に入った（Enter済み）
 				{
 					// HP0ならノックバック中でも即Deadへ（吹き飛びながら縮小）
-					// ※ Enter で Jump が呼ばれた後なので垂直速度は確定している
 					if (isDead_)
 					{
 						isKnockBack_ = false;
@@ -537,14 +540,14 @@ namespace app
 				toPlayer.y = 0.0f;
 				float distance = toPlayer.Length();
 
-				if (distance <= 40.0f) {
+				if (distance <= aiParam->attackRange) {
 					SetMoveDirection(chaseDirection_);
 					RequestChangeState(AttackCharacterState::ID());
 				}
-				else if (distance <= 200.0f) {
+				else if (distance <= aiParam->chaseRange) {
 					SetMoveDirection(chaseDirection_);
 					RequestChangeState(RunCharacterState::ID());
-					aiTimer_ = 5.0f;
+					aiTimer_ = aiParam->chaseAITimerInitial;
 				}
 				else
 				{
@@ -558,7 +561,7 @@ namespace app
 			if (IsEqualCurrentState(IdleCharacterState::ID()))
 			{
 				aiTimer_ += g_gameTime->GetFrameDeltaTime();
-				if (aiTimer_ > WAIT_TIME)
+				if (aiTimer_ > aiParam->waitTime)
 				{
 					RequestChangeState(RunCharacterState::ID());
 					aiTimer_ = 0.0f;
@@ -570,11 +573,11 @@ namespace app
 			{
 				aiTimer_ += g_gameTime->GetFrameDeltaTime();
 
-				if (aiTimer_ <= 2.0f)
+				if (aiTimer_ <= aiParam->patrolLeftTurnTime)
 				{
 					SetMoveDirection(Vector3::Left);
 				}
-				else if (aiTimer_ <= 4.0f)
+				else if (aiTimer_ <= aiParam->patrolRightTurnTime)
 				{
 					SetMoveDirection(Vector3::Right);
 				}

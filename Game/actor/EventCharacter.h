@@ -39,7 +39,7 @@ namespace app
 			void Initialize(CharacterInitializeParameter& param) override final;
 			/** 当たり判定を作り直す */
 			void ResizeCollision();
-			Vector3 GetForward()
+			Vector3 GetForward() const
 			{
 				return forward_;
 			}
@@ -50,7 +50,7 @@ namespace app
 				stateMachine_->AddState<TState>();
 			}
 
-			EventCharacterStateMachine* GetStateMachine()
+			EventCharacterStateMachine* GetStateMachine() const
 			{
 				return stateMachine_.get();
 			}

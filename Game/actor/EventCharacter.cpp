@@ -5,6 +5,15 @@
 #include "EventCharacter.h"
 #include "ActorStatus.h"
 #include "ui/AwardManager.h"
+#include "core/ParameterManager.h"
+
+namespace
+{
+	// Y座標のオフセット（半径の何倍浮かせるか）
+	//constexpr float GHOSTBODY_POS_Y_OFFSET_FACTOR = 2.0f;
+	// 落下死と判定するY座標のしきい値
+	//constexpr float FALL_DEATH_THRESHOLD_Y = -100.0f;
+}
 
 namespace app
 {
@@ -20,11 +29,14 @@ namespace app
 
 
 		EventCharacter::~EventCharacter()
-		{}
+		{
+		}
 
 
 		bool EventCharacter::Start()
 		{
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterEventCharacterParameter>();
+
 			stateMachine_->Initialize();
 			stateMachine_->Setup(this);
 			status_->Setup();
@@ -41,7 +53,7 @@ namespace app
 
 			// GhostBody の初期座標を計算して設定
 			Vector3 centerPos = transform.position;
-			centerPos.y += status_->GetRadius() * 2.0f; // 半径分浮かせる
+			centerPos.y += status_->GetRadius() * parameter->ghostbodyPosYOffset;
 			ghostBody_->SetPosition(centerPos);
 
 			return true;
@@ -51,6 +63,8 @@ namespace app
 		void EventCharacter::Update()
 		{
 			if (isPause_) { return; }
+
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterEventCharacterParameter>();
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 			stateMachine_->Update();
@@ -62,12 +76,15 @@ namespace app
 			transform.UpdateTransform();
 			stateMachine_->transform.position = nextPosition;
 
-			// ゴーストボディ
-			Vector3 centerPos = transform.position;
-			centerPos.y += status_->GetRadius() * 2.0f;
-			ghostBody_->SetPosition(centerPos);
+			// ゴーストボディの座標更新（DisableCollision後はnullのためガード）
+			if (ghostBody_)
+			{
+				Vector3 centerPos = transform.position;
+				centerPos.y += status_->GetRadius() * parameter->ghostbodyPosYOffset;
+				ghostBody_->SetPosition(centerPos);
+			}
 
-			if (transform.localPosition.y <= -100.0f)
+			if (transform.localPosition.y <= parameter->fallDeathThresholdPosY)
 			{
 				if (!stateMachine_->IsDead())
 				{

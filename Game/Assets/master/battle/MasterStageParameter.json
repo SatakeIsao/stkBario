@@ -1,11 +1,35 @@
 [
     {
-        "comment": "共通ステージパラメーター",
+        "commentStage": "共通ステージパラメーター",
         "gravity": -650.0,
         "fallLimitY": -10.0,
         "friction": 0.7,
         "warpStartScale": 1.0,
         "warpEndScale": 0.3,
-        "warpTime": 1.0
+        "warpTime": 1.0,
+        
+        "commentCoin": "コインのパラメータ",
+        "coinShrinkSpeed": 2.0,
+        "coinRotationSpeed": 500.0,
+        "coinJumpInitVelocityY": 50.0,
+        "coinCollisionRadius": 10.0,
+        "coinCollisionHeight": 20.0,
+        "coinYOffset": -20.0,
+        "coinEffectYOffset":10.0,
+
+        "commentGoal": "ゴールのパラメータ",
+        "spawnYOffset": -100.0,
+        "goalEffectRiseSpeed": 50.0,
+        "goalEffectRiseHeight": 100.0,
+        "goalEffectCoolTime": 1.3,
+        "goalEffectScale": { "x": 3.0, "y": 3.0, "z": 3.0},
+        "goalTriggerDistance": 50.0,
+
+        "commentTimer": "タイマー演出のパラメータ",
+        "blinkTimeThreshold": 30.0,
+        "separatorTime100Start": 100.0,
+        "separatorTime100End": 97.0,
+        "separatorTime50Start": 50.0,
+        "separatorTime50End": 47.0
     }
 ]

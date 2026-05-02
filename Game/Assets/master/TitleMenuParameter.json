@@ -10,6 +10,12 @@
         "cursolPositionYA": 180.0,
         "cursolPositionYB": 20.0,
         "cursolPositionYC": -140.0,
-        "cursolPositionYD": -300.0
+        "cursolPositionYD": -300.0,
+
+        "maxCursolIndex": 3,
+        "SelectionScale": { "x": 1.3, "y": 1.3, "z": 1.0},
+        "DefaultScale": { "x": 1.0, "y": 1.0, "z": 1.0},
+        "SelectionColor": { "x": 1.0, "y": 1.0, "z": 0.0},
+        "DefaultColor": { "x": 1.0, "y": 1.0, "z": 1.0}
     }
 ]

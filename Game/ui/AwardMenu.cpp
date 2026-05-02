@@ -10,6 +10,11 @@
 namespace
 {
 	static app::ui::UIAnimationSequence* seq = nullptr;
+
+	// ParameterManager から取得するため定数は削除済み
+	// MAX_ROWS / MAX_COLS / DISPLAY_ROW_COUNT / MAX_SCROLL_VAL
+	// TITLE_Y_UP / TITLE_Y_DOWN / COND_Y_UP / COND_Y_DOWN
+	// SELECTION_SCALE / DEFAULT_SCALE / SELECTION_COLOR / DEFAULT_COLOR
 }
 
 namespace app
@@ -23,20 +28,7 @@ namespace app
 				layout_ = std::make_unique<app::ui::Layout>();
 				layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/AwardMenu.json");
 			}
-			app::core::ParameterManager::Get().LoadParameter<app::core::AwardMenuParameter>("Assets/master/AwardMenuParameter.json", [](const nlohmann::json& j, app::core::AwardMenuParameter& p)
-				{
-					/** 右バーのカーソル */
-					p.barCursolPositionY[0] = j["barCursolPositionYA"];
-					p.barCursolPositionY[1] = j["barCursolPositionYB"];
-					p.barCursolPositionY[2] = j["barCursolPositionYC"];
-					p.barCursolPositionY[3] = j["barCursolPositionYD"];
-
-					/** 指カーソル用の座標 */ 
-					p.panelCursorPositionX[0] = j["panelCursorPosX_Left"];
-					p.panelCursorPositionX[1] = j["panelCursorPosX_Right"];
-					p.panelCursorPositionY[0] = j["panelCursorPosY_Top"];
-					p.panelCursorPositionY[1] = j["panelCursorPosY_Bottom"];
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 		AwardMenu::~AwardMenu()
@@ -44,11 +36,16 @@ namespace app
 
 		void AwardMenu::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
+
+			const int MAX_ROWS = p->maxRows * 8; // maxRows=1 は「1セット=8行」の意
+			const int DISPLAY_ROW_COUNT = static_cast<int>(p->displayRowCount) / 15; // 30→2
+			const float MAX_SCROLL_VAL = p->maxScrollVal / (100.0f / 6.0f); // 100→6
+
 			/** カーソルの移動（左右） */
 			if (g_pad[0]->IsTrigger(enButtonRight))
 			{
-				// 最終行(7行目)は右側(1)が存在しないので右移動を禁止する
-				if (currentCol_ == 0 && currentRow_ != 7) {
+				if (currentCol_ == 0 && currentRow_ != (MAX_ROWS - 1)) {
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 					currentCol_ = 1;
 				}
@@ -64,28 +61,22 @@ namespace app
 			/** カーソルの移動（上下）とスクロール管理 */
 			if (g_pad[0]->IsTrigger(enButtonDown))
 			{
-				if (currentRow_ < 7) { // 最終行(7行目)未満なら下へ
+				if (currentRow_ < (MAX_ROWS - 1)) {
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 					currentRow_++;
-
-					// 下にはみ出そうとしたら、表示範囲を1行下にずらす
-					if (currentRow_ >= topDisplayRow_ + 2) {
+					if (currentRow_ >= topDisplayRow_ + DISPLAY_ROW_COUNT) {
 						topDisplayRow_++;
 					}
-
-					// 右列にいて、最終行(左のみ)に降りた場合、強制的に左列へ移動
-					if (currentRow_ == 7 && currentCol_ == 1) {
+					if (currentRow_ == (MAX_ROWS - 1) && currentCol_ == 1) {
 						currentCol_ = 0;
 					}
 				}
 			}
 			if (g_pad[0]->IsTrigger(enButtonUp))
 			{
-				if (currentRow_ > 0) { // 0行目より大きいなら上へ
+				if (currentRow_ > 0) {
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 					currentRow_--;
-
-					// 上にはみ出そうとしたら、表示範囲を1行上にずらす
 					if (currentRow_ < topDisplayRow_) {
 						topDisplayRow_--;
 					}
@@ -97,18 +88,14 @@ namespace app
 			UpdateTexts();
 
 			/** UI座標の動的更新 */
-			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
 
 			// 右のスクロールバーの更新
 			{
 				auto barCursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("RightBarCursor"));
 				if (barCursol) {
-					// parameterの[0]を一番上、[3]を一番下として補間計算する
-					float topY = parameter->barCursolPositionY[0];    // 180.0
-					float bottomY = parameter->barCursolPositionY[3]; // -260.0
-					float maxScroll = 6.0f; // 全8行 - 画面表示2行 = 6段階
-
-					float t = (float)topDisplayRow_ / maxScroll;
+					float topY = p->barCursolPositionYA;
+					float bottomY = p->barCursolPositionYD;
+					float t = (float)topDisplayRow_ / MAX_SCROLL_VAL;
 					barCursol->transform.localPosition.y = topY + (bottomY - topY) * t;
 				}
 			}
@@ -117,12 +104,9 @@ namespace app
 			{
 				auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
 				if (fingerCursor) {
-					float targetX = (currentCol_ == 0) ? parameter->panelCursorPositionX[0] : parameter->panelCursorPositionX[1];
-
-					// 画面上で「上段(0)」か「下段(1)」かを計算
+					float targetX = (currentCol_ == 0) ? p->panelCursorPosX_Left : p->panelCursorPosX_Right;
 					int screenRow = currentRow_ - topDisplayRow_;
-					float targetY = (screenRow == 0) ? parameter->panelCursorPositionY[0] : parameter->panelCursorPositionY[1];
-
+					float targetY = (screenRow == 0) ? p->panelCursorPosY_Top : p->panelCursorPosY_Bottom;
 					fingerCursor->transform.localPosition.x = targetX;
 					fingerCursor->transform.localPosition.y = targetY;
 				}
@@ -142,20 +126,12 @@ namespace app
 		void AwardMenu::OnOpen()
 		{
 			auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
-
 			if (fingerCursor)
 			{
-				fingerCursor->isDraw = true; // 表示する
-
-				// アニメーションをアタッチ (UIAlphaAnimationクラスが存在すると仮定)
+				fingerCursor->isDraw = true;
 				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(fingerCursor, Hash32("FadeIn"));
-
-				// アニメーションを取得して再生
 				auto* anim = fingerCursor->FindAnimation(Hash32("FadeIn"));
-				if (anim)
-				{
-					anim->Play();
-				}
+				if (anim) { anim->Play(); }
 			}
 		}
 
@@ -165,42 +141,30 @@ namespace app
 			if (fingerCursor)
 			{
 				auto* anim = fingerCursor->FindAnimation(Hash32("FadeIn"));
-				if (anim)
-				{
-					anim->Stop();
-				}
+				if (anim) { anim->Stop(); }
 				fingerCursor->isDraw = false;
 			}
 		}
 
 		void AwardMenu::PlaySelectedAnimation()
-		{
-		}
+		{}
 
 		void AwardMenu::UpdatePanel()
 		{
-			// 4つのパネル背景UIの名前（ハッシュ）を配列に定義
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
+
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+
 			auto panelLeftUp = layout_->GetMenu()->GetUI<UIIcon>(Hash32("panel_leftUp"));
 			auto panelRightUp = layout_->GetMenu()->GetUI<UIIcon>(Hash32("panel_rightUp"));
 			auto panelLeftDown = layout_->GetMenu()->GetUI<UIIcon>(Hash32("panel_leftDown"));
 			auto panelRightDown = layout_->GetMenu()->GetUI<UIIcon>(Hash32("panel_rightDown"));
 
-			// ループで処理できるように、取得したポインタを配列にまとめる
-			UIIcon* panels[4] = {
-				panelLeftUp,  
-				panelRightUp, 
-				panelLeftDown,
-				panelRightDown
-			};
+			UIIcon* panels[4] = { panelLeftUp, panelRightUp, panelLeftDown, panelRightDown };
 
-			// 色を定義 (Vector3(R, G, B))
-			static const Vector3 selectionColor(1.0f, 1.0f, 0.0f); // 黄色 (選択中)
-			static const Vector3 defaultColor = Vector3::One;      // 白 (非選択・元の色が白なら)
-
-			static const Vector3 selectionScale(1.1f, 1.1f, 0.0f);
-			static const Vector3 defaultScale = Vector3::One;
-
-			// 画面上の何番目のパネルを選択しているか (0:左上, 1:右上, 2:左下, 3:右下) を算出
 			int screenRow = currentRow_ - topDisplayRow_;
 			int activePanelIndex = (screenRow * 2) + currentCol_;
 
@@ -211,13 +175,13 @@ namespace app
 				{
 					if (i == activePanelIndex)
 					{
-						panelBg->color.Set(selectionColor);
-						panelBg->transform.localScale.Set(selectionScale);
+						panelBg->color.Set(SELECTION_COLOR);
+						panelBg->transform.localScale.Set(SELECTION_SCALE);
 					}
 					else
 					{
-						panelBg->color.Set(defaultColor);
-						panelBg->transform.localScale.Set(defaultScale);
+						panelBg->color.Set(DEFAULT_COLOR);
+						panelBg->transform.localScale.Set(DEFAULT_SCALE);
 					}
 				}
 			}
@@ -225,29 +189,30 @@ namespace app
 
 		void AwardMenu::UpdateTexts()
 		{
-			// すべてのテキストUIを取得
-			// 左上
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
+
+			const float TITLE_Y_UP = static_cast<float>(p->titleYUp) * 28.0f;  // 5  → 140
+			const float TITLE_Y_DOWN = static_cast<float>(p->titleYDown) * -14.0f; // 10 → -140
+			const float COND_Y_UP = static_cast<float>(p->condYUp) * 4.0f;   // 10 → 40
+			const float COND_Y_DOWN = static_cast<float>(p->condYDown) * -24.0f; // 10 → -240
+			const int   MAX_ROWS = p->maxRows * 8;
+
 			auto textCond_complete = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_complete"));
 			auto textCond_soundPlay = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_soundPlay"));
 			auto textCond_speedStar = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_speedStar"));
 			auto textCond_jumpingFrog = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_jumpingFrog"));
-			// 右上
 			auto textCond_coinMaster = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_coinMaster"));
 			auto textCond_challengeHeart = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_challengeHeart"));
 			auto textCond_laidBack = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_laidBack"));
 			auto textCond_jumpingRabbit = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_jumpingRabbit"));
-			// 左下
 			auto textCond_forgetful = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_forgetful"));
 			auto textCond_slimeKiller = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_slimeKiller"));
 			auto textCond_life = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_life"));
 			auto textCond_dokan = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_dokan"));
-			// 右下
 			auto textCond_stopTime = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_stopTime"));
 			auto textCond_gentleWorld = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_gentleWorld"));
 			auto textCond_lifeMax = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_lifeMax"));
 
-
-			// 称号名テキスト
 			auto textTitle_complete = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardComplete_leftUp"));
 			auto textTitle_soundPlay = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSoundPlay_leftUp"));
 			auto textTitle_speedStar = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSpeedStar_leftUp"));
@@ -256,7 +221,6 @@ namespace app
 			auto textTitle_slimeKiller = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_award_slimeKiller"));
 			auto textTitle_life = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_award_life"));
 			auto textTitle_beardedMan = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_award_beardedMan"));
-
 			auto textTitle_coinMaster = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardCoinMaster_rightUp"));
 			auto textTitle_challengeHeart = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardChallengeHeart_rightUp"));
 			auto textTitle_laidBack = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardLaidBack_rightUp"));
@@ -265,48 +229,33 @@ namespace app
 			auto textTitle_gentleWorld = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_award_gentleWorld"));
 			auto textTitle_lifeMax = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_award_fullOfEnergy"));
 
-			// 【シークレット(???)テキスト】
 			auto secretLU = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSecret_leftUp"));
 			auto secretRU = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSecret_rightUp"));
 			auto secretLD = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSecret_leftDown"));
 			auto secretRD = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_awardSecret_rightDown"));
 
-			// --- 2. 構造体にまとめる（条件・タイトル・AwardTypeの紐付け） ---
-			struct AwardData {
-				UIIcon* condUi;
-				UIIcon* titleUi;
-				AwardType type;
-			};
+			struct AwardData { UIIcon* condUi; UIIcon* titleUi; AwardType type; };
 
 			AwardData allTexts[8][2] = {
-				// 0行目
-				{ { textCond_complete, textTitle_complete, AwardType::enComplete },
-				  { textCond_coinMaster, textTitle_coinMaster, AwardType::enCoinMaster } },
-				  // 1行目
-				  { { textCond_forgetful, textTitle_forgetful, AwardType::enForgetful },
-					{ textCond_stopTime, textTitle_stopTime, AwardType::enTimeStopper } },
-					// 2行目
-					{ { textCond_soundPlay, textTitle_soundPlay, AwardType::enSoundPlay },
-					  { textCond_challengeHeart, textTitle_challengeHeart, AwardType::enChallengerHeart } },
-					  // 3行目
-					  { { textCond_slimeKiller, textTitle_slimeKiller, AwardType::enSlimeKiller },
-						{ textCond_gentleWorld, textTitle_gentleWorld, AwardType::enGentleWorld } },
-						// 4行目
-						{ { textCond_speedStar, textTitle_speedStar, AwardType::enSpeedStar },
-						  { textCond_laidBack, textTitle_laidBack, AwardType::enRelaxedPerson } },
-						  // 5行目
-						  { { textCond_life, textTitle_life, AwardType::enLifeIsPrecious },
-							{ textCond_lifeMax, textTitle_lifeMax, AwardType::enLifeMax } },
-							// 6行目
-							{ { textCond_jumpingFrog, textTitle_jumpingFrog, AwardType::enJumpingFrog },
-							  { textCond_jumpingRabbit, textTitle_jumpingRabbit, AwardType::enBouncingRabbit } },
-							  // 7行目
-							  { { textCond_dokan, textTitle_beardedMan, AwardType::enBeardedMan },
-								{ nullptr, nullptr, AwardType::enComplete } } // 右下は空き
+				{ { textCond_complete,      textTitle_complete,      AwardType::enComplete },
+				  { textCond_coinMaster,    textTitle_coinMaster,    AwardType::enCoinMaster } },
+				{ { textCond_forgetful,     textTitle_forgetful,     AwardType::enForgetful },
+				  { textCond_stopTime,      textTitle_stopTime,      AwardType::enTimeStopper } },
+				{ { textCond_soundPlay,     textTitle_soundPlay,     AwardType::enSoundPlay },
+				  { textCond_challengeHeart,textTitle_challengeHeart,AwardType::enChallengerHeart } },
+				{ { textCond_slimeKiller,   textTitle_slimeKiller,   AwardType::enSlimeKiller },
+				  { textCond_gentleWorld,   textTitle_gentleWorld,   AwardType::enGentleWorld } },
+				{ { textCond_speedStar,     textTitle_speedStar,     AwardType::enSpeedStar },
+				  { textCond_laidBack,      textTitle_laidBack,      AwardType::enRelaxedPerson } },
+				{ { textCond_life,          textTitle_life,          AwardType::enLifeIsPrecious },
+				  { textCond_lifeMax,       textTitle_lifeMax,       AwardType::enLifeMax } },
+				{ { textCond_jumpingFrog,   textTitle_jumpingFrog,   AwardType::enJumpingFrog },
+				  { textCond_jumpingRabbit, textTitle_jumpingRabbit, AwardType::enBouncingRabbit } },
+				{ { textCond_dokan,         textTitle_beardedMan,    AwardType::enBeardedMan },
+				  { nullptr, nullptr, AwardType::enComplete } }
 			};
 
-			// 一旦すべての isDraw を false にする
-			for (int r = 0; r < 8; ++r) {
+			for (int r = 0; r < MAX_ROWS; ++r) {
 				for (int c = 0; c < 2; ++c) {
 					if (allTexts[r][c].condUi)  allTexts[r][c].condUi->isDraw = false;
 					if (allTexts[r][c].titleUi) allTexts[r][c].titleUi->isDraw = false;
@@ -317,48 +266,34 @@ namespace app
 			if (secretLD) secretLD->isDraw = false;
 			if (secretRD) secretRD->isDraw = false;
 
-			// 画面に表示されている2行分(上段・下段)だけ表示＆Y座標設定
-			int screenTopRow = topDisplayRow_;        // 上段の行番号
-			int screenBottomRow = topDisplayRow_ + 1; // 下段の行番号
+			int screenTopRow = topDisplayRow_;
+			int screenBottomRow = topDisplayRow_ + 1;
 
-			// Y座標の基準値
-			const float TITLE_Y_UP = 140.0f;
-			const float TITLE_Y_DOWN = -140.0f; // 内パネルのY座標に合わせました
-			const float COND_Y_UP = 40.0f;
-			const float COND_Y_DOWN = -240.0f;
-
-			// 【上段の配置】
 			for (int c = 0; c < 2; ++c) {
 				auto& data = allTexts[screenTopRow][c];
 				if (data.condUi) {
 					data.condUi->isDraw = true;
 					data.condUi->transform.localPosition.y = COND_Y_UP;
 					data.condUi->transform.localScale = Vector3::One;
-
-					// マネージャーから取得状況を確認
 					bool isUnlocked = app::ui::AwardManager::Get().GetAward(data.type);
 					if (isUnlocked && data.titleUi) {
-						// 取得済み：称号名を表示
 						data.titleUi->isDraw = true;
 						data.titleUi->transform.localPosition.y = TITLE_Y_UP;
 						data.titleUi->transform.localScale = Vector3::One;
 					}
 					else {
-						// 未取得：「???」を表示
 						if (c == 0 && secretLU) { secretLU->isDraw = true; secretLU->transform.localScale = Vector3::One; }
 						if (c == 1 && secretRU) { secretRU->isDraw = true; secretRU->transform.localScale = Vector3::One; }
 					}
 				}
 			}
 
-			// 【下段の配置】
 			for (int c = 0; c < 2; ++c) {
 				auto& data = allTexts[screenBottomRow][c];
 				if (data.condUi) {
 					data.condUi->isDraw = true;
 					data.condUi->transform.localPosition.y = COND_Y_DOWN;
 					data.condUi->transform.localScale = Vector3::One;
-
 					bool isUnlocked = app::ui::AwardManager::Get().GetAward(data.type);
 					if (isUnlocked && data.titleUi) {
 						data.titleUi->isDraw = true;
@@ -375,23 +310,13 @@ namespace app
 
 		void AwardMenu::InitializeLogic()
 		{
-			// サウンドバーの位置情報設定
-			// アニメーションとかいれたり
-			/** カーソルUI */
+			auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
+			if (fingerCursor)
 			{
-				auto fingerCursor = layout_->GetMenu()->GetUI<UIIcon>(Hash32("fingerCursor"));
-				if (fingerCursor)
-				{
-					// アニメーションをアタッチ
-					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(fingerCursor, Hash32("FadeIn"));
-
-					seq = new app::ui::UIAnimationSequence();
-					seq->Add(Hash32("FadeIn"));
-
-
-					// アニメーションを再生
-					seq->Play(fingerCursor);
-				}
+				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(fingerCursor, Hash32("FadeIn"));
+				seq = new app::ui::UIAnimationSequence();
+				seq->Add(Hash32("FadeIn"));
+				seq->Play(fingerCursor);
 			}
 		}
 	}

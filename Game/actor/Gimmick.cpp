@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "Gimmick.h"
 #include "gimmick/WarpSystem.h"
+#include "core/ParameterManager.h"
 
 
 namespace app
@@ -11,13 +12,11 @@ namespace app
 	namespace actor
 	{
 		IGimmick::IGimmick()
-		{
-		}
+		{}
 
 
 		IGimmick::~IGimmick()
-		{
-		}
+		{}
 
 		void IGimmick::Update()
 		{
@@ -38,13 +37,11 @@ namespace app
 
 
 		StaticGimmick::StaticGimmick()
-		{
-		}
+		{}
 
 
 		StaticGimmick::~StaticGimmick()
-		{
-		}
+		{}
 
 
 		bool StaticGimmick::Start()
@@ -87,8 +84,7 @@ namespace app
 
 
 		PipeGimmick::PipeGimmick()
-		{
-		}
+		{}
 
 
 		PipeGimmick::~PipeGimmick()
@@ -159,7 +155,7 @@ namespace app
 			ghostBody_->SetPosition(transform.position);
 		}
 
-		
+
 		Vector3 PipeGimmick::GetMouthPosition() const
 		{
 			return Vector3(transform.position.x, boudingVolume_.maxPoint.y, transform.position.z);
@@ -170,7 +166,7 @@ namespace app
 		{
 			return transform.rotation;
 		}
-		
+
 
 		Vector3 PipeGimmick::GetForward() const
 		{
@@ -183,13 +179,11 @@ namespace app
 
 
 		CoinGimmick::CoinGimmick()
-		{
-		}
+		{}
 
 
 		CoinGimmick::~CoinGimmick()
-		{
-		}
+		{}
 
 
 		bool CoinGimmick::Start()
@@ -212,26 +206,33 @@ namespace app
 		void CoinGimmick::Update()
 		{
 			if (isPause_) { return; }
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterStageParameter>();
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			transform.position += velocity_ * deltaTime;
 
 			if (isDead_)
 			{
-				const float shlinkScale = 2.0f;
-				actionScale_ -= shlinkScale * deltaTime;
-				if (actionScale_ <= 0.0f){
+				// 縮小処理
+				actionScale_ -= parameter->coinShrinkSpeed * deltaTime;
+				if (actionScale_ <= 0.0f) {
 					actionScale_ = 0.0f;
 					Dead();
 				}
 				transform.scale = Vector3(actionScale_, actionScale_, actionScale_);
 			}
-			
 
 			// 高速で回転
 			Quaternion rot;
-			rot.SetRotationDegY(deltaTime * 500.0f);
+			rot.SetRotationDegY(deltaTime * parameter->coinRotationSpeed);
 			transform.rotation *= rot;
+
+			// ゴーストボディの座標を毎フレーム同期
+			if (ghostBody_)
+			{
+				ghostBody_->SetPosition(transform.position);
+			}
 
 			IGimmick::Update();
 		}
@@ -245,6 +246,7 @@ namespace app
 
 		void CoinGimmick::Initialize(const char* path, int32_t myId, const Vector3& forward)
 		{
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterStageParameter>();
 			// ID設定
 			endpointId_ = myId;
 
@@ -265,16 +267,16 @@ namespace app
 
 			// ゴーストボディ作成
 			ghostBody_.reset(new app::collision::GhostBody());
-			ghostBody_->CreateCapsule(this, ID(), 10.0f, 20.0f, app::collision::ghost::CollisionAttribute::Coin, app::collision::ghost::CollisionAttributeMask::Coin);
+			ghostBody_->CreateCapsule(this, ID(), parameter->coinCollisionRadius, parameter->coinCollisionHeight, app::collision::ghost::CollisionAttribute::Coin, app::collision::ghost::CollisionAttributeMask::Coin);
 			ghostBody_->SetPosition(transform.position);
 		}
 
 		void CoinGimmick::DeadAction()
 		{
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterStageParameter>();
 			// 上に跳ねあがるための初速を設定
-			velocity_.y += 50.0f;
+			velocity_.y += parameter->coinJumpInitVelocityY;
 			actionScale_ = 1.0f;
-
 			isDead_ = true;
 		}
 

@@ -1,15 +1,37 @@
 [
     {
-        "comment": "バーカーソルのパラメータ",
+        "commentBar": "バーカーソルのパラメータ",
         "barCursolPositionYA": 180.0,
         "barCursolPositionYB": 33.0,
         "barCursolPositionYC": -133.0,
         "barCursolPositionYD": -260.0,
     
-        "comment": "指カーソルのパラメータ",
+        "commentCursor": "指カーソルのパラメータ",
         "panelCursorPosX_Left": -670.0,
         "panelCursorPosX_Right": 10.0,
         "panelCursorPosY_Top": 0.0,
-        "panelCursorPosY_Bottom": -300.0
+        "panelCursorPosY_Bottom": -300.0,
+
+        "commentAwardManager": "称号条件のパラメータ",
+        "lowHpThreshold": 1,
+        "maxHpThreshold": 7,
+        "fastTimeLimit": 30.0,
+        "slowTimethreshold": 100.0,
+        "jumpCountFrog": 5,
+        "jumpCountRabbit": 10,
+
+        "commentAward": "称号メニューのパラメータ",
+        "maxRows": 1,
+        "maxCols": 7,
+        "displayRowCount": 30.0,
+        "maxScrollVal": 100.0,
+        "titleYUp": 5,
+        "titleYDown": 10,
+        "CondYUp": 10,
+        "CondYDown": 10,
+        "SelectionScale": { "x": 1.1, "y": 1.1, "z": 1.1},
+        "DefaultScale": { "x": 1.0, "y": 1.0, "z": 1.0},
+        "SelectionColor": { "x": 1.1, "y": 1.1, "z": 1.1},
+        "DefaultColor": { "x": 1.0, "y": 1.0, "z": 1.0}
     }
 ]

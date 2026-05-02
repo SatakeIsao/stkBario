@@ -8,16 +8,14 @@
 #include "ui/BattleSequence.h"
 #include "core/PauseManager.h"
 #include "SceneManager.h"
+#include "core/ParameterManager.h"
 
-namespace
-{
-}
+
 
 
 
 BattleScene::BattleScene()
-{
-}
+{}
 
 
 BattleScene::~BattleScene()
@@ -43,18 +41,18 @@ void BattleScene::Update()
 
 
 void BattleScene::Render(RenderContext& rc)
-{
-}
+{}
 
 
 bool BattleScene::RequestScene(uint32_t& id, float& waitTime)
 {
+	auto* sceneParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>();
 	/** ゲームオーバーアイコンのアニメーション終了したら */
 	if (app::battle::BattleManager::Get().IsGameOverAnimFinished()
 		|| app::battle::BattleManager::Get().IsTimeUpAnimFinished())
 	{
 		id = GameOverScene::ID();
-		waitTime = 3.0f;
+		waitTime = sceneParam->sceneTransitionWaitTime;
 		return true;
 	}
 	/** ゲームクリアアイコンのアニメーション終了したら */
@@ -63,36 +61,35 @@ bool BattleScene::RequestScene(uint32_t& id, float& waitTime)
 		// 遷移前に現在のコイン数を取得し、SceneManagerに預ける
 		int currentCoin = app::battle::BattleManager::Get().GetTotalCoin();
 		SceneManager::Get().SetTotalCoin(currentCoin);
-	
+
 		int currentTimer = app::battle::BattleManager::Get().GetRemainTime();
 		SceneManager::Get().SetCurrentTimer(currentTimer);
-	
+
 		id = GameClearScene::ID();
-		waitTime = 3.0f;
+		waitTime = sceneParam->sceneTransitionWaitTime;
 		return true;
 	}
 
 	if (app::core::PauseManager::Get().IsReturnToTitleRequested())
 	{
 		id = TitleScene::ID();
-		waitTime = 3.0f;
+		waitTime = sceneParam->sceneTransitionWaitTime;
 		return true;
 	}
 
 	if (requestSceneId_ != INVALID_SCENE_ID)
 	{
 		id = requestSceneId_;
-		waitTime = 1.0f;
+		waitTime = sceneParam->sceneRequestWaitTime;
 		return true;
 	}
-	
+
 	return false;
 }
 
 
 void BattleScene::Change()
-{
-}
+{}
 
 
 bool BattleScene::CanChange() const

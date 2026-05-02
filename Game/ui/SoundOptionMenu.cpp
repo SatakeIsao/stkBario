@@ -8,25 +8,10 @@
 #include "ui/AwardManager.h"
 
 
-namespace 
+namespace
 {
-	/** 音量増減の1目盛 */
-	constexpr float VOLUME_STEP = 0.10f;
-	/** 最大音量(0.0～1.0の範囲) */
-	constexpr float VOLUME_MAX = 1.0f;
-	/** 最小音量(0.0～1.0の範囲) */
-	constexpr float VOLUME_MIN = 0.0f;
-	/** デフォルト音量 */
-	constexpr float VOLUME_DEFAULT_MASTER = 0.50f;
-	constexpr float VOLUME_DEFAULT_BGM = 0.20f;
-	constexpr float VOLUME_DEFAULT_SE = 0.50f;
-	/** 数値表示用に0.0～1.0の音量を0～10に変換するための乗数 */
-	constexpr float VOLUME_DISPLAY_MULTIPLIER = 10.0f;
-
-	// @todo for test
 	static app::ui::UIAnimationSequence* seq = nullptr;
 }
-
 
 namespace app
 {
@@ -35,37 +20,7 @@ namespace app
 		SoundOptionMenu::SoundOptionMenu()
 			: volumeCursolIndex_(static_cast<int>(app::SoundManager::SoundVolumeType::Master))
 		{
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterSoundOptionMenuParameter>("Assets/master/SoundOptionMenuParameter.json", [](const nlohmann::json& j, app::core::MasterSoundOptionMenuParameter& p)
-				{
-					// 多いからいい感じにした
-					char gaugeBarXStr[] = "gaugeBarXA";
-					const uint32_t barYSize = ARRAYSIZE(p.gaugeBarX);
-					for (uint32_t i = 0; i < barYSize; ++i) {
-						gaugeBarXStr[9] = 'A' + i;
-						p.gaugeBarX[i] = j[gaugeBarXStr];
-					}
-					
-					// 2個しかないのでそのまま
-					p.gaugeBarY[0] = j["gaugeBarYA"];
-					p.gaugeBarY[1] = j["gaugeBarYB"];
-					p.gaugeBarY[2] = j["gaugeBarYC"];
-
-					//多い
-					char gaugeScaleSE[] = "gaugeBarScaleXA";
-					const uint32_t barScaleX = ARRAYSIZE(p.gaugeBarScaleX);
-					for (uint32_t i = 0; i < barScaleX; ++i) {
-						gaugeScaleSE[14] = 'A' + i;
-						p.gaugeBarScaleX[i] = j[gaugeScaleSE];
-					}
-
-					//ノブ
-					char knobSE[] = "knobXA";
-					const uint32_t knobX = ARRAYSIZE(p.knobX);
-					for (uint32_t i = 0; i < knobX; ++i) {
-						knobSE[5] = 'A' + i;
-						p.knobX[i] = j[knobSE];
-					}
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 
@@ -77,6 +32,7 @@ namespace app
 
 		void SoundOptionMenu::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterSoundOptionMenuParameter>();
 			auto* canvas = GetCanvas();
 			if (canvas)
 			{
@@ -101,7 +57,7 @@ namespace app
 					if (openAnim && !openAnim->IsPlay())
 					{
 						canvas->RemoveAnimation(Hash32("ScaleUp_SoundMenu"));
-						
+
 						//ForEachUI([](app::ui::UIBase* ui) {
 						//	ui->RemoveAnimation(Hash32("FadeInPauseMenu"));
 						//	});
@@ -137,7 +93,7 @@ namespace app
 
 				/** 左右キーで音量調整 */
 				bool isVolumeChanged = false;
-				
+
 				auto currentVolumeType = static_cast<app::SoundManager::SoundVolumeType>(volumeCursolIndex_);
 				float targetVolume = app::SoundManager::Get().GetVolume(currentVolumeType);
 
@@ -150,20 +106,20 @@ namespace app
 				if (g_pad[0]->IsTrigger(enButtonRight))
 				{
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
-					targetVolume += VOLUME_STEP;
-					if (targetVolume > VOLUME_MAX)
+					targetVolume += p->volumeStep;
+					if (targetVolume > p->volumeMax)
 					{
-						targetVolume = VOLUME_MAX;
+						targetVolume = p->volumeMax;
 					}
 					isVolumeChanged = true;
 				}
 				else if (g_pad[0]->IsTrigger(enButtonLeft))
 				{
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
-					targetVolume -= VOLUME_STEP;
-					if (targetVolume < VOLUME_MIN)
+					targetVolume -= p->volumeStep;
+					if (targetVolume < p->volumeMin)
 					{
-						targetVolume = VOLUME_MIN;
+						targetVolume = p->volumeMin;
 					}
 					isVolumeChanged = true;
 				}
@@ -178,11 +134,11 @@ namespace app
 				}
 
 				// 動的に数値をUIに設定
-				auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterSoundOptionMenuParameter>();
+				auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterSoundOptionMenuParameter>();
 
 				// MASTER/BGM/SEの場所
 				{
-					const float y = parameter->gaugeBarY[volumeCursolIndex_];
+					const float y = (volumeCursolIndex_ == 0) ? p->gaugeBarYA : (volumeCursolIndex_ == 1) ? p->gaugeBarYB : p->gaugeBarYC;
 					auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
 					cursol->transform.localPosition.y = y;
 				}
@@ -196,8 +152,8 @@ namespace app
 					}
 					// MASTERノブのX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						auto knobMASTER = GetUI<UIIcon>(Hash32("Knob_MASTER"));
 						const float x = minX + ((minX - maxX) * volumeMaster);
@@ -205,8 +161,8 @@ namespace app
 					}
 					// MASTERノブ背景のX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						auto knobBackGroundMASTER = GetUI<UIIcon>(Hash32("KnobBackground_MASTER"));
 						const float x = minX + ((minX - maxX) * volumeMaster);
@@ -216,7 +172,7 @@ namespace app
 					{
 						auto digitMASTER = GetUI<UIDigit>(Hash32("VolumeDigit_MASTER"));
 						if (digitMASTER) {
-							digitMASTER->SetNumber(static_cast<int>(std::round(volumeMaster * VOLUME_DISPLAY_MULTIPLIER)));
+							digitMASTER->SetNumber(static_cast<int>(std::round(volumeMaster * p->volumeDisplayMultiplier)));
 						}
 					}
 				}
@@ -231,8 +187,8 @@ namespace app
 					}
 					// BGMノブのX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						auto knobBGM = GetUI<UIIcon>(Hash32("Knob_BGM"));
 						const float x = minX + ((minX - maxX) * volumeBGM);
@@ -240,8 +196,8 @@ namespace app
 					}
 					// BGMノブ背景のX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						auto knobBackGroundBGM = GetUI<UIIcon>(Hash32("KnobBackground_BGM"));
 						const float x = minX + ((minX - maxX) * volumeBGM);
@@ -251,7 +207,7 @@ namespace app
 					{
 						auto digitBGM = GetUI<UIDigit>(Hash32("VolumeDigit_BGM"));
 						if (digitBGM) {
-							digitBGM->SetNumber(static_cast<int>(std::round(volumeBGM * VOLUME_DISPLAY_MULTIPLIER)));
+							digitBGM->SetNumber(static_cast<int>(std::round(volumeBGM * p->volumeDisplayMultiplier)));
 						}
 					}
 				}
@@ -266,8 +222,8 @@ namespace app
 					}
 					// SEノブのX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						// 四角の場所 ＝ minX + ((maxX - minX) * ボリュームパーセント)
 						// ※ (maxX - minX) = 長さ
@@ -278,8 +234,8 @@ namespace app
 					}
 					// SEノブ背景のX座標
 					{
-						const float minX = parameter->gaugeBarX[0];
-						const float maxX = parameter->gaugeBarX[10];
+						const float minX = p->gaugeBarXA;
+						const float maxX = p->gaugeBarXK;
 
 						auto knobBackGroundSE = GetUI<UIIcon>(Hash32("KnobBackground_SE"));
 						const float x = minX + ((minX - maxX) * volumeSE);
@@ -289,7 +245,7 @@ namespace app
 					{
 						auto digitSE = GetUI<UIDigit>(Hash32("VolumeDigit_SE"));
 						if (digitSE) {
-							digitSE->SetNumber(static_cast<int>(std::round(volumeSE * VOLUME_DISPLAY_MULTIPLIER)));
+							digitSE->SetNumber(static_cast<int>(std::round(volumeSE * p->volumeDisplayMultiplier)));
 						}
 					}
 				}
@@ -305,7 +261,7 @@ namespace app
 		void SoundOptionMenu::OnOpen()
 		{
 			isPause_ = true;
-			
+
 			//キャンバス
 			{
 				auto* canvas = GetCanvas();
@@ -360,12 +316,19 @@ namespace app
 					//if (closeAnim) closeAnim->Play();
 					});
 			}
-			
+
 		}
 
 
 		void SoundOptionMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterSoundOptionMenuParameter>();
+			const Vector3 p_selection_color(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 p_default_color(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 p_text_scale(p->textScaleX, p->textScaleY, p->textScaleZ);
+			const Vector3 p_digit_scale(p->digitScaleX, p->digitScaleY, p->digitScaleZ);
+			const Vector3 p_default_scale(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto* textMASTER = GetUI<app::ui::UIIcon>(Hash32("Text_MASTER"));
 			auto* textBGM = GetUI<app::ui::UIIcon>(Hash32("Text_BGM"));
@@ -381,73 +344,74 @@ namespace app
 				&& digitMASTER)
 			{
 				/** リセット: 黄色から白 */
-				textBGM->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				textSE->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitBGM->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitSE->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textBGM->color.Set(p_default_color);
+				textSE->color.Set(p_default_color);
+				digitBGM->color.Set(p_default_color);
+				digitSE->color.Set(p_default_color);
 				/** リセット: 等倍に戻す */
-				textBGM->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				textSE->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitBGM->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitSE->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textBGM->transform.localScale = p_default_scale;
+				textSE->transform.localScale = p_default_scale;
+				digitBGM->transform.localScale = p_default_scale;
+				digitSE->transform.localScale = p_default_scale;
 
 				/** 黄色 */
-				textMASTER->color.Set(Vector3(1.0f, 1.0f, 0.0f));
-				digitMASTER->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textMASTER->color.Set(p_selection_color);
+				digitMASTER->color.Set(p_selection_color);
 				/** スケール拡大 */
-				textMASTER->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
-				digitMASTER->transform.localScale = Vector3(1.5f, 1.5f, 0.0f);
+				textMASTER->transform.localScale = p_text_scale;
+				digitMASTER->transform.localScale = p_digit_scale;
 			}
 			else if (volumeCursolIndex_ == static_cast<int>(app::SoundManager::SoundVolumeType::BGM)
 				&& textBGM
 				&& digitBGM)
 			{
 				/** リセット: 黄色から白 */
-				textMASTER->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				textSE->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitMASTER->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitSE->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textMASTER->color.Set(p_default_color);
+				textSE->color.Set(p_default_color);
+				digitMASTER->color.Set(p_default_color);
+				digitSE->color.Set(p_default_color);
 				/** リセット: 等倍に戻す */
-				textMASTER->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				textSE->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitMASTER->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitSE->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textMASTER->transform.localScale = p_default_scale;
+				textSE->transform.localScale = p_default_scale;
+				digitMASTER->transform.localScale = p_default_scale;
+				digitSE->transform.localScale = p_default_scale;
 
 				/** 黄色 */
-				textBGM->color.Set(Vector3(1.0f, 1.0f, 0.0f));
-				digitBGM->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textBGM->color.Set(p_selection_color);
+				digitBGM->color.Set(p_selection_color);
 				/** スケール拡大 */
-				textBGM->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
-				digitBGM->transform.localScale = Vector3(1.5f, 1.5f, 0.0f);
+				textBGM->transform.localScale = p_text_scale;
+				digitBGM->transform.localScale = p_digit_scale;
 			}
 			else if (volumeCursolIndex_ == static_cast<int>(app::SoundManager::SoundVolumeType::SE)
 				&& textSE
 				&& digitSE)
 			{
 				/** リセット: 黄色から白 */
-				textMASTER->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				textBGM->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitMASTER->color.Set(Vector3(1.0f, 1.0f, 1.0f));
-				digitBGM->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textMASTER->color.Set(p_default_color);
+				textBGM->color.Set(p_default_color);
+				digitMASTER->color.Set(p_default_color);
+				digitBGM->color.Set(p_default_color);
 				/** リセット: 等倍に戻す */
-				textMASTER->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				textBGM->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitMASTER->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				digitBGM->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
-				
+				textMASTER->transform.localScale = p_default_scale;
+				textBGM->transform.localScale = p_default_scale;
+				digitMASTER->transform.localScale = p_default_scale;
+				digitBGM->transform.localScale = p_default_scale;
+
 
 				/** 黄色 */
-				textSE->color.Set(Vector3(1.0f, 1.0f, 0.0f));
-				digitSE->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textSE->color.Set(p_selection_color);
+				digitSE->color.Set(p_selection_color);
 				/** スケール拡大 */
-				textSE->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
-				digitSE->transform.localScale = Vector3(1.5f, 1.5f, 0.0f);
+				textSE->transform.localScale = p_text_scale;
+				digitSE->transform.localScale = p_digit_scale;
 			}
 		}
 
 
 		void SoundOptionMenu::InitializeLogic()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterSoundOptionMenuParameter>();
 			// サウンドバーの位置情報設定
 			// アニメーションとかいれたり
 			/** キャンバス（UI全体) */
@@ -468,15 +432,15 @@ namespace app
 					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeIn"));
 					app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(cursol, Hash32("FadeOut"));
 					app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(cursol, Hash32("ScaleUp"));
-					
-					
+
+
 					seq = new app::ui::UIAnimationSequence();
 					seq->Add(Hash32("FadeIn"));
-						//.Add(Hash32("ScaleUp"))
-						//.Add(Hash32("FadeOut"));
-					
+					//.Add(Hash32("ScaleUp"))
+					//.Add(Hash32("FadeOut"));
 
-					// アニメーションを再生
+
+				// アニメーションを再生
 					seq->Play(cursol);
 				}
 			}
@@ -501,9 +465,9 @@ namespace app
 			}
 			//初期位置
 			{
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::Master, VOLUME_DEFAULT_MASTER);
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::BGM, VOLUME_DEFAULT_BGM);
-				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::SE, VOLUME_DEFAULT_SE);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::Master, p->volumeDefaultMaster);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::BGM, p->volumeDefaultBgm);
+				app::SoundManager::Get().SetVolume(app::SoundManager::SoundVolumeType::SE, p->volumeDefaultSe);
 			}
 		}
 	}

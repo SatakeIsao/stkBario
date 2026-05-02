@@ -8,11 +8,14 @@
 #include "TitleScene.h"
 #include "ui/ResultMenu.h"
 #include "sound/SoundManager.h"
+#include "core/ParameterManager.h"
+
+
+
 
 
 GameClearScene::GameClearScene()
-{
-}
+{}
 
 
 GameClearScene:: ~GameClearScene()
@@ -46,16 +49,16 @@ void GameClearScene::Update()
 
 
 void GameClearScene::Render(RenderContext& rc)
-{
-}
+{}
 
 
 bool GameClearScene::RequestScene(uint32_t& id, float& waitTime)
 {
+	auto* sceneParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>();
 	if (m_requestSceneId != INVALID_SCENE_ID)
 	{
 		id = m_requestSceneId;
-		waitTime = 3.0f;
+		waitTime = sceneParam->sceneTransitionWaitTime;
 		return true;
 	}
 	return false;

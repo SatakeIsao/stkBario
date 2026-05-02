@@ -5,6 +5,8 @@
         "jumpMoveSpeed": 20,
         "jumpPower":30,
         "radius": 15,
-        "height": 1
+        "height": 1,
+        "ghostbodyPosYOffset": 2,
+        "fallDeathThresholdPosY": -200
     }
 ]

@@ -275,8 +275,6 @@ namespace app
 			Vector3 knockBackDirection_ = Vector3::Zero;
 			/** AI用のタイマー */
 			float aiTimer_ = 0.0f;
-			/** 最初の待機時間 */
-			const float WAIT_TIME = 1.0f;
 			/** 踏まれたか */
 			bool isSquashed_ = false;
 			/** 視野角に入ったか */

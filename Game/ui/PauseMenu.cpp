@@ -12,30 +12,22 @@ namespace
 	static app::ui::UIAnimationSequence* seq = nullptr;
 }
 
-namespace app 
+namespace app
 {
 	namespace ui
 	{
 		PauseMenu::PauseMenu()
 		{
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterPauseMenuParameter>("Assets/master/PauseMenuParameter.json", [](const nlohmann::json& j, app::core::MasterPauseMenuParameter& p)
-				{
-					//TODO; X座標もやりたいなぁ
-					p.cursolPositionX[0] = j["cursolPositionXA"];
-					p.cursolPositionX[1] = j["cursolPositionXB"];
-
-					p.cursolPositionY[0] = j["cursolPositionYA"];
-					p.cursolPositionY[1] = j["cursolPositionYB"];
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 		PauseMenu::~PauseMenu()
-		{
-			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterPauseMenuParameter>();
-		}
+		{}
 
 		void PauseMenu::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterPauseMenuParameter>();
+
 			auto* canvas = GetCanvas();
 			if (canvas)
 			{
@@ -63,9 +55,9 @@ namespace app
 			{
 				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 				cursolIndex_++;
-				if (cursolIndex_ >= 1)
+				if (cursolIndex_ >= p->maxCursolIndex)
 				{
-					cursolIndex_ = 1;
+					cursolIndex_ = p->maxCursolIndex;
 				}
 			}
 			if (g_pad[0]->IsTrigger(enButtonUp))
@@ -79,15 +71,15 @@ namespace app
 			}
 
 			// 動的に数値をUIに設定
-			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterPauseMenuParameter>();
+			//auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterPauseMenuParameter>();
 			// 音を変える/タイトルにもどるテキストの場所
 			{
-				const float x = parameter->cursolPositionX[cursolIndex_];
+				const float x = (cursolIndex_ == 0) ? p->cursolPositionXA : p->cursolPositionXB;
 				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.x = x;
 			}
 			{
-				const float y = parameter->cursolPositionY[cursolIndex_];
+				const float y = (cursolIndex_ == 0) ? p->cursolPositionYA : p->cursolPositionYB;
 				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.y = y;
 			}
@@ -175,6 +167,12 @@ namespace app
 
 		void PauseMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::MasterPauseMenuParameter>();
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const int MAX_CURSOL_INDEX = p->maxCursolIndex;
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto* textSound = GetUI<app::ui::UIIcon>(Hash32("text_ChangeTheSound"));
 			auto* textTitle = GetUI<app::ui::UIIcon>(Hash32("text_ReturnToTitle"));
@@ -184,27 +182,27 @@ namespace app
 				&& textSound)
 			{
 				/** リセット: 黄色から白 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textTitle->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textTitle->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textTitle->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textSound->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textSound->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textSound->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textSound->transform.localScale = SELECTION_SCALE;
 			}
-			else if (cursolIndex_ == 1
+			else if (cursolIndex_ == p->maxCursolIndex
 				&& textTitle)
 			{
 				/** リセット: 黄色から白 */
-				textSound->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textSound->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textSound->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textSound->transform.localScale = SELECTION_SCALE;
 
 				/** 黄色 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textTitle->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textTitle->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textTitle->transform.localScale = SELECTION_SCALE;
 			}
 		}
 

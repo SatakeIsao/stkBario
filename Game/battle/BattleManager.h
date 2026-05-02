@@ -30,7 +30,6 @@ namespace app
     namespace core
     {
         class PauseManagerObject;
-       // class GameOverManagerObject;
     }
     namespace effect
     {
@@ -82,58 +81,83 @@ namespace app
             // @todo for test
             LevelRender levelRender_;
 
+            /** バトルキャラクター */
             app::actor::BattleCharacter* battleCharacter_ = nullptr;
-            //app::actor::EventCharacter* eventCharacter_ = nullptr;
-            app::actor::CoinGimmick* coinGimmick_ = nullptr;
+            /** テスト用静的ギミックのリスト */
 			std::vector<app::actor::StaticGimmick*> testGimmickList_;
+            /** 土管ギミックのリスト */
             std::vector<app::actor::PipeGimmick*> pipeGimmickList_;
+            /** コインギミックのリスト */
             std::vector<app::actor::CoinGimmick*> coinGimmickList_;
+            /** イベントキャラクター（スライム）のリスト */
             std::vector<app::actor::EventCharacter*> eventCharacterList_;
             
+            /** キャラクターの入力・移動を制御するステアリング */
             std::unique_ptr<app::actor::CharacterSteering> characterSteering_ = nullptr;
+            /** カメラの追従・制御を行うステアリング */
 			std::unique_ptr<app::camera::CameraSteering> cameraSteering_ = nullptr;
+            /** ゲームカメラのコントローラー参照 */
 			app::camera::RefCameraController gameCameraController_ = nullptr;
 
+            /** エフェクト管理オブジェクト */
             EffectManagerObject* effectManagerObject_ = nullptr;
+            /** ポーズ管理オブジェクト */
             app::core::PauseManagerObject* pauseManagerObject_ = nullptr;
 
+            /** HPバーUI */
             app::ui::HPBarObject* hpBarObject_ = nullptr;
+            /** コイン枚数UI */
             app::ui::CoinUIObject* coinUIObject_ = nullptr;
+            /** タイマーUI */
             app::ui::TimerUIObject* timerUIObject_ = nullptr;
+            /** バトル演出シーケンス */
             app::ui::BattleSequence* battleSequenceObject_ = nullptr;
 
-            nsK2EngineLow::SkyCube* skyCube_ = nullptr;									//スカイキューブのオブジェクト
+            /** スカイキューブのオブジェクト */
+            nsK2EngineLow::SkyCube* skyCube_ = nullptr;
             /** 通知リスト */
 			std::vector<std::unique_ptr<INotify>> notifyList_;
-
-            /** あとで書き換える */
-            //Test currentDown = Test::Compleate;
-            float countDownTimer_ = 3.0f;
-            // 残り時間;
-            float remainTime_ = 120.0f;
-            // ゴールの初期の高さを記憶する用
-            float baseGoalY_ = 0.0f;
-            // クールタイムを計るタイマー
-            float goalEffectTimer_ = 0.0f;
-
-            // コインの総数
-            int totalCoin_ = 0;
+            /** レイアウト */
             std::unique_ptr<app::ui::Layout> layout_;
 
+            /** バトル開始カウントダウンタイマー */
+            float countDownTimer_ = 3.0f;
+            /** バトルの残り時間（秒）; */
+            float remainTime_ = 120.0f;
+            /** ゴールエフェクト発生位置の基準Y座標 */ 
+            float baseGoalY_ = 0.0f;
+            /** ゴールエフェクトの発生クールタイムタイマー */
+            float goalEffectTimer_ = 0.0f;
+
+            /** 取得済みコインの総数 */
+            int totalCoin_ = 0;
+
+            /** パンチヒットエフェクトを再生済みか */
             bool hasPlayedPunchEffect_ = false;
-            /** 死亡したか */
+            /** プレイヤーが死亡したか */
             bool isPlayerDead_ = false;
+            /** ポーズ中か */
             bool isPause_ = false;
+            /** ゲームオーバーアニメーションが完了したか */
             bool isGameOverAnimFinished_ = false;
+            /** ゲームクリアアニメーションが完了したか */
             bool isGameClearAnimFinished_ = false;
+            /** ゲームオーバーUIの再生を開始済みか */
             bool hasStartedGameOverUI_ = false;
+            /** タイムアップ処理を実行済みか */
             bool isTimeUp_ = false;
+            /** 残り時間が点滅閾値を下回っているか */
             bool isBlinking_ = false;
+            /** タイマーのセパレーター（区切り演出）表示中か */
             bool isSeparator = false;
+            /** プレイヤーの入力を受け付けているか（バトルシーケンス終了後にtrue） */
             bool isInputEnabled_ = false;
 
+            /** ゴールオブジェクトのワールド座標 */
             Vector3 goalPosition_ = Vector3::Zero;
+            /** ゴールオブジェクトの回転 */
             Quaternion goalRotation_ = Quaternion::Identity;
+            /** ゴールオブジェクトが配置されているか */
             bool hasGoal_ = false;
 
         private:
@@ -226,7 +250,7 @@ namespace app
             }
 
         private:
-            void LoadParameter();
+           // void LoadParameter();
 
 
 
@@ -281,32 +305,5 @@ namespace app
             /** シングルトンインスタンス */
             static BattleManager* instance_;
         };
-
-
-        //class IPauseMenu : Noncopyable
-        //{
-        //public:
-        //    IPauseMenu() {}
-        //    virtual ~IPauseMenu() {}
-        //
-        //    virtual bool Start() = 0;
-        //    virtual void Update() = 0;
-        //    virtual void Render(RenderContext& rc) = 0;
-        //    virtual void CanChange(int& request) = 0;
-        //};
-        //
-        //
-        //
-        ///** ポーズメニュー表示 */
-        //class BattlePauseMenu : IPauseMenu
-        //{
-        //public:
-        //    enum EnPauseMenuType
-        //    {
-        //        enPauseMenuType_ReGame,
-        //        enPauseMenuType_Volume,
-        //
-        //    };
-        //};
     }
 }

@@ -1,19 +1,12 @@
 #include "stdafx.h"
-#include "HPBar.h"
+#include "InGameUI.h"
 #include "ui/Layout.h"
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
 #include "battle/BattleManager.h"
+#include "core/ParameterManager.h"
 
 
-namespace
-{
-	static const int MAX_HP = 8;
-	static const int MAX_TIME = 10;
-	static const float BOUNCE_DURACTION = 0.30f;
-	/** 点滅を開始するタイミングのしきい値 */
-	static const float HURRY_UP_TRIGGER_TIME = 30.0f;
-}
 
 namespace app
 {
@@ -26,31 +19,39 @@ namespace app
 		}
 
 		HPBarObject::~HPBarObject()
-		{
-		}
+		{}
 
 		void HPBarObject::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::InGameUiParameter>();
+			const Vector3 p_color_normal(p->colorHpMaxX, p->colorHpMaxY, p->colorHpMaxZ);
+			const Vector3 p_color_caution(p->colorCautionX, p->colorCautionY, p->colorCautionZ);
+			const Vector3 p_color_danger(p->colorDangerX, p->colorDangerY, p->colorDangerZ);
+			const Vector3 p_color_safe(p->colorSafeX, p->colorSafeY, p->colorSafeZ);
+			const Vector4 p_color_highscore(p->colorHighscoreX, p->colorHighscoreY, p->colorHighscoreZ, p->colorHighscoreW);
+			const Vector4 p_color_default(p->colorDefaultX, p->colorDefaultY, p->colorDefaultZ, p->colorDefaultW);
+			const Vector3 p_scale_default(p->scaleDefaultX, p->scaleDefaultY, p->scaleDefaultZ);
+
 			/** インデックス数に応じて表示/非表示切り替え */
 			if (layout_) {
 				auto* menu = layout_->GetMenu();
 				if (menu) {
 					/** 青色 */
-					Vector3 targetColor = Vector3(0.0f, 0.569f, 1.0f);
-					if (currentHP_ < 3) {
+					Vector3 targetColor = p_color_normal;
+					if (currentHP_ < p->thresholdLow) {
 						/** 緑色 */
-						targetColor = Vector3(1.0f, 0.0f, 0.0f);
+						targetColor = p_color_danger;
 					}
-					else if (currentHP_ < 5) {
+					else if (currentHP_ < p->thresholdMid) {
 						/** 黄色 */
-						targetColor = Vector3(1.0f, 1.0f, 0.0f);
+						targetColor = p_color_caution;
 					}
-					else if (currentHP_ < 7) {
+					else if (currentHP_ < p->thresholdHigh) {
 						/** 赤色 */
-						targetColor = Vector3(0.0f, 1.0f, 0.0f);
+						targetColor = p_color_safe;
 					}
 
-					for (int i = 1; i <= MAX_HP; i++) {
+					for (int i = 1; i <= p->maxHp; i++) {
 						/** 文字列を作成 */
 						std::string name = "HPBar_" + std::to_string(i);
 
@@ -65,9 +66,9 @@ namespace app
 							bool isVisible = (i <= currentHP_);
 
 							/** 色をイージングで変える場合は以下のように */
-							float targetAlpha = isVisible ? 1.0f : 0.15f;
+							float targetAlpha = isVisible ? p->alphaActive : p->alphaInactive;
 							float currentAlpha = barIcon->color.w;
-							float newAlpha = currentAlpha + (targetAlpha - currentAlpha) * 0.1f;
+							float newAlpha = currentAlpha + (targetAlpha - currentAlpha) * p->lerpSpeed;
 							barIcon->color.w = newAlpha;
 
 							barIcon->color.x = targetColor.x;
@@ -100,11 +101,19 @@ namespace app
 		}
 
 		CoinUIObject::~CoinUIObject()
-		{
-		}
-	
+		{}
+
 		void CoinUIObject::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::InGameUiParameter>();
+			const Vector3 p_color_normal(p->colorHpMaxX, p->colorHpMaxY, p->colorHpMaxZ);
+			const Vector3 p_color_caution(p->colorCautionX, p->colorCautionY, p->colorCautionZ);
+			const Vector3 p_color_danger(p->colorDangerX, p->colorDangerY, p->colorDangerZ);
+			const Vector3 p_color_safe(p->colorSafeX, p->colorSafeY, p->colorSafeZ);
+			const Vector4 p_color_highscore(p->colorHighscoreX, p->colorHighscoreY, p->colorHighscoreZ, p->colorHighscoreW);
+			const Vector4 p_color_default(p->colorDefaultX, p->colorDefaultY, p->colorDefaultZ, p->colorDefaultW);
+			const Vector3 p_scale_default(p->scaleDefaultX, p->scaleDefaultY, p->scaleDefaultZ);
+
 			auto* menu = layout_->GetMenu();
 			if (menu)
 			{
@@ -114,10 +123,10 @@ namespace app
 					coinDigit->SetZeroPadding(true);
 					coinDigit->SetNumber(currentCoin_);
 
-					if (currentCoin_ >= 10)
+					if (currentCoin_ >= p->colorChangeCount)
 					{
 						/** ハイスコアで黄色を増す */
-						coinDigit->color = Vector4(1.3f, 1.3f, 0.0f, 1.0f);
+						coinDigit->color = p_color_highscore;
 					}
 
 					// バウンド中の処理
@@ -125,8 +134,8 @@ namespace app
 					{
 						bounceTime_ += g_gameTime->GetFrameDeltaTime();
 
-						if (bounceState_ == BounceState::enUp 
-							&& bounceTime_ >= 0.15f)
+						if (bounceState_ == BounceState::enUp
+							&& bounceTime_ >= p->bounceUpLimit)
 						{
 							bounceState_ = BounceState::enDown;
 
@@ -151,8 +160,8 @@ namespace app
 								animDown->Play();
 							}
 						}
-						else if (bounceState_ == BounceState::enDown 
-							&& bounceTime_ >= 0.30f)
+						else if (bounceState_ == BounceState::enDown
+							&& bounceTime_ >= p->bounceTotalDuration)
 						{
 							bounceState_ = BounceState::enStop;
 
@@ -215,7 +224,8 @@ namespace app
 			layout_ = std::make_unique<app::ui::Layout>();
 			layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/timerLayout.json");
 
-			timer_ = MAX_TIME;
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::InGameUiParameter>();
+			timer_ = p->maxTime;
 		}
 
 		TimerUIObject::~TimerUIObject()
@@ -223,30 +233,39 @@ namespace app
 
 		void TimerUIObject::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::InGameUiParameter>();
+			const Vector3 p_color_normal(p->colorHpMaxX, p->colorHpMaxY, p->colorHpMaxZ);
+			const Vector3 p_color_caution(p->colorCautionX, p->colorCautionY, p->colorCautionZ);
+			const Vector3 p_color_danger(p->colorDangerX, p->colorDangerY, p->colorDangerZ);
+			const Vector3 p_color_safe(p->colorSafeX, p->colorSafeY, p->colorSafeZ);
+			const Vector4 p_color_highscore(p->colorHighscoreX, p->colorHighscoreY, p->colorHighscoreZ, p->colorHighscoreW);
+			const Vector4 p_color_default(p->colorDefaultX, p->colorDefaultY, p->colorDefaultZ, p->colorDefaultW);
+			const Vector3 p_scale_default(p->scaleDefaultX, p->scaleDefaultY, p->scaleDefaultZ);
+
 			// 0未満にならないように制限
 			if (timer_ <= 0.0f) {
 				timer_ = 0.0f;
 			}
 
 			// タイマーが巻き戻った時（リトライなど）にフラグをリセット
-			if (timer_ > 100.0f) hasPulsed100_ = false;
-			if (timer_ > 50.0f)  hasPulsed50_ = false;
-			if (timer_ > 30.0f)  hasPulsed30_ = false;
+			if (timer_ > p->triggerPulse100) hasPulsed100_ = false;
+			if (timer_ > p->triggerPulse50)  hasPulsed50_ = false;
+			if (timer_ > p->triggerPulse30)  hasPulsed30_ = false;
 
-			// ① 100秒になった瞬間
-			if (timer_ <= 100.0f && !hasPulsed100_) {
+			// 100秒になった瞬間
+			if (timer_ <= p->triggerPulse100 && !hasPulsed100_) {
 				hasPulsed100_ = true;
 				bounceState_ = BounceState::enUp;
 				bounceTime_ = 0.0f;
 			}
-			// ② 50秒になった瞬間
-			else if (timer_ <= 50.0f && !hasPulsed50_) {
+			// 50秒になった瞬間
+			else if (timer_ <= p->triggerPulse50 && !hasPulsed50_) {
 				hasPulsed50_ = true;
 				bounceState_ = BounceState::enUp;
 				bounceTime_ = 0.0f;
 			}
-			// ③ 30秒になった瞬間
-			else if (timer_ <= 30.0f && !hasPulsed30_) {
+			// 30秒になった瞬間
+			else if (timer_ <= p->triggerPulse30 && !hasPulsed30_) {
 				hasPulsed30_ = true;
 				bounceState_ = BounceState::enUp;
 				bounceTime_ = 0.0f;
@@ -257,11 +276,12 @@ namespace app
 			{
 				bounceTime_ += g_gameTime->GetFrameDeltaTime();
 
-				if (bounceState_ == BounceState::enUp && bounceTime_ >= 0.2f) {
+				if (bounceState_ == BounceState::enUp && bounceTime_ >= p->pulseUpDuration) {
 					bounceState_ = BounceState::enDown;
 				}
-				else if (bounceState_ == BounceState::enDown && bounceTime_ >= 0.4f) {
-					bounceState_ = BounceState::enStop; // ここで止める
+				else if (bounceState_ == BounceState::enDown && bounceTime_ >= p->pulseTotalDuration) {
+					// 停止
+					bounceState_ = BounceState::enStop;
 				}
 			}
 
@@ -349,16 +369,16 @@ namespace app
 							if (animFast && animFast->IsPlay()) animFast->Stop();
 
 							if (timer_ <= 0.0f) {
-								timerDigit->color = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 0秒は赤固定
+								timerDigit->color = p_color_danger;	// 0秒は赤固定
 							}
 							else {
-								timerDigit->color = Vector4::White; // 通常は白固定
+								timerDigit->color = p_color_default;	// 通常は白固定
 							}
 						}
 					}
 				}
-				
-			
+
+
 				/** アイコン (timerUI) の処理 */
 				{
 					auto timerUI = menu->GetUI<app::ui::UIIcon>(Hash32("timerUI"));
@@ -396,7 +416,7 @@ namespace app
 							auto* animDown = timerUI->FindAnimation(Hash32("timerPulseScaleDown"));
 							if (animDown && animDown->IsPlay()) animDown->Stop();
 
-							timerUI->transform.scale = Vector3::One; // スケールを1.0に戻す
+							timerUI->transform.scale = p_scale_default; // スケールを1.0に戻す
 						}
 
 
@@ -433,15 +453,15 @@ namespace app
 							if (animFast && animFast->IsPlay()) animFast->Stop();
 
 							if (timer_ <= 0.0f) {
-								timerUI->color = Vector4(1.0f, 0.0f, 0.0f, 1.0f); // 0秒は赤固定
+								timerUI->color = p_color_danger;	// 0秒は赤固定
 							}
 							else {
-								timerUI->color = Vector4::White; // 通常は白固定
+								timerUI->color = p_color_default; // 通常は白固定
 							}
 						}
 					}
 				}
-				
+
 			}
 			layout_->Update();
 		}

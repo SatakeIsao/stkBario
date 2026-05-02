@@ -37,6 +37,7 @@ private:
 
 	TitleSceneState state_ = TitleSceneState::TitleMenu;
 
+	/** Bボタン長押し経過時間 */
 	float bButtonHoldTime_ = 0.0f;
 	/** サブメニューを開いた直後のフレームは入力を無視するフラグ */
 	bool isSubMenuJustOpened_ = false;

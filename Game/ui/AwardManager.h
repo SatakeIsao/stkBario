@@ -55,12 +55,7 @@ namespace app
 
 
             // プレイヤーがジャンプした時にPlayerクラスから呼ぶ
-            void AddJumpCount() {
-                jumpCount_++;
-                // 規定回数に達したらその場でフラグを立てる
-                if (jumpCount_ == 5)  SetAward(AwardType::enJumpingFrog);
-                if (jumpCount_ == 10) SetAward(AwardType::enBouncingRabbit);
-            }
+            void AddJumpCount();
 
             // オプション画面で音量をいじった時にUIManagerから呼ぶ
             void OnSoundAdjusted() {

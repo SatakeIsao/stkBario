@@ -177,7 +177,7 @@
     <ClCompile Include="memory\Allocator.cpp">
       <Filter>memory</Filter>
     </ClCompile>
-    <ClCompile Include="ui\HPBar.cpp" />
+    <ClCompile Include="ui\InGameUi.cpp" />
     <ClCompile Include="scene\GameOverScene.cpp" />
     <ClCompile Include="scene\GameClearScene.cpp" />
     <ClCompile Include="scene\BattleScene.cpp" />
@@ -194,6 +194,8 @@
     <ClCompile Include="ui\ManualMenu.cpp" />
     <ClCompile Include="ui\AwardMenu.cpp" />
     <ClCompile Include="ui\AwardManager.cpp" />
+    <ClCompile Include="util\BinaryParameterTest.cpp" />
+    <ClCompile Include="core\ParameterLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -356,7 +358,7 @@
     <ClInclude Include="..\..\..\Users\t-sugahara\Desktop\ParallelFor\ParallelFor\GameTask.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="ui\HPBar.h" />
+    <ClInclude Include="ui\InGameUI.h" />
     <ClInclude Include="scene\GameOverScene.h" />
     <ClInclude Include="scene\GameClearScene.h" />
     <ClInclude Include="scene\BattleScene.h" />
@@ -375,11 +377,17 @@
     <ClInclude Include="ui\ManualMenu.h" />
     <ClInclude Include="ui\AwardMenu.h" />
     <ClInclude Include="ui\AwardManager.h" />
+    <ClInclude Include="util\BinaryParameterTest.h" />
+    <ClInclude Include="core\BinaryParameterLoader.h" />
+    <ClInclude Include="core\ParameterLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\ui\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="util\convert_parameters.py" />
   </ItemGroup>
 </Project>

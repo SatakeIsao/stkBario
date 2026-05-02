@@ -1,0 +1,27 @@
+[
+    {
+        "comment": "バトルシーケンスのパラメータ",
+        
+        "delayWaitTime": 0.5,
+        "readyDisplayTime": 2.0,
+        "goDisplayTime": 1.5,
+        "goFadeStartTime": 1.0,
+
+        "gameoverFirstDown": 0.30,
+        "gameoverFirstUp": 0.20,
+        "gameoverSecondDown": 0.20,
+        "gameoverSecondUp": 0.15,
+        "gameoverThirdDown": 1.15,
+
+        "gameclearPopUpTime": 1.20,
+        "gameclearShrinkTime": 0.85,
+        "gameclearWaitTime": 2.00,
+
+        "timeupSlideInTime": 0.20,
+        "timeupSlideBackTime": 0.15,
+        "timeupWaitTime": 2.0,
+
+        "stageMaxSlimes": 6,
+        "stageMaxCoins": 15
+    }
+]

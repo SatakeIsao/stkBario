@@ -16,24 +16,21 @@ namespace app
 	{
 		ReturnToTitleMenu::ReturnToTitleMenu()
 		{
-			app::core::ParameterManager::Get().LoadParameter<app::core::ReturnToTitleMenuParameter>("Assets/master/ReturnToTitleMenuParameter.json", [](const nlohmann::json& j, app::core::ReturnToTitleMenuParameter& p)
-				{
-					//TODO; X座標もやりたいなぁ
-					p.cursolPositionX[0] = j["cursolPositionXA"];
-					p.cursolPositionX[1] = j["cursolPositionXB"];
-
-					p.cursolPositionY[0] = j["cursolPositionYA"];
-					p.cursolPositionY[1] = j["cursolPositionYB"];
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 		ReturnToTitleMenu:: ~ReturnToTitleMenu()
-		{
-			app::core::ParameterManager::Get().UnloadParameter<app::core::ReturnToTitleMenuParameter>();
-		}
+		{}
 
 		void ReturnToTitleMenu::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ReturnToTitleMenuParameter>();
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const int MAX_CURSOL_INDEX = p->maxCursolIndex;
+
 			auto* canvas = GetCanvas();
 			if (canvas)
 			{
@@ -61,9 +58,9 @@ namespace app
 			{
 				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 				cursolIndex_++;
-				if (cursolIndex_ >= 1)
+				if (cursolIndex_ >= MAX_CURSOL_INDEX)
 				{
-					cursolIndex_ = 1;
+					cursolIndex_ = MAX_CURSOL_INDEX;
 				}
 			}
 			if (g_pad[0]->IsTrigger(enButtonUp))
@@ -83,7 +80,7 @@ namespace app
 				isDecidedYes_ = true;
 			}
 			/** いいえをえらぶ */
-			if (cursolIndex_ == 1
+			if (cursolIndex_ == MAX_CURSOL_INDEX
 				&& g_pad[0]->IsTrigger(enButtonA))
 			{
 				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
@@ -98,12 +95,12 @@ namespace app
 			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::ReturnToTitleMenuParameter>();
 			// はい/いいえテキストの場所
 			{
-				const float x = parameter->cursolPositionX[cursolIndex_];
+				const float x = (cursolIndex_ == 0) ? parameter->cursolPositionXA : parameter->cursolPositionXB;
 				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.x = x;
 			}
 			{
-				const float y = parameter->cursolPositionY[cursolIndex_];
+				const float y = (cursolIndex_ == 0) ? parameter->cursolPositionYA : parameter->cursolPositionYB;
 				auto cursol = GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.y = y;
 			}
@@ -186,6 +183,13 @@ namespace app
 
 		void ReturnToTitleMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ReturnToTitleMenuParameter>();
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const int MAX_CURSOL_INDEX = p->maxCursolIndex;
+
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto* textYes = GetUI<app::ui::UIIcon>(Hash32("text_Yes"));
 			auto* textNo = GetUI<app::ui::UIIcon>(Hash32("text_No"));
@@ -195,27 +199,27 @@ namespace app
 				&& textYes)
 			{
 				/** リセット: 黄色から白 */
-				textNo->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textNo->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textNo->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textNo->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textYes->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textYes->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textYes->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textYes->transform.localScale = SELECTION_SCALE;
 			}
-			else if (cursolIndex_ == 1
+			else if (cursolIndex_ == MAX_CURSOL_INDEX
 				&& textNo)
 			{
 				/** リセット: 黄色から白 */
-				textYes->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textYes->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textYes->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textYes->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textNo->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textNo->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textNo->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textNo->transform.localScale = SELECTION_SCALE;
 			}
 		}
 

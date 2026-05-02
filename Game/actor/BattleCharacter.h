@@ -48,7 +48,7 @@ namespace app
 			}
 
 
-			BattleCharacterStateMachine* GetStateMachine()
+			BattleCharacterStateMachine* GetStateMachine() const
 			{
 				return stateMachine_.get();
 			}

@@ -5,11 +5,8 @@
 #include "ui/AwardManager.h"
 #include "battle/BattleManager.h"
 #include "sound/SoundManager.h"
+#include "core/ParameterManager.h"
 
-namespace
-{
-	static app::ui::UIAnimationSequence* seq = nullptr;
-}
 
 namespace app
 {
@@ -17,6 +14,15 @@ namespace app
 	{
 		BattleSequence::BattleSequence()
 		{
+			// タイマー初期値をパラメーターから設定
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>();
+			delayTimer_ = p->delayWaitTime;
+			maxCountDownTimer_ = p->readyDisplayTime;
+			goTimer_ = p->goDisplayTime;
+			gameOverTimer_ = 0.0f;
+			gameClearTimer_ = 0.0f;
+			timeUpTimer_ = 0.0f;
+
 			layout_ = std::make_unique<app::ui::Layout>();
 			layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/BattleSequenceMenuLayout.json");
 			currentDown_ = SequenceName::Wait;
@@ -33,8 +39,7 @@ namespace app
 		}
 
 		BattleSequence::~BattleSequence()
-		{
-		}
+		{}
 
 		void BattleSequence::Update()
 		{
@@ -56,10 +61,6 @@ namespace app
 						auto* readyIcon = menu->GetUI<UIIcon>(Hash32("Ready"));
 						if (readyIcon)
 						{
-							//seq = new app::ui::UIAnimationSequence();
-							//seq->Add(Hash32("ScaleUp_Ready"));
-							//seq->Play(readyIcon);
-
 							/** DEBUG_TEST: UIAnimシーケンスで再生したい */
 							{
 								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(readyIcon, Hash32("ScaleUp_Ready"));
@@ -102,7 +103,7 @@ namespace app
 			else if (currentDown_ == SequenceName::GO)
 			{
 				goTimer_ -= g_gameTime->GetFrameDeltaTime();
-				if (goTimer_ <= 1.0f
+				if (goTimer_ <= app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>()->goFadeStartTime
 					&& !hasPlayedGoFadeOut_)
 				{
 					hasPlayedGoFadeOut_ = true;
@@ -134,6 +135,7 @@ namespace app
 			}
 			else if (currentDown_ == SequenceName::GameOver)
 			{
+				auto* p_seq = app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>();
 				if (menu)
 				{
 					auto* gameOverIcon = menu->GetUI<UIIcon>(Hash32("GameOver"));
@@ -143,68 +145,71 @@ namespace app
 					{
 						gameOverTimer_ += g_gameTime->GetFrameDeltaTime();
 
-						// 1. 最初の落下(FirstDown)完了 (JSONのduration: 0.30秒)
-						if (bounceState_ == BounceState::enFirstDown && gameOverTimer_ >= 0.30f)
+						// 最初の落下(FirstDown)完了 (JSONのduration: 0.30秒)
+						if (bounceState_ == BounceState::enFirstDown && gameOverTimer_ >= p_seq->gameoverFirstDown)
 						{
 							bounceState_ = BounceState::enFirstUp;
-							gameOverTimer_ = 0.0f; // ★ここが超重要！タイマーをリセット
+							/** リセット */
+							gameOverTimer_ = 0.0f;
 
 							gameOverIcon->RemoveAnimation(Hash32("GameOverBounceDownY"));
 							app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(gameOverIcon, Hash32("GameOverBounceUpY"));
 							auto* anim = gameOverIcon->FindAnimation(Hash32("GameOverBounceUpY"));
-							/** TODO: あとでSE変更 */
+							/** 効果音再生 */
 							app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::GameOver));
 							if (anim) anim->Play();
 						}
-						// 2. 1回目の上昇(FirstUp)完了 (JSONのduration: 0.20秒)
-						else if (bounceState_ == BounceState::enFirstUp && gameOverTimer_ >= 0.20f)
+						// 1回目の上昇(FirstUp)完了 (JSONのduration: 0.20秒)
+						else if (bounceState_ == BounceState::enFirstUp && gameOverTimer_ >= p_seq->gameoverFirstUp)
 						{
 							bounceState_ = BounceState::enSecondDown;
-							gameOverTimer_ = 0.0f; // ★リセット
+							/** リセット */
+							gameOverTimer_ = 0.0f;
 
 							gameOverIcon->RemoveAnimation(Hash32("GameOverBounceUpY"));
 							app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(gameOverIcon, Hash32("GameOverBounceSecondDownY"));
 							auto* anim = gameOverIcon->FindAnimation(Hash32("GameOverBounceSecondDownY"));
 							if (anim) anim->Play();
 						}
-						// 3. 2回目の落下(SecondDown)完了 (JSONのduration: 0.20秒)
-						else if (bounceState_ == BounceState::enSecondDown && gameOverTimer_ >= 0.20f)
+						// 2回目の落下(SecondDown)完了 (JSONのduration: 0.20秒)
+						else if (bounceState_ == BounceState::enSecondDown && gameOverTimer_ >= p_seq->gameoverSecondDown)
 						{
 							bounceState_ = BounceState::enSecondUp;
-							gameOverTimer_ = 0.0f; // ★リセット
+							/** リセット */
+							gameOverTimer_ = 0.0f;
 
 							gameOverIcon->RemoveAnimation(Hash32("GameOverBounceSecondDownY"));
 							app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(gameOverIcon, Hash32("GameOverBounceSecondUpY"));
 							auto* anim = gameOverIcon->FindAnimation(Hash32("GameOverBounceSecondUpY"));
 							if (anim) anim->Play();
 						}
-						// 4. 2回目の上昇(SecondUp)完了 (JSONのduration: 0.15秒)
-						else if (bounceState_ == BounceState::enSecondUp && gameOverTimer_ >= 0.15f)
+						// 2回目の上昇(SecondUp)完了 (JSONのduration: 0.15秒)
+						else if (bounceState_ == BounceState::enSecondUp && gameOverTimer_ >= p_seq->gameoverSecondUp)
 						{
 							bounceState_ = BounceState::enThirdDown;
-							gameOverTimer_ = 0.0f; // ★リセット
+							/** リセット */
+							gameOverTimer_ = 0.0f;
 
 							gameOverIcon->RemoveAnimation(Hash32("GameOverBounceSecondUpY"));
 							app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(gameOverIcon, Hash32("GameOverBounceThirdDownY"));
 							auto* anim = gameOverIcon->FindAnimation(Hash32("GameOverBounceThirdDownY"));
 							if (anim) anim->Play();
 						}
-						// 5. 3回目の落下(ThirdDown)完了 (JSONのduration: 0.15秒)
-						else if (bounceState_ == BounceState::enThirdDown && gameOverTimer_ >= 1.15f)
+						// 3回目の落下(ThirdDown)完了 (JSONのduration: 0.15秒)
+						else if (bounceState_ == BounceState::enThirdDown && gameOverTimer_ >= p_seq->gameoverThirdDown)
 						{
 							bounceState_ = BounceState::enStop;
 
 							auto* anim = gameOverIcon->FindAnimation(Hash32("GameOverBounceThirdDownY"));
 							if (anim) anim->Stop();
 							app::battle::BattleManager::Get().SetGameOverAnimFinished(true);
-							//isGameOverAnimFinished_ = true;
-							//currentDown_ = SequenceName::Finished;
 						}
 					}
 				}
 			}
 			else if (currentDown_ == SequenceName::GameClear)
 			{
+				auto* p_seq = app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>();
 				if (menu)
 				{
 					auto* gameClearIcon = menu->GetUI<UIIcon>(Hash32("GameClear"));
@@ -215,11 +220,12 @@ namespace app
 						{
 							gameClearTimer_ += g_gameTime->GetFrameDeltaTime();
 
-							// 1. 拡大(PopUp)完了 (JSONのduration: 0.20秒)
-							if (gameClearState_ == GameClearState::enPopUp && gameClearTimer_ >= 1.20f)
+							// 拡大(PopUp)完了 (JSONのduration: 0.20秒)
+							if (gameClearState_ == GameClearState::enPopUp && gameClearTimer_ >= p_seq->gameclearPopUpTime)
 							{
 								gameClearState_ = GameClearState::enShrinkBack;
-								gameClearTimer_ = 0.0f; // ★タイマーリセット
+								/** リセット */
+								gameClearTimer_ = 0.0f;
 
 								gameClearIcon->RemoveAnimation(Hash32("GameClearScalePopUp"));
 								app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("GameClearScaleShrink"));
@@ -227,21 +233,22 @@ namespace app
 								if (anim) anim->Play();
 							}
 							// 縮小完了
-							else if (gameClearState_ == GameClearState::enShrinkBack && gameClearTimer_ >= 0.85f)
+							else if (gameClearState_ == GameClearState::enShrinkBack && gameClearTimer_ >= p_seq->gameclearShrinkTime)
 							{
 								gameClearState_ = GameClearState::enWait;
-								gameClearTimer_ = 0.0f; // タイマーリセット
+								/** リセット */
+								gameClearTimer_ = 0.0f;
 
 								auto* anim = gameClearIcon->FindAnimation(Hash32("GameClearScaleShrink"));
 								if (anim) anim->Stop();
 							}
 							// 待機完了
-							else if (gameClearState_ == GameClearState::enWait && gameClearTimer_ >= 2.00f)
+							else if (gameClearState_ == GameClearState::enWait && gameClearTimer_ >= p_seq->gameclearWaitTime)
 							{
-								//isGameOverAnimFinished_ = true;
 								gameClearState_ = GameClearState::enStop;
-								gameClearTimer_ = 0.0f; // タイマーリセット
-							
+								/** リセット */
+								gameClearTimer_ = 0.0f;
+
 								// ここでリザルト画面への遷移や、フェードアウトアニメーションを再生する
 								app::battle::BattleManager::Get().SetGameClearAnimFinished(true);
 
@@ -252,50 +259,23 @@ namespace app
 									float maxTime = 120.0f;
 									float clearTime = maxTime - battleMgr.GetRemainTime();
 
-									// ステージ内の最大数 (※仮の数字です。必要に応じて調整してください)
-									const int maxSlimes = 6;
-									const int maxCoins = 15;
-
-									// マネージャーに最終報告！
+									// マネージャーに最終報告
 									app::ui::AwardManager::Get().CheckResultAwards(
 										battleMgr.GetPlayerHP(),  // 残りHP
 										clearTime,                // かかった時間
-										maxSlimes,                // ステージのスライム総数
-										maxCoins,                 // ステージのコイン総数
+										p_seq->stageMaxSlimes,         // ステージのスライム総数
+										p_seq->stageMaxCoins,          // ステージのコイン総数
 										battleMgr.GetTotalCoin()  // 実際に集めたコイン数
 									);
 								}
 							}
 						}
-
-						///// アニメーションをアタッチ
-						///app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("GameClearScalePopUp"));
-						///app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("GameClearScaleShrink"));
-						///app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("ScaleUp"));
-						///
-						///seq_ = std::make_unique<app::ui::UIAnimationSequence>();
-						///seq_->Add(Hash32("GameClearScalePopUp"));
-						///seq_->Add(Hash32("GameClearScaleShrink"));
-						///
-						///
-						////** すべて表示されたら再生 */
-						///// アニメーションを再生
-						///seq_->Play(gameClearIcon);
-						///
-						/////gameClearIcon->RemoveAnimation(Hash32("ScaleUp_Go"));
-						/////app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("ScaleUp_Go"));
-						/////auto* anim = gameClearIcon->FindAnimation(Hash32("ScaleUp_Go"));
-						/////if (anim) anim->Play();
 					}
 				}
-
-				//if (gameClearTimer_ <= 0.0f)
-				//{
-				//	currentDown_ = SequenceName::Wait;
-				//}
 			}
 			else if (currentDown_ == SequenceName::TimeUp)
 			{
+				auto* p_seq = app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>();
 				if (menu)
 				{
 					auto* timeUpIcon = menu->GetUI<UIIcon>(Hash32("TimeUp"));
@@ -305,8 +285,8 @@ namespace app
 						{
 							timeUpTimer_ += g_gameTime->GetFrameDeltaTime();
 
-							// 1. スライドイン（行き過ぎ）完了
-							if (timeUpState_ == TimeUpState::enSlideIn && timeUpTimer_ >= 0.20f)
+							// スライドイン（行き過ぎ）完了
+							if (timeUpState_ == TimeUpState::enSlideIn && timeUpTimer_ >= p_seq->timeupSlideInTime)
 							{
 								timeUpState_ = TimeUpState::enSlideBack;
 								timeUpTimer_ = 0.0f;
@@ -314,12 +294,12 @@ namespace app
 								timeUpIcon->RemoveAnimation(Hash32("TimeUpSlideIn"));
 								app::ui::UIAnimationFactory::Attach<app::ui::UITranslateAniamtion>(timeUpIcon, Hash32("TimeUpSlideBack"));
 								auto* anim = timeUpIcon->FindAnimation(Hash32("TimeUpSlideBack"));
-								/** TODO: あとでSE変更 */
+								/** 効果音再生 */
 								app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::TimeUp));
 								if (anim) anim->Play();
 							}
-							// 2. 戻り完了（その後一定時間待つ）
-							else if (timeUpState_ == TimeUpState::enSlideBack && timeUpTimer_ >= 0.15f)
+							// 戻り完了（その後一定時間待つ）
+							else if (timeUpState_ == TimeUpState::enSlideBack && timeUpTimer_ >= p_seq->timeupSlideBackTime)
 							{
 								timeUpState_ = TimeUpState::enWait;
 								timeUpTimer_ = 0.0f;
@@ -327,8 +307,8 @@ namespace app
 								auto* anim = timeUpIcon->FindAnimation(Hash32("TimeUpSlideBack"));
 								if (anim) anim->Stop();
 							}
-							// 3. アニメーション完了後、2秒ほど待ってからシーン遷移フラグを立てる
-							else if (timeUpState_ == TimeUpState::enWait && timeUpTimer_ >= 2.0f)
+							// アニメーション完了後、2秒ほど待ってからシーン遷移フラグを立てる
+							else if (timeUpState_ == TimeUpState::enWait && timeUpTimer_ >= p_seq->timeupWaitTime)
 							{
 								timeUpState_ = TimeUpState::enStop;
 								app::battle::BattleManager::Get().SetTimeUpAnimFinished(true);
@@ -337,59 +317,18 @@ namespace app
 					}
 				}
 			}
-			
-			///** ゴールしたら */
-			//if(g_pad[0]->IsTrigger(enButtonLB1))
-			//{
-			//	currentDown_ = SequenceName::GameClear;
-			//	// ★追加：ステートとタイマーを初期化
-			//	gameClearState_ = GameClearState::enPopUp;
-			//	gameClearTimer_ = 0.0f;
-			//
-			//	// ★追加：最初のアニメーション（PopUp）をここでアタッチして再生開始！
-			//	if (menu)
-			//	{
-			//		auto* gameClearIcon = menu->GetUI<UIIcon>(Hash32("GameClear"));
-			//		if (gameClearIcon)
-			//		{
-			//			app::ui::UIAnimationFactory::Attach<app::ui::UIScaleAnimation>(gameClearIcon, Hash32("GameClearScalePopUp"));
-			//			auto* anim = gameClearIcon->FindAnimation(Hash32("GameClearScalePopUp"));
-			//			/** TODO: あとでSE変更 */
-			//			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
-			//			if (anim) anim->Play();
-			//		}
-			//	}
-			//}
-
-			/** タイマーが0になったら */
-			//if(g_pad[0]->IsTrigger(enButtonY)
-			//	|| )
-			//{
-			//	currentDown_ = SequenceName::TimeUp;
-			//}
 
 
-			///** PlayerのHP0になったら */
-			//if (g_pad[0]->IsTrigger(enButtonX)
-			//	)
-			//{
-			//	GetPlayAnimation();
-			//	currentDown_ = SequenceName::GameOver;
-			//}
-
-
-			// 毎フレーム安全にUIを取得し、表示状態を上書きする
-			//auto* menu = layout_->GetMenu();
+			// 毎フレーム安全にUIを取得し、表示状態を上書き
 			if (menu)
 			{
-				// 事前計算したハッシュ値を使うので超高速
 				auto* readyIcon = menu->GetUI<UIIcon>(Hash32("Ready"));
 				auto* goIcon = menu->GetUI<UIIcon>(Hash32("Go"));
 				auto* gameOverIcon = menu->GetUI<UIIcon>(Hash32("GameOver"));
 				auto* gameClearIcon = menu->GetUI<UIIcon>(Hash32("GameClear"));
 				auto* timeUpIcon = menu->GetUI<UIIcon>(Hash32("TimeUp"));
 
-				// isDraw フラグを使って物理的に描画をON/OFFする
+				// isDraw フラグを使って物理的に描画をON/OFF
 				if (currentDown_ == SequenceName::Wait || currentDown_ == SequenceName::Finished)
 				{
 					if (readyIcon) readyIcon->isDraw = false;
@@ -479,7 +418,7 @@ namespace app
 
 		void BattleSequence::StartGameOver()
 		{
-			// 何度も呼ばれないように、現在の状態がGameOverでない時だけ実行する
+			// 何度も呼ばれないように、現在の状態がGameOverでない時だけ実行
 			if (currentDown_ != SequenceName::GameOver)
 			{
 				currentDown_ = SequenceName::GameOver;
@@ -509,6 +448,7 @@ namespace app
 				}
 			}
 		}
+
 		void BattleSequence::StartGameClear()
 		{
 			if (currentDown_ != SequenceName::GameClear)
@@ -519,7 +459,7 @@ namespace app
 				gameClearState_ = GameClearState::enPopUp;
 				gameClearTimer_ = 0.0f;
 
-				// 最初のアニメーション（PopUp）をここでアタッチして再生開始！
+				// 最初のアニメーション（PopUp）をここでアタッチして再生開始
 				auto* menu = layout_->GetMenu();
 				if (menu)
 				{

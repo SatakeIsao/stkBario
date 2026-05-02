@@ -22,19 +22,7 @@ namespace app
 				layout_ = std::make_unique<app::ui::Layout>();
 				layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/titleMenu.json");
 			}
-			app::core::ParameterManager::Get().LoadParameter<app::core::TitleMenuParameter>("Assets/master/TitleMenuParameter.json", [](const nlohmann::json& j, app::core::TitleMenuParameter& p)
-				{
-					//TODO; X座標もやりたいなぁ
-					p.cursolPositionX[0] = j["cursolPositionXA"];
-					p.cursolPositionX[1] = j["cursolPositionXB"];
-					p.cursolPositionX[2] = j["cursolPositionXC"];
-					p.cursolPositionX[3] = j["cursolPositionXD"];
-
-					p.cursolPositionY[0] = j["cursolPositionYA"];
-					p.cursolPositionY[1] = j["cursolPositionYB"];
-					p.cursolPositionY[2] = j["cursolPositionYC"];
-					p.cursolPositionY[3] = j["cursolPositionYD"];
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 		TitleMenu::~TitleMenu()
@@ -79,9 +67,9 @@ namespace app
 				{
 					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 					cursolIndex_++;
-					if (cursolIndex_ >= 3)
+					if (cursolIndex_ >= app::core::ParameterManager::Get().GetParameter<app::core::TitleMenuParameter>()->maxCursolIndex)
 					{
-						cursolIndex_ = 3;
+						cursolIndex_ = app::core::ParameterManager::Get().GetParameter<app::core::TitleMenuParameter>()->maxCursolIndex;
 					}
 				}
 				if (g_pad[0]->IsTrigger(enButtonUp))
@@ -101,12 +89,14 @@ namespace app
 			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::TitleMenuParameter>();
 			// 音を変える/タイトルにもどるテキストの場所
 			{
-				const float x = parameter->cursolPositionX[cursolIndex_];
+				const float cursolXArr[] = { parameter->cursolPositionXA, parameter->cursolPositionXB, parameter->cursolPositionXC, parameter->cursolPositionXD };
+				const float x = cursolXArr[cursolIndex_];
 				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.x = x;
 			}
 			{
-				const float y = parameter->cursolPositionY[cursolIndex_];
+				const float cursolYArr[] = { parameter->cursolPositionYA, parameter->cursolPositionYB, parameter->cursolPositionYC, parameter->cursolPositionYD };
+				const float y = cursolYArr[cursolIndex_];
 				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.y = y;
 			}
@@ -298,7 +288,7 @@ namespace app
 			if (textPush)
 			{
 				textPush->isDraw = true;
-				
+
 				app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(textPush, Hash32("FadeIn"));
 
 				// アニメーションを取得して再生
@@ -312,6 +302,12 @@ namespace app
 
 		void TitleMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::TitleMenuParameter>();
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const int MAX_CURSOL_INDEX = p->maxCursolIndex;
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto textStart = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_start"));
 			auto textHowToPlay = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_howToPlay"));
@@ -323,61 +319,61 @@ namespace app
 				&& textStart)
 			{
 				/** リセット: 黄色から白 */
-				textHowToPlay->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textHowToPlay->color.Set(SELECTION_COLOR);
 				/** リセット: 等倍に戻す */
-				textHowToPlay->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textHowToPlay->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textStart->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textStart->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textStart->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textStart->transform.localScale = SELECTION_SCALE;
 			}
 			else if (cursolIndex_ == 1
 				&& textHowToPlay)
 			{
 				/** リセット: 黄色から白 */
-				textStart->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textStart->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textStart->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textStart->transform.localScale = DEFAULT_SCALE;
 				/** リセット: 黄色から白 */
-				textAward->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textAward->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textAward->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textAward->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textHowToPlay->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textHowToPlay->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textHowToPlay->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textHowToPlay->transform.localScale = SELECTION_SCALE;
 			}
 			else if (cursolIndex_ == 2
 				&& textAward)
 			{
 				/** リセット: 黄色から白 */
-				textHowToPlay->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textHowToPlay->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textHowToPlay->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textHowToPlay->transform.localScale = DEFAULT_SCALE;
 				/** リセット: 黄色から白 */
-				textExit->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textExit->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textExit->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textExit->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textAward->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textAward->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textAward->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textAward->transform.localScale = SELECTION_SCALE;
 			}
-			else if (cursolIndex_ == 3
+			else if (cursolIndex_ == MAX_CURSOL_INDEX
 				&& textExit)
 			{
 				/** リセット: 黄色から白 */
-				textAward->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textAward->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textAward->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textAward->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textExit->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textExit->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textExit->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textExit->transform.localScale = SELECTION_SCALE;
 			}
 		}
 

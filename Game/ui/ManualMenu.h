@@ -16,10 +16,9 @@ namespace app
 			std::unique_ptr <app::ui::Layout> layout_;
 			/** 長押し経過時間 */
 			float holdTimer_ = 0.0f;
-			/** 長押し完了までの時間（秒） */
-			float holdMaxTime_ = 0.95f;
 
 			int cursolIndex_ = 0;
+
 			bool isOpenJustNow_ = false;
 		public:
 			ManualMenu();

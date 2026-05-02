@@ -1,4 +1,4 @@
-/**
+﻿/**
  * BattleManager.cpp
  * バトル管理
  */
@@ -16,9 +16,10 @@
 #include "camera/CameraManager.h"
 #include "camera/CameraController.h"
 #include "core/ParameterManager.h"
+#include "core/ParameterLoader.h"
 #include "collision/GhostBodyManager.h"
 #include "collision/CollisionHitManager.h"
-#include "ui/HPBar.h"
+#include "ui/InGameUI.h"
 #include "ui/BattleSequence.h"
 #include "ui/AwardManager.h"
 #include "effect/EffectManager.h"
@@ -34,8 +35,42 @@ namespace
 	constexpr const char* MASTER_BATTLE_CAMERA_PARAM_PATH = "Assets/master/battle/MasterBattleCameraParameter.json";
 	constexpr const char* MASTER_BATTLE_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterBattleCharacterParameter.json";
 	constexpr const char* MASTER_EVENT_CHARACTER_PARAM_PATH = "Assets/master/battle/MasterEventCharacterParameter.json";
+	constexpr const char* MASTER_EVENT_CHARACTER_AI_PARAM_PATH = "Assets/master/battle/MasterEventCharacterAIParameter.json";
 
 	static const int MAX_HP = 8;
+
+	// 配置オフセット関連
+	/** コインの配置Y座標オフセット */
+	constexpr float COIN_Y_OFFSET = -20.0f;
+	/** コイン取得エフェクトのY座標オフセット */
+	constexpr float COIN_EFFECT_Y_OFFSET = 10.0f;
+
+	// ゴール演出関連
+	/** ゴールの配置Y座標オフセット（地面への埋め込み調整） */
+	constexpr float SPAWN_Y_OFFSET = -100.0f;
+	/** ゴールエフェクトの毎秒上昇量 */
+	constexpr float GOAL_EFFECT_RISE_SPEED = 50.0f;
+	/** ゴールエフェクトの最大上昇量（ベースYからのオフセット） */
+	constexpr float GOAL_EFFECT_MAX_HEIGHT = 100.0f;
+	/** ゴールエフェクトの再生クールタイム（秒） */
+	constexpr float GOAL_EFFECT_COOLTIME = 1.3f;
+	/** ゴールエフェクトのスケール */
+	static const Vector3 GOAL_EFFECT_SCALE = { 3.0f, 3.0f, 3.0f };
+	/** ゴール判定に入る距離 */
+	constexpr float GOAL_TRIGGER_DISTANCE = 50.0f;
+
+	// タイマー演出関連
+	/** 点滅開始・BGM切り替えを行う残り時間（秒） */
+	constexpr float BLINK_TIME_THRESHOLD = 30.0f;
+	/** セパレーター表示区間1：開始残り時間 */
+	constexpr float SEPARATOR_TIME_100_START = 100.0f;
+	/** セパレーター表示区間1：終了残り時間 */
+	constexpr float SEPARATOR_TIME_100_END = 97.0f;
+	/** セパレーター表示区間2：開始残り時間 */
+	constexpr float SEPARATOR_TIME_50_START = 50.0f;
+	/** セパレーター表示区間2：終了残り時間 */
+	constexpr float SEPARATOR_TIME_50_END = 47.0f;
+
 
 	// Player用
 	static app::actor::CharacterInitializeParameter sPlayerInitializeParameter = app::actor::CharacterInitializeParameter([](app::actor::CharacterInitializeParameter* parameter)
@@ -119,13 +154,11 @@ namespace app
 		{
 			DeleteGO(skyCube_);
 			DeleteGO(battleCharacter_);
-			//DeleteGO(eventCharacter_);
 			DeleteGO(hpBarObject_);
 			DeleteGO(coinUIObject_);
 			DeleteGO(timerUIObject_);
 			DeleteGO(effectManagerObject_);
 			DeleteGO(pauseManagerObject_);
-			//DeleteGO(gameOverManagerObject_);
 			DeleteGO(battleSequenceObject_);
 
 			for (auto& test : testGimmickList_)
@@ -149,6 +182,10 @@ namespace app
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterStageParameter>();
 			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleCharacterParameter>();
+			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterBattleCameraParameter>();
+			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterEventCharacterParameter>();
+			app::core::ParameterManager::Get().UnloadParameter<app::core::MasterEventCharacterAIParameter>();
+
 			app::collision::GhostBodyManager::Get().ClearCallback();
 			app::collision::CollisionHitManager::Finalize();
 			app::gimmick::WarpSystem::Finalize();
@@ -157,8 +194,15 @@ namespace app
 
 		void BattleManager::Start()
 		{
-			// パラメーター読み込み
-			LoadParameter();
+			// バイナリパラメーター読み込み
+			app::core::ParameterLoader::LoadAll();
+
+			// デバッグ確認（問題解決後に削除）
+			K2_ASSERT(
+				app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>() != nullptr,
+				"BattleSequenceParameter が読み込まれていません"
+			);
+
 			//エフェクトマネージャーオブジェクト
 			{
 				effectManagerObject_ = NewGO<EffectManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
@@ -244,7 +288,7 @@ namespace app
 					if (objData.ForwardMatchName(L"CoinGimmick") == true) {
 						app::actor::CoinGimmick* coinGimmick = NewGO<app::actor::CoinGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "coinGimmick");
 						coinGimmick->transform.localPosition = (objData.position);
-						coinGimmick->transform.localPosition.y -= 20.0f;
+						coinGimmick->transform.localPosition.y += COIN_Y_OFFSET;
 						coinGimmick->transform.UpdateTransform();
 						coinGimmick->Initialize("Assets/ModelData/item/coin/coin.tkm", 0, Vector3::Down);
 						coinGimmickList_.push_back(coinGimmick);
@@ -287,7 +331,7 @@ namespace app
 						// エフェクトはここでは再生せず、座標と回転だけを保存する
 						{
 							goalPosition_ = objData.position;
-							goalPosition_.y -= 100.0f;
+							goalPosition_.y += SPAWN_Y_OFFSET;
 							goalRotation_ = objData.rotation;
 							baseGoalY_ = goalPosition_.y;
 							hasGoal_ = true;
@@ -297,7 +341,7 @@ namespace app
 							app::actor::StaticGimmick* stage = NewGO<app::actor::StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "Goal");
 							stage->transform.position = (objData.position);
 							// Y座標を100.0f下げる処理を追加
-							stage->transform.position.y -= 100.0f;
+							stage->transform.position.y += SPAWN_Y_OFFSET;
 
 							stage->transform.rotation = (objData.rotation);
 
@@ -402,7 +446,7 @@ namespace app
 			}
 			// BGM再生
 			{
-				app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
+				//app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
 			}
 			// 称号マネージャー
 			{
@@ -466,10 +510,10 @@ namespace app
 			if (hasGoal_)
 			{
 				// エフェクトの発生位置を毎フレーム上に移動
-				goalPosition_.y += 50.0f * g_gameTime->GetFrameDeltaTime();
+				goalPosition_.y += GOAL_EFFECT_RISE_SPEED * g_gameTime->GetFrameDeltaTime();
 
 				// ある程度の高さまで行ったら元の高さに戻す
-				if (goalPosition_.y > baseGoalY_ + 100.0f)
+				if (goalPosition_.y > baseGoalY_ + GOAL_EFFECT_MAX_HEIGHT)
 				{
 					goalPosition_.y = baseGoalY_;
 				}
@@ -485,11 +529,11 @@ namespace app
 							enEffectKind_CircleGoal,
 							goalPosition_,
 							goalRotation_,
-							Vector3(3.0f, 3.0f, 3.0f)
+							GOAL_EFFECT_SCALE
 						);
 					}
 					// クールタイムをリセット
-					goalEffectTimer_ = 1.3f;
+					goalEffectTimer_ = GOAL_EFFECT_COOLTIME;
 				}
 
 				if (battleCharacter_)
@@ -505,8 +549,8 @@ namespace app
 					Vector3 diff = playerPos - targetGoalPos;
 					float distance = diff.Length();
 
-					// 距離が一定以内ならクリア！
-					if (distance < 50.0f)
+					// 距離が一定以内ならゲームクリア
+					if (distance < GOAL_TRIGGER_DISTANCE)
 					{
 						if (battleSequenceObject_) {
 							battleSequenceObject_->StartGameClear();
@@ -519,8 +563,8 @@ namespace app
 			if (remainTime_ > 0.0f) {
 				remainTime_ -= g_gameTime->GetFrameDeltaTime();
 				// 指定した時間帯の時だけ isSeparator を true
-				if ((remainTime_ <= 100.0f && remainTime_ > 97.0f) ||
-					(remainTime_ <= 50.0f && remainTime_ > 47.0f))
+				if ((SEPARATOR_TIME_100_START && SEPARATOR_TIME_100_END) ||
+					(SEPARATOR_TIME_50_START && SEPARATOR_TIME_50_END))
 				{
 					isSeparator = true;
 				}
@@ -530,7 +574,7 @@ namespace app
 				}
 
 				/** 30秒以下で点滅フラグON */
-				if (remainTime_ <= 30.0f && remainTime_ > 0.0f) {
+				if (remainTime_ <= BLINK_TIME_THRESHOLD && remainTime_ > 0.0f) {
 					// まだ点滅フラグがOFF（＝30秒以下になった最初の1フレーム）の時だけBGMを変更する
 					if (!isBlinking_) {
 						app::SoundManager::Get().StopBGM();
@@ -586,7 +630,7 @@ namespace app
 							// エフェクト再生
 							effectManagerObject_->PlayEffect(
 								enEffectKind_PlayerKnockBack,
-								coin->transform.position + Vector3(0.0f, 10.0f, 0.0f),
+								coin->transform.position + Vector3(0.0f, COIN_EFFECT_Y_OFFSET, 0.0f),
 								Quaternion::Identity,
 								Vector3::One
 							);
@@ -725,52 +769,75 @@ namespace app
 		}
 
 
-		void BattleManager::LoadParameter()
-		{
-			// バトル共通パラメーター読み込み
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleParameter>(MASTER_BATTLE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleParameter& p)
-				{
-					p.battleTime = json["battleTime"].get<float>();
-				});
-			// ステージ共通パラメーター読み込み
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterStageParameter>(MASTER_STAGE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterStageParameter& p)
-				{
-					p.gravity = json["gravity"].get<float>();
-					p.fallLimitY = json["fallLimitY"].get<float>();
-					p.friction = json["friction"].get<float>();
-					p.warpStartScale = json["warpStartScale"].get<float>();
-					p.warpEndScale = json["warpEndScale"].get<float>();
-					p.warpTime = json["warpTime"].get<float>();
-				});
-			// バトルカメラパラメーター読み込み
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCameraParameter>(MASTER_BATTLE_CAMERA_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCameraParameter& p)
-				{
-					p.distance = json["distance"].get<float>();
-					p.height = json["height"].get<float>();
-					p.fov = json["fov"].get<float>();
-					p.nearClip = json["nearClip"].get<float>();
-					p.farClip = json["farClip"].get<float>();
-					p.rotationX = json["rotationX"].get<float>();
-					p.rotationY = json["rotationY"].get<float>();
-				});
-			// バトルキャラクターパラメーター読み込み
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)
-				{
-					p.moveSpeed = json["moveSpeed"].get<float>();
-					p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
-					p.jumpPower = json["jumpPower"].get<float>();
-					p.radius = json["radius"].get<float>();
-					p.height = json["height"].get<float>();
-				});
-			// イベントキャラクターパラメーター読み込み
-			app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterParameter>(MASTER_EVENT_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterParameter& p)
-				{
-					p.moveSpeed = json["moveSpeed"].get<float>();
-					p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
-					p.jumpPower = json["jumpPower"].get<float>();
-					p.radius = json["radius"].get<float>();
-					p.height = json["height"].get<float>();
-				});
-		}
-	}
+		//void BattleManager::LoadParameter()
+		//{
+		//	// バトル共通パラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleParameter>(MASTER_BATTLE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleParameter& p)
+		//		{
+		//			p.battleTime = json["battleTime"].get<float>();
+		//		});
+		//	// ステージ共通パラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterStageParameter>(MASTER_STAGE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterStageParameter& p)
+		//		{
+		//			p.gravity = json["gravity"].get<float>();
+		//			p.fallLimitY = json["fallLimitY"].get<float>();
+		//			p.friction = json["friction"].get<float>();
+		//			p.warpStartScale = json["warpStartScale"].get<float>();
+		//			p.warpEndScale = json["warpEndScale"].get<float>();
+		//			p.warpTime = json["warpTime"].get<float>();
+		//			p.coinShrinkSpeed = json["coinShrinkSpeed"].get<float>();
+		//			p.coinRotationSpeed = json["coinRotationSpeed"].get<float>();
+		//			p.coinJumpInitVelocityY = json["coinJumpInitVelocityY"].get<float>();
+		//			p.coinCollisionRadius = json["coinCollisionRadius"].get<float>();
+		//			p.coinCollisionHeight = json["coinCollisionHeight"].get<float>();
+		//		});
+		//	// バトルカメラパラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCameraParameter>(MASTER_BATTLE_CAMERA_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCameraParameter& p)
+		//		{
+		//			p.distance = json["distance"].get<float>();
+		//			p.height = json["height"].get<float>();
+		//			p.fov = json["fov"].get<float>();
+		//			p.nearClip = json["nearClip"].get<float>();
+		//			p.farClip = json["farClip"].get<float>();
+		//			p.rotationX = json["rotationX"].get<float>();
+		//			p.rotationY = json["rotationY"].get<float>();
+		//		});
+		//	// バトルキャラクターパラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)
+		//		{
+		//			p.moveSpeed = json["moveSpeed"].get<float>();
+		//			p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
+		//			p.jumpPower = json["jumpPower"].get<float>();
+		//			p.radius = json["radius"].get<float>();
+		//			p.height = json["height"].get<float>();
+		//			p.ghostbodyPosYOffset = json["ghostbodyPosYOffset"].get<float>();
+		//			p.collisionRadiusOffset = json["collisionRadiusOffset"].get<float>();
+		//			p.collisionHeightOffset = json["collisionHeightOffset"].get<float>();
+		//		});
+		//	// イベントキャラクターパラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterParameter>(MASTER_EVENT_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterParameter& p)
+		//		{
+		//			p.moveSpeed = json["moveSpeed"].get<float>();
+		//			p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
+		//			p.jumpPower = json["jumpPower"].get<float>();
+		//			p.radius = json["radius"].get<float>();
+		//			p.height = json["height"].get<float>();
+		//			p.ghostbodyPosYOffset = json["ghostbodyPosYOffset"].get<float>();
+		//			p.fallDeathThresholdPosY = json["fallDeathThresholdPosY"].get<float>();
+		//		});
+		//	// イベントキャラクターAIパラメーター読み込み
+		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterAIParameter>(MASTER_EVENT_CHARACTER_AI_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterAIParameter& p)
+		//		{
+		//			p.knockbackJumpPower = json["knockbackJumpPower"].get<float>();
+		//			p.chaseDetectionRange = json["chaseDetectionRange"].get<float>();
+		//			p.chaseFieldOfViewDeg = json["chaseFieldOfViewDeg"].get<float>();
+		//			p.attackRange = json["attackRange"].get<float>();
+		//			p.chaseRange = json["chaseRange"].get<float>();
+		//			p.chaseAITimerInitial = json["chaseAITimerInitial"].get<float>();
+		//			p.patrolLeftTurnTime = json["patrolLeftTurnTime"].get<float>();
+		//			p.patrolRightTurnTime = json["patrolRightTurnTime"].get<float>();
+		//			p.waitTime = json["waitTime"].get<float>();
+		//		});
+		//}
+	}	//
 }

@@ -4,16 +4,12 @@
 #include "ui/Layout.h"
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
-#include "ui/HPBar.h"
+#include "ui/InGameUI.h"
 #include "scene/SceneManager.h"
 #include "AwardManager.h"
 #include "battle/BattleManager.h"
 #include "sound/SoundManager.h"
 
-namespace 
-{
-	constexpr const int MAX_TIME = 120.0f;
-}
 
 
 namespace app
@@ -28,17 +24,6 @@ namespace app
 				layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/resultMenu.json");
 			}
 			InitializeLogic();
-			
-			/** 使う所パッと思いつかないので一旦コメントアウト */
-			//app::core::ParameterManager::Get().LoadParameter<app::core::GameOverMenuParameter>("Assets/master/GameOverMenuParameter.json", [](const nlohmann::json& j, app::core::GameOverMenuParameter& p)
-			//	{
-			//		//TODO; X座標もやりたいなぁ
-			//		p.cursolPositionX[0] = j["cursolPositionXA"];
-			//		p.cursolPositionX[1] = j["cursolPositionXB"];
-			//
-			//		p.cursolPositionY[0] = j["cursolPositionYA"];
-			//		p.cursolPositionY[1] = j["cursolPositionYB"];
-			//	});
 		}
 
 		ResultMenu::~ResultMenu()
@@ -46,6 +31,12 @@ namespace app
 
 		void ResultMenu::Update()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ResultMenuParameter>();
+			const Vector3 p_selection_color(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 p_selection_scale(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 p_default_scale(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const Vector3 p_default_color(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector4 p_bonus_text_color(p->bonusTextColorX, p->bonusTextColorY, p->bonusTextColorZ, p->bonusTextColorW);
 			/** 処理負荷を考えてなんとかしたい */
 			if (seq_)   seq_->Update(g_gameTime->GetFrameDeltaTime());
 			if (seqTextNext_) seqTextNext_->Update(g_gameTime->GetFrameDeltaTime());
@@ -61,15 +52,15 @@ namespace app
 				sequenceTimer_ += g_gameTime->GetFrameDeltaTime();
 
 				// タイマーを強制的に進めてスキップ
-					if (g_pad[0]->IsTrigger(enButtonA)) {
-						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
-						sequenceTimer_ = 2.0f;
-					}
+				if (g_pad[0]->IsTrigger(enButtonA)) {
+					app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
+					sequenceTimer_ = 2.0f;
+				}
 
 				auto menu = layout_->GetMenu();
 				if (menu) {
 					// タイム
-					if (state_ == ResultState::Init && sequenceTimer_ >= 0.5f) {
+					if (state_ == ResultState::Init && sequenceTimer_ >= p->nextStepDelay) {
 						state_ = ResultState::Time;
 						sequenceTimer_ = 0.0f;
 						auto timeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("timeNumbers"));
@@ -78,7 +69,7 @@ namespace app
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// コイン
-					else if (state_ == ResultState::Time && sequenceTimer_ >= 0.5f) {
+					else if (state_ == ResultState::Time && sequenceTimer_ >= p->nextStepDelay) {
 						state_ = ResultState::Coin;
 						sequenceTimer_ = 0.0f;
 						auto coinNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("coinNumbers"));
@@ -86,7 +77,7 @@ namespace app
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// スライム
-					else if (state_ == ResultState::Coin && sequenceTimer_ >= 0.5f) {
+					else if (state_ == ResultState::Coin && sequenceTimer_ >= p->nextStepDelay) {
 						state_ = ResultState::Slime;
 						sequenceTimer_ = 0.0f;
 						auto slimeNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("slimeNumbers"));
@@ -94,7 +85,7 @@ namespace app
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// スコア
-					else if (state_ == ResultState::Slime && sequenceTimer_ >= 0.5f) {
+					else if (state_ == ResultState::Slime && sequenceTimer_ >= p->nextStepDelay) {
 						state_ = ResultState::Score;
 						sequenceTimer_ = 0.0f;
 						auto scoreNumbers = menu->GetUI<app::ui::UIDigit>(Hash32("scoreNumbers"));
@@ -103,7 +94,7 @@ namespace app
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// アワード
-					else if (state_ == ResultState::Score && sequenceTimer_ >= 1.0f) {
+					else if (state_ == ResultState::Score && sequenceTimer_ >= p->awardStepDelay) {
 						state_ = ResultState::Award;
 						sequenceTimer_ = 0.0f;
 						// 固定のアイコンではなく、記憶しておいたランダムなアイコンを再生する
@@ -111,7 +102,7 @@ namespace app
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Pop));
 					}
 					// ボタンを表示して完了
-					else if (state_ == ResultState::Award && sequenceTimer_ >=1.0f) {
+					else if (state_ == ResultState::Award && sequenceTimer_ >= p->awardStepDelay) {
 						state_ = ResultState::Finished;
 						sequenceTimer_ = 0.0f;
 						auto buttonA = menu->GetUI<app::ui::UIIcon>(Hash32("buttonA"));
@@ -143,6 +134,11 @@ namespace app
 
 		void ResultMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ResultMenuParameter>();
+			const Vector3 p_selection_color(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 p_selection_scale(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 p_default_scale(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
+			const Vector3 p_default_color(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto textRetry = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_retry"));
 			auto textTitle = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_ReturnToTitle"));
@@ -152,27 +148,27 @@ namespace app
 				&& textRetry)
 			{
 				/** リセット: 黄色から白 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textTitle->color.Set(p_default_color);
 				/** リセット: 等倍に戻す */
-				textTitle->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textTitle->transform.localScale = p_default_scale;
 
 				/** 黄色 */
-				textRetry->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textRetry->color.Set(p_selection_color);
 				/** スケール拡大 */
-				textRetry->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textRetry->transform.localScale = p_selection_scale;
 			}
 			else if (cursolIndex_ == 1
 				&& textTitle)
 			{
 				/** リセット: 黄色から白 */
-				textRetry->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textRetry->color.Set(p_default_color);
 				/** リセット: 等倍に戻す */
-				textRetry->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textRetry->transform.localScale = p_default_scale;
 
 				/** 黄色 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textTitle->color.Set(p_selection_color);
 				/** スケール拡大 */
-				textTitle->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textTitle->transform.localScale = p_selection_scale;
 			}
 		}
 
@@ -215,6 +211,8 @@ namespace app
 
 		void ResultMenu::InitializeLogic()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ResultMenuParameter>();
+			const Vector4 p_bonus_text_color(p->bonusTextColorX, p->bonusTextColorY, p->bonusTextColorZ, p->bonusTextColorW);
 			// サウンドバーの位置情報設定
 			// アニメーションとかいれたり
 			auto menu = layout_->GetMenu();
@@ -243,18 +241,11 @@ namespace app
 				coinNumbers->SetNumber(coin);
 			}
 
-			///** 残りタイムを経過タイムに変換 */
-			//if (timeNumbersBackground) {
-			//	const int timer = SceneManager::Get().GetCurrentTimer();
-			//
-			//	const int masterTimer = MAX_TIME - timer;
-			//	timeNumbersBackground->SetNumber(masterTimer);
-			//}
 			/** 残りタイムを経過タイムに変換 */
 			if (timeNumbers) {
 				const int timer = SceneManager::Get().GetCurrentTimer();
 
-				const int masterTimer = MAX_TIME - timer;
+				const int masterTimer = p->masterMaxTime - timer;
 				timeNumbers->SetNumber(masterTimer);
 			}
 
@@ -266,51 +257,34 @@ namespace app
 				coinNumbers->SetNumber(coin);
 
 				const int timer = SceneManager::Get().GetCurrentTimer();
-				int masterTimer = MAX_TIME - timer;
+				int masterTimer = p->masterMaxTime - timer;
 				timeNumbers->SetNumber(masterTimer);
 
-				/** しきい値 */
-				const int test = 100.0f;
-				int test2 = 0.0f;
+				int timerBonus = 0.0f;
 
-				if (masterTimer <= 30.0f)
+				if (masterTimer <= p->thresholdTimeRankS)
 				{
-					test2 = 3000.0f;
+					timerBonus = p->timeBonusRankS;
 
-					timeNumbers->color = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-					//if (timeNumbersBackground)
-					//{
-					//	timeNumbersBackground->RemoveAnimation(Hash32("ScaleUp_digits"));
-					//	timeNumbersBackground->RemoveAnimation(Hash32("ScaleDown_digits"));
-					//
-					//	// 冒頭でスケールがZeroになっているため、元のサイズ(1.0)に戻す
-					//	timeNumbersBackground->transform.localScale = Vector3(1.3f, 1.3f, 1.0);
-					//
-					//	// UIColorAnimationとしてFadeInをアタッチ
-					//	app::ui::UIAnimationFactory::Attach<app::ui::UIColorAnimation>(timeNumbersBackground, Hash32("FadeIn_NumberBackground"));
-					//
-					//	// アニメーションを取得して再生
-					//	auto* anim = timeNumbersBackground->FindAnimation(Hash32("FadeIn_NumberBackground"));
-					//	//if (anim) anim->Play();
-					//}
+					timeNumbers->color = p_bonus_text_color;
 				}
-				else if (masterTimer <= 60.0f)
+				else if (masterTimer <= p->thresholdTimeRankA)
 				{
-					test2 = 2500.0f;
+					timerBonus = p->timeBonusRankA;
 				}
-				else if (masterTimer <= 90.0f)
+				else if (masterTimer <= p->thresholdTimeRankB)
 				{
-					test2 = 2000.0f;
+					timerBonus = p->timeBonusRankB;
 				}
-				else if (masterTimer <= 120.0f)
+				else if (masterTimer <= p->thresholdTimeRankC)
 				{
-					test2 = 1000.0f;
+					timerBonus = p->timeBonusRankC;
 				}
 
-				coin *= test;
+				coin *= p->coinScoreWeight;
 
-				const int memory = (coin + test2);
-				scoreNumbers->SetNumber(memory);
+				const int finalScore = (coin + timerBonus);
+				scoreNumbers->SetNumber(finalScore);
 			}
 
 			/** カーソルUI */
