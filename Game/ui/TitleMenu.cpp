@@ -319,7 +319,7 @@ namespace app
 				&& textStart)
 			{
 				/** リセット: 黄色から白 */
-				textHowToPlay->color.Set(SELECTION_COLOR);
+				textHowToPlay->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
 				textHowToPlay->transform.localScale = DEFAULT_SCALE;
 
