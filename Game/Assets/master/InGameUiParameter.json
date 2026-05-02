@@ -1,0 +1,37 @@
+[
+    {
+        "comment": "インゲームUIのパラメータ",
+        
+        "maxHp": 8,
+        "maxTime": 10,
+        "bounceDuraction": 0.30,
+        "hurryUpTriggerTime": 30.0,
+
+        "colorHpMax": { "x": 0.0, "y": 0.569, "z": 1.0},
+        "colorCaution": { "x": 1.0, "y": 1.0, "z": 0.0},
+        "colorDanger": { "x": 1.0, "y": 0.0, "z": 0.0},
+        "colorSafe": { "x": 0.0, "y": 1.0, "z": 0.0},
+        "colorHighscore": { "x": 1.3, "y": 1.3, "z": 1.0, "w": 1.0},
+        "colorDefault": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0},
+
+        "thresholdLow": 3,
+        "thresholdMid": 5,
+        "thresholdHigh": 7,
+
+        "alphaActive": 1.0,
+        "alphaInactive": 0.15,
+        "lerpSpeed": 0.1,
+
+        "colorChangeCount": 10,
+        "bounceUpLimit": 0.15,
+        "bounceTotalDuration": 0.30,
+
+        "triggerPulse100": 100.0,
+        "triggerPulse50": 50.0,
+        "triggerPulse30": 30.0,
+
+        "pulseUpDuration": 0.2,
+        "pulseTotalDuration": 0.4,
+        "ScaleDefault": { "x": 1.0, "y": 1.0, "z": 1.0}
+    }
+]

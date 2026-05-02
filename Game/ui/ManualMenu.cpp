@@ -6,13 +6,17 @@
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
 
+
+
 namespace app
 {
 	namespace ui
 	{
 		ManualMenu::ManualMenu()
 		{
-			/** ゲームオーバーレイアウト */
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ManualMenuParameter>();
+
+			/** レイアウト */
 			{
 				layout_ = std::make_unique<app::ui::Layout>();
 				layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/ManualMenu.json");
@@ -20,20 +24,20 @@ namespace app
 
 			// 長押しゲージ初期化
 			{
-				holdGauge_.Init(nullptr, 90.0f, 90.0f);
-				holdGauge_.SetPosition({ 575.0f, -400.0f, 0.0f });
-				holdGauge_.SetInnerRadius(0.58f);
-				holdGauge_.SetOuterRadius(0.95f);
-				holdGauge_.SetScale(0.85f);
-				holdGauge_.SetFillColor({ 0.88f, 0.38f, 0.13f, 1.0f }); // オレンジ
-				holdGauge_.SetEmptyColor({ 0.0f, 0.0f, 0.0f, 1.0f });	// 黒
+				holdGauge_.Init(nullptr, p->bIconGaugeSizeX, p->bIconGaugeSizeY);
+				holdGauge_.SetPosition(Vector3(p->gaugePositionX, p->gaugePositionY, p->gaugePositionZ));
+				holdGauge_.SetInnerRadius(p->gaugeInnerRadius);
+				holdGauge_.SetOuterRadius(p->gaugeOuterRadius);
+				holdGauge_.SetScale(p->gaugeScale);
+				holdGauge_.SetFillColor(Vector4(p->gaugeFillColorX, p->gaugeFillColorY, p->gaugeFillColorZ, p->gaugeFillColorW));
+				holdGauge_.SetEmptyColor(Vector4(p->gaugeEmptyColorX, p->gaugeEmptyColorY, p->gaugeEmptyColorZ, p->gaugeEmptyColorW));
 			}
 
 			// アイコン
 			{
-				bIcon_.Init("Assets/ui/pause/volume/buttonB.DDS", 64.0f, 64.0f);
-				bIcon_.SetPosition({ 580.0f, -405.0f, 0.0f });
-				bIcon_.SetScale({ 1.0f,1.0f,1.0f });
+				bIcon_.Init("Assets/ui/pause/volume/buttonB.DDS", p->bIconButtonSizeX, p->bIconButtonSizeY);
+				bIcon_.SetPosition(Vector3(p->bIconPositionX, p->bIconPositionY, p->bIconPositionZ));
+				bIcon_.SetScale(Vector3(p->bIconScaleX, p->bIconScaleY, p->bIconScaleZ));
 			}
 		}
 
@@ -45,17 +49,20 @@ namespace app
 			layout_->Update();
 
 			// Bボタン長押し処理
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::ManualMenuParameter>();
+			const float HOLD_MAX_TIME = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>()->bButtonHoldThreshold;
+
 			if (g_pad[0]->IsPress(enButtonB))
 			{
 				holdTimer_ += g_gameTime->GetFrameDeltaTime();
-				holdTimer_ = min(holdTimer_, holdMaxTime_);
+				holdTimer_ = min(holdTimer_, HOLD_MAX_TIME);
 			}
 			else
 			{
 				holdTimer_ = 0.0f; // 離したらリセット
 			}
 
-			float progress = holdTimer_ / holdMaxTime_;
+			float progress = holdTimer_ / HOLD_MAX_TIME;
 			holdGauge_.SetFillAmount(progress);
 			holdGauge_.Update();
 
@@ -78,8 +85,7 @@ namespace app
 		{}
 
 		void ManualMenu::PlaySelectedAnimation()
-		{
-		}
+		{}
 
 		void ManualMenu::InitializeLogic()
 		{

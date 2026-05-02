@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "BattleCharacter.h"
 #include "ActorStatus.h"
-
+#include "core/ParameterManager.h"
 
 namespace app
 {
@@ -39,6 +39,8 @@ namespace app
 
 		void BattleCharacter::Update()
 		{
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterBattleCharacterParameter>();
+
 			if (isPause_) {	return; }
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
@@ -53,7 +55,7 @@ namespace app
 			transform.UpdateTransform();
 			stateMachine_->transform.position = nextPosition;
 
-			transform.localPosition.y += 30.0f;
+			transform.localPosition.y += parameter->ghostbodyPosYOffset;
 			ghostBody_->SetPosition(transform.localPosition);
 
 			SuperClass::Update();
@@ -68,6 +70,7 @@ namespace app
 
 		void BattleCharacter::Initialize(CharacterInitializeParameter& param)
 		{
+			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::MasterBattleCharacterParameter>();
 			param.Load();
 
 			const uint32_t animationCount = static_cast<uint32_t>(param.animationDataList.size());
@@ -80,13 +83,11 @@ namespace app
 			modelRender_ = std::make_unique<ModelRender>();
 			modelRender_->Init(param.modelName, animationClips_.data(), animationClips_.size());
 
-			/** DEBUG: スライムと座標同じだったのでテスト用でずらした */
-			//transform.position = Vector3::Zero;
-			transform.position = Vector3(0.0f,0.0f,-500.0f);
+			transform.position = Vector3::Zero;
 			transform.scale = Vector3::One;
 			transform.rotation = Quaternion::Identity;
 
-			ghostBody_->CreateCapsule(this, ID(), status_->GetRadius() + 15.0f, status_->GetHeight()+60.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+			ghostBody_->CreateCapsule(this, ID(), status_->GetRadius() + parameter->collisionRadiusOffset, status_->GetHeight() + parameter->collisionHeightOffset, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 		}
 	}
 }

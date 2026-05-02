@@ -12,6 +12,32 @@
 #include "ui/AwardManager.h"
 #include "sound/SoundManager.h"
 
+namespace
+{
+	// 移動・ノックバック関連
+	static const Vector3 KNOCKBACK_SQUASH_SCALE = { 1.0f,0.1f,1.0f };
+	constexpr float KNOCKBACK_INITIAL_SPEED = 500.0f;
+	constexpr float KNOCKBACK_DECELERATION_TIME = 1.0f;
+	constexpr float KNOCKBACK_END_LIMIT_TIME = 2.0f;
+	constexpr float LANDING_CHECK_DELAY = 0.1f;
+
+	// 攻撃（パンチ）関連
+	static const Vector3 ATTACK_EFFECT_SCALE = { 3.0f, 3.0f, 3.0f };
+	constexpr float ATTACK_GHOST_RADIUS = 20.0f;
+	constexpr float ATTACK_EFFECT_OFFSET_FORWARD = 30.0f;
+	constexpr float ATTACK_EFFECT_OFFSET_Y = 30.0f;
+	constexpr float PUNCH_GHOST_RADIUS = 45.0f;
+	constexpr float PUNCH_EFFECT_OFFSET_FORWARD = 30.0f;
+	constexpr float FORWARD_VECTOR_LENGTH_THRESHOLD = 0.1f;
+
+	// タイム・期間関連
+	constexpr float ATTACK_STATE_CHANGE_THRESHOLD = 3.0f;
+	constexpr float DEAD_STATE_DEFAULT_TRANSITION_TIME = 2.0f;
+	constexpr float JUMP_ANIMATION_SPEED = 2.5f;
+
+	// その他オフセット
+	constexpr float WARP_IN_Y_OFFSET = -1.0f;
+}
 
 namespace app
 {
@@ -64,21 +90,6 @@ namespace app
 
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Run));
-
-
-			//  runBody_ = new app::collision::GhostBody();
-			//  runBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(),10.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
-			//  // @todo for test
-			//  const float radius = characterStateMachine->GetStatus()->GetRadius();
-			//  // キャラクターの現在の回転から前方向ベクトルを計算する
-			//  Vector3 forward = Vector3(0.0f, 0.0f, 1.0f); // または Vector3::Front
-			//  characterStateMachine->transform.rotation.Apply(forward);
-			//  forward.Normalize();
-			//  
-			//  // キャラクターの正面にゴーストを配置
-			//  runBody_->SetPosition(characterStateMachine->transform.position + forward * (radius) + Vector3(0.0f, radius, 0.0f));
-			//  //runBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
-			//  runBody_->SetRotation(characterStateMachine->transform.rotation);
 		}
 
 
@@ -89,20 +100,6 @@ namespace app
 			characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), characterStatus->GetMoveSpeed());
 
 			characterStateMachine->transform.rotation.SetRotationYFromDirectionXZ(characterStateMachine->GetMoveSpeedVector());
-
-			//  //ゴーストの位置をスライムの現在位置に合わせて追従させる
-			//  if (runBody_)
-			//  {
-			//  	const float radius = characterStateMachine->GetStatus()->GetRadius();
-			//  	// GetMoveDirection() ではなく、キャラクターの実際の向きを使う
-			//  	Vector3 forward = Vector3(0.0f, 0.0f, 1.0f);
-			//  	characterStateMachine->transform.rotation.Apply(forward);
-			//  	forward.Normalize();
-			//  
-			//  	// キャラクターの正面に追従させる
-			//  	runBody_->SetPosition(characterStateMachine->transform.position + forward * (radius) + Vector3(0.0f, radius, 0.0f));
-			//  	runBody_->SetRotation(characterStateMachine->transform.rotation);
-			//  }
 		}
 
 
@@ -140,16 +137,16 @@ namespace app
 				{
 					auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 					attackBody_ = new app::collision::GhostBody();
-					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 20.0f, app::collision::ghost::CollisionAttribute::Enemy, app::collision::ghost::CollisionAttributeMask::All);
+					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), ATTACK_GHOST_RADIUS, app::collision::ghost::CollisionAttribute::Enemy, app::collision::ghost::CollisionAttributeMask::All);
 					isAttackBody_ = true;
 
 					// スライムが攻撃した瞬間に自分でエフェクトを出す
 					if (app::battle::BattleManager::Get().GetPlayerHP() > 0) {
 						app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
 							enEffectKind_SlimeAttack,
-							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * 30.0f) + Vector3(0.0f, 30.0f, 0.0f),
+							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * ATTACK_EFFECT_OFFSET_FORWARD) + Vector3(0.0f, ATTACK_EFFECT_OFFSET_Y, 0.0f),
 							Quaternion::Identity,
-							Vector3(3.0f, 3.0f, 3.0f)
+							ATTACK_EFFECT_SCALE
 						);
 
 						app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::PlayerPunch));
@@ -165,13 +162,12 @@ namespace app
 
 					Vector3 forward = characterStateMachine->GetMoveDirection();
 
-					if (forward.LengthSq() < 0.01f) {
+					if (forward.LengthSq() < FORWARD_VECTOR_LENGTH_THRESHOLD) {
 						forward = Vector3::Front;
 					}
 					attackBody_->SetPosition(characterStateMachine->transform.position + forward * (radius + radius) + Vector3(0.0f, radius, 0.0f));
 				}, false);
 
-			// DEBUG; 削除はEnterではしない
 			//ゴースト削除タイマー
 			attackScheduler_->AddTimer(0.1f, [&]()
 				{
@@ -229,17 +225,7 @@ namespace app
 
 		bool AttackCharacterState::CanChangeState() const
 		{
-			/** TODO; ある程度の距離外になったら　　アニメーション再生は廃止したいな
-				 あくまで攻撃ステートは攻撃用のゴーストオブジェクトを付与してるだけ
-				 ゴーストの付与の切り替えかな
-			 */
-
-
-			return stateTimer_ > 3.0f;
-
-			//auto* characterStateMachine = owner_->As<CharacterStateMachine>();
-			//auto* modelRender = characterStateMachine->GetModelRender();
-			//return !modelRender->IsPlayingAnimation();
+			return stateTimer_ > ATTACK_STATE_CHANGE_THRESHOLD;
 		}
 
 
@@ -264,7 +250,7 @@ namespace app
 
 			characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpAscend));
 
-			characterStateMachine->GetModelRender()->SetAnimationSpeed(2.5f);
+			characterStateMachine->GetModelRender()->SetAnimationSpeed(JUMP_ANIMATION_SPEED);
 
 			if (app::ui::AwardManager::IsAvailable()) {
 				app::ui::AwardManager::Get().AddJumpCount();
@@ -280,28 +266,28 @@ namespace app
 
 			switch (jumpPhase_)
 			{
-			case JumpPhase::Ascend:
-			{
-				// 上昇が終わったら落下フェーズへ
-				if (characterStateMachine->GetCharacterController()->GetVerticalVelocity() < 0.0f) {
-					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling));
-					jumpPhase_ = JumpPhase::Falling;
+				case JumpPhase::Ascend:
+				{
+					// 上昇が終わったら落下フェーズへ
+					if (characterStateMachine->GetCharacterController()->GetVerticalVelocity() < 0.0f) {
+						characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpFalling));
+						jumpPhase_ = JumpPhase::Falling;
+					}
+					break;
 				}
-				break;
-			}
-			case JumpPhase::Falling:
-			{
-				// 地面に着地したら着地フェーズへ
-				if (characterStateMachine->GetCharacterController()->IsOnGround()) {
-					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand));
-					jumpPhase_ = JumpPhase::Land;
+				case JumpPhase::Falling:
+				{
+					// 地面に着地したら着地フェーズへ
+					if (characterStateMachine->GetCharacterController()->IsOnGround()) {
+						characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::JumpLand));
+						jumpPhase_ = JumpPhase::Land;
+					}
+					break;
 				}
-				break;
-			}
-			case JumpPhase::Land:
-			{
-				break;
-			}
+				case JumpPhase::Land:
+				{
+					break;
+				}
 			}
 
 			auto* characterStatus = characterStateMachine->GetStatus();
@@ -389,7 +375,7 @@ namespace app
 					auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 					characterStateMachine->GetModelRender()->PlayAnimation(static_cast<uint8_t>(app::actor::PlayerAnimationKind::Punch));
 					attackBody_ = new app::collision::GhostBody();
-					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), 45.0f, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
+					attackBody_->CreateSphere(characterStateMachine->GetCharacter(), characterStateMachine->GetCharacterID(), PUNCH_GHOST_RADIUS, app::collision::ghost::CollisionAttribute::Player, app::collision::ghost::CollisionAttributeMask::All);
 					// @todo for test
 					const float radius = characterStateMachine->GetStatus()->GetRadius();
 					attackBody_->SetPosition(characterStateMachine->transform.position + characterStateMachine->GetMoveDirection() * (radius + radius) + Vector3(0.0f, radius, 0.0f));
@@ -399,7 +385,7 @@ namespace app
 					{
 						app::battle::BattleManager::Get().GetEffectManager()->PlayEffect(
 							enEffectKind_SlimeAttack,
-							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * 30.0f),
+							characterStateMachine->transform.position + (characterStateMachine->GetMoveDirection() * PUNCH_EFFECT_OFFSET_FORWARD),
 							Quaternion::Identity,
 							Vector3::One
 						);
@@ -485,7 +471,7 @@ namespace app
 			characterStateMachine->transform.scale = Vector3(scaleCurve_.GetCurrentValue());
 			Vector3 newPosition = translateCurve_.GetCurrentValue();
 			characterStateMachine->transform.position.x = newPosition.x;
-			characterStateMachine->transform.position.y -= 1.0f; // NOTE: 下に埋め込みたいので
+			characterStateMachine->transform.position.y += WARP_IN_Y_OFFSET; // NOTE: 下に埋め込みたいので
 			characterStateMachine->transform.position.z = newPosition.z;
 		}
 
@@ -618,16 +604,16 @@ namespace app
 				float deceleration = 1.0f - knockBackTimer_;
 				if (deceleration < 0.0f) { deceleration = 0.0f; }
 
-				float currentSpeed = 500.0f * deceleration;
+				float currentSpeed = KNOCKBACK_INITIAL_SPEED * deceleration;
 				characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), currentSpeed);
 
 				// 着地 or 一定時間で移動終了
 				bool isLanded = false;
-				if (knockBackTimer_ > 0.1f)
+				if (knockBackTimer_ > LANDING_CHECK_DELAY)
 				{
 					isLanded = characterStateMachine->GetCharacterController()->IsOnGround();
 				}
-				if (isLanded || knockBackTimer_ > 2.0f)
+				if (isLanded || knockBackTimer_ > KNOCKBACK_END_LIMIT_TIME)
 				{
 					isKnockBackDead_ = false;
 				}
@@ -677,8 +663,7 @@ namespace app
 			{
 				return shrinkTimer_ >= SHRINK_DURATION;
 			}
-			// プレイヤーなど: 従来通り 2 秒後
-			return timer_ > 2.0f;
+			return timer_ > DEAD_STATE_DEFAULT_TRANSITION_TIME;
 		}
 
 
@@ -701,7 +686,7 @@ namespace app
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 
 			// ぺっちゃんこスケールに即座にセット
-			characterStateMachine->transform.scale = Vector3(1.0f, 0.1f, 1.0f);
+			characterStateMachine->transform.scale = KNOCKBACK_SQUASH_SCALE;
 
 			// アニメーション再生
 			characterStateMachine->GetModelRender()->PlayAnimation(
@@ -736,11 +721,10 @@ namespace app
 			auto* characterStateMachine = owner_->As<CharacterStateMachine>();
 			auto* eventMachine = owner_->As<EventCharacterStateMachine>();
 
-			// Dead に遷移する場合はスケールをそのまま維持する
-			// （ぺっちゃんこ状態を DeadCharacterState の縮小開始点として使うため）
+			// Dead に遷移する場合はスケールをそのまま維持
 			if (eventMachine != nullptr && eventMachine->IsDead())
 			{
-				// スケールはそのまま（(1, 0.1, 1) を維持）
+				// スケールはそのまま
 				return;
 			}
 
@@ -786,7 +770,7 @@ namespace app
 
 			bool isLanded = false;
 
-			if (timer_ > 0.1f)
+			if (timer_ > LANDING_CHECK_DELAY)
 			{
 				isLanded = characterStateMachine->GetCharacterController()->IsOnGround();
 			}
@@ -799,7 +783,7 @@ namespace app
 					deceleration = 0.0f;
 				}
 				//スピード調整
-				float currentSpeed = 500.0f * deceleration;
+				float currentSpeed = KNOCKBACK_INITIAL_SPEED * deceleration;
 
 				characterStateMachine->Move(g_gameTime->GetFrameDeltaTime(), currentSpeed);
 			}
@@ -820,12 +804,12 @@ namespace app
 			bool isAnimFinished = !characterStateMachine->GetModelRender()->IsPlayingAnimation();
 			bool isLanded = false;
 
-			if (timer_ > 0.1f)
+			if (timer_ > LANDING_CHECK_DELAY)
 			{
 				isLanded = characterStateMachine->GetCharacterController()->IsOnGround();
 			}
 
-			return ((isAnimFinished && isLanded) || timer_ > 2.0f);
+			return ((isAnimFinished && isLanded) || timer_ > KNOCKBACK_END_LIMIT_TIME);
 		}
 	}
 }

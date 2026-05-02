@@ -32,8 +32,8 @@ namespace app
 
 			virtual void Initialize(const char* path) = 0;
 
-			ModelRender* GetModelRender() { return modelRender_.get(); }
-			app::collision::PhysicalBody* GetPhysicalBody() { return physicalBody_.get(); }
+			ModelRender* GetModelRender() const { return modelRender_.get(); }
+			app::collision::PhysicalBody* GetPhysicalBody() const { return physicalBody_.get(); }
 		};
 
 
@@ -142,7 +142,7 @@ namespace app
 			virtual void Initialize(const char* path, int32_t myId, const Vector3& forward);
 
 			void DeadAction();
-			bool IsDead() { return isDead_;}
+			bool IsDead() const { return isDead_;}
 			void SetPause(bool isPause)
 			{
 				isPause_ = isPause;

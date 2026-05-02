@@ -26,6 +26,7 @@ namespace app
 			{
 				return cursolIndex_;
 			}
+
 		public:
 			virtual void InitializeLogic();
 		};

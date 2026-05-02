@@ -5,6 +5,9 @@
         "jumpMoveSpeed": 300,
         "jumpPower":370,
         "radius": 15,
-        "height": 30
+        "height": 30,
+        "ghostbodyPosYOffset": 30,
+        "collisionRadiusOffset": 15,
+        "collisionHeightOffset": 60
     }
 ]

@@ -6,6 +6,7 @@
 #include "ui/UIAnimationFactory.h"
 #include "ui/UIAnimation.h"
 
+
 namespace
 {
 	static app::ui::UIAnimationSequence* seq = nullptr;
@@ -22,54 +23,22 @@ namespace app
 				layout_ = std::make_unique<app::ui::Layout>();
 				layout_->Initialize<app::ui::MenuBase>("Assets/ui/layout/gameOverMenu.json");
 			}
-			app::core::ParameterManager::Get().LoadParameter<app::core::GameOverMenuParameter>("Assets/master/GameOverMenuParameter.json", [](const nlohmann::json& j, app::core::GameOverMenuParameter& p)
-				{
-					//TODO; X座標もやりたいなぁ
-					p.cursolPositionX[0] = j["cursolPositionXA"];
-					p.cursolPositionX[1] = j["cursolPositionXB"];
-
-					p.cursolPositionY[0] = j["cursolPositionYA"];
-					p.cursolPositionY[1] = j["cursolPositionYB"];
-				});
+			// バイナリ経由で読み込み済みのためここでは何もしない
 		}
 
 		GameOverMenu::~GameOverMenu()
-		{
-			app::core::ParameterManager::Get().UnloadParameter<app::core::GameOverMenuParameter>();
-		}
-		
+		{}
+
 		void GameOverMenu::Update()
 		{
-			//auto* canvas = GetCanvas();
-			//if (canvas)
-			//{
-			//	//閉じる
-			//	{
-			//		auto* closeAnim = canvas->FindAnimation(Hash32("ScaleDown"));
-			//		if (closeAnim && !closeAnim->IsPlay())
-			//		{
-			//			canvas->RemoveAnimation(Hash32("ScaleDown"));
-			//			closeAnim = nullptr;
-			//			isPause_ = false;
-			//		}
-			//	}
-			//	//開く
-			//	{
-			//		auto* openAnim = canvas->FindAnimation(Hash32("ScaleUp"));
-			//		if (openAnim && !openAnim->IsPlay())
-			//		{
-			//			canvas->RemoveAnimation(Hash32("ScaleUp"));
-			//		}
-			//	}
-			//}
-
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::GameOverMenuParameter>();
 			if (g_pad[0]->IsTrigger(enButtonDown))
 			{
 				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 				cursolIndex_++;
-				if (cursolIndex_ >= 1)
+				if (cursolIndex_ >= p->maxCursolIndex)
 				{
-					cursolIndex_ = 1;
+					cursolIndex_ = p->maxCursolIndex;
 				}
 			}
 			if (g_pad[0]->IsTrigger(enButtonUp))
@@ -82,18 +51,18 @@ namespace app
 				}
 			}
 
-			
+
 
 			// 動的に数値をUIに設定
-			auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::GameOverMenuParameter>();
+			//auto* parameter = app::core::ParameterManager::Get().GetParameter<app::core::GameOverMenuParameter>();
 			// 音を変える/タイトルにもどるテキストの場所
 			{
-				const float x = parameter->cursolPositionX[cursolIndex_];
+				const float x = (cursolIndex_ == 0) ? p->cursolPositionXA : p->cursolPositionXB;
 				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.x = x;
 			}
 			{
-				const float y = parameter->cursolPositionY[cursolIndex_];
+				const float y = (cursolIndex_ == 0) ? p->cursolPositionYA : p->cursolPositionYB;
 				auto cursol = layout_->GetMenu()->GetUI<UIIcon>(Hash32("Cursol"));
 				cursol->transform.localPosition.y = y;
 			}
@@ -154,6 +123,11 @@ namespace app
 
 		void GameOverMenu::PlaySelectedAnimation()
 		{
+			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::GameOverMenuParameter>();
+			const Vector3 SELECTION_COLOR(p->selectionColorX, p->selectionColorY, p->selectionColorZ);
+			const Vector3 DEFAULT_COLOR(p->defaultColorX, p->defaultColorY, p->defaultColorZ);
+			const Vector3 SELECTION_SCALE(p->selectionScaleX, p->selectionScaleY, p->selectionScaleZ);
+			const Vector3 DEFAULT_SCALE(p->defaultScaleX, p->defaultScaleY, p->defaultScaleZ);
 			/** TODO: Updateで、処理が走っているので、無駄な処理を改善したい */
 			auto textRetry = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_retry"));
 			auto textTitle = layout_->GetMenu()->GetUI<UIIcon>(Hash32("text_ReturnToTitle"));
@@ -163,30 +137,30 @@ namespace app
 				&& textRetry)
 			{
 				/** リセット: 黄色から白 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textTitle->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textTitle->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textTitle->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textRetry->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textRetry->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textRetry->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textRetry->transform.localScale = SELECTION_SCALE;
 			}
-			else if (cursolIndex_ == 1
+			else if (cursolIndex_ == p->maxCursolIndex
 				&& textTitle)
 			{
 				/** リセット: 黄色から白 */
-				textRetry->color.Set(Vector3(1.0f, 1.0f, 1.0f));
+				textRetry->color.Set(DEFAULT_COLOR);
 				/** リセット: 等倍に戻す */
-				textRetry->transform.localScale = Vector3(1.0f, 1.0f, 0.0f);
+				textRetry->transform.localScale = DEFAULT_SCALE;
 
 				/** 黄色 */
-				textTitle->color.Set(Vector3(1.0f, 1.0f, 0.0f));
+				textTitle->color.Set(SELECTION_COLOR);
 				/** スケール拡大 */
-				textTitle->transform.localScale = Vector3(1.3f, 1.3f, 0.0f);
+				textTitle->transform.localScale = SELECTION_SCALE;
 			}
 		}
-	
+
 		void GameOverMenu::InitializeLogic()
 		{
 			// サウンドバーの位置情報設定

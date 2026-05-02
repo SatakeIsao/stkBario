@@ -1,6 +1,6 @@
-/**
+ï»¿/**
  * TitleScene.cpp
- * ƒ^ƒCƒgƒ‹‰æ–Ê‚ÌƒV[ƒ“
+ * ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ã‚·ãƒ¼ãƒ³
  */
 #include "stdafx.h"
 #include "TitleScene.h"
@@ -9,15 +9,15 @@
 #include "ui/TitleMenu.h"
 #include "ui/ManualMenu.h"
 #include "ui/AwardMenu.h"
+#include "core/ParameterManager.h"
 
 #if defined(APP_DEBUG)
 #include "DebugScene.h"
 #endif // APP_DEBUG
 
-namespace
-{
-	constexpr float B_BUTTON_HOLD_THRESHOLD = 1.0f;
-}
+
+
+
 
 TitleScene::TitleScene()
 {}
@@ -35,7 +35,7 @@ bool TitleScene::Start()
 {
 	app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Title));
 
-	// ƒ^ƒCƒgƒ‹ƒƒjƒ…[ƒIƒuƒWƒFƒNƒg¶¬
+	// ã‚¿ã‚¤ãƒˆãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
 	{
 		titleMenu_ = NewGO<app::ui::TitleMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
 		state_ = TitleSceneState::TitleMenu;
@@ -47,7 +47,7 @@ bool TitleScene::Start()
 
 void TitleScene::Update()
 {
-	// ƒ^ƒCƒgƒ‹ƒƒjƒ…[‘€ì’†‚Ìˆ—
+	// ã‚¿ã‚¤ãƒˆãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ“ä½œä¸­ã®å‡¦ç†
 	if (state_ == TitleSceneState::TitleMenu)
 	{
 		if (titleMenu_ && titleMenu_->IsReadyToSelect())
@@ -59,32 +59,33 @@ void TitleScene::Update()
 			}
 		}
 	}
-	// ƒ}ƒjƒ…ƒAƒ‹i‚ ‚»‚Ñ‚©‚½jƒƒjƒ…[‘€ì’†‚Ìˆ—
+	// ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ï¼ˆã‚ãã³ã‹ãŸï¼‰ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ“ä½œä¸­ã®å‡¦ç†
 	else if (state_ == TitleSceneState::ManualMenu)
 	{
-		// ŠJ‚¢‚½’¼Œã‚ÌƒtƒŒ[ƒ€‚Í“ü—Í‚ğ–³‹‚·‚é
+		// é–‹ã„ãŸç›´å¾Œã®ãƒ•ãƒ¬ãƒ¼ãƒ ã¯å…¥åŠ›ã‚’ç„¡è¦–ã™ã‚‹
 		if (isSubMenuJustOpened_)
 		{
 			isSubMenuJustOpened_ = false;
 		}
 		else
 		{
-			if (g_pad[0]->IsPress(enButtonB)) // Bƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‘±‚¯‚Ä‚¢‚é
+			if (g_pad[0]->IsPress(enButtonB)) // Bãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œç¶šã‘ã¦ã„ã‚‹
 			{
-				bButtonHoldTime_ += g_gameTime->GetFrameDeltaTime(); // Œo‰ßŠÔ‚ğ‰ÁZ
+				bButtonHoldTime_ += g_gameTime->GetFrameDeltaTime(); // çµŒéæ™‚é–“ã‚’åŠ ç®—
 			}
 			else
 			{
-				bButtonHoldTime_ = 0.0f; // —£‚³‚ê‚½‚çƒŠƒZƒbƒg
+				bButtonHoldTime_ = 0.0f; // é›¢ã•ã‚ŒãŸã‚‰ãƒªã‚»ãƒƒãƒˆ
 			}
 
-			// Bƒ{ƒ^ƒ“’·‰Ÿ‚µ‚Åƒ^ƒCƒgƒ‹ƒƒjƒ…[‚É–ß‚é
-			if (bButtonHoldTime_ >= B_BUTTON_HOLD_THRESHOLD)
+			// Bãƒœã‚¿ãƒ³é•·æŠ¼ã—ã§ã‚¿ã‚¤ãƒˆãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«æˆ»ã‚‹
+			auto* sceneParam_ = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>();
+			if (bButtonHoldTime_ >= sceneParam_->bButtonHoldThreshold)
 			{
 				bButtonHoldTime_ = 0.0f;
 				app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
-				// ManualMenu‚ğ•Â‚¶‚Äíœ
+				// ManualMenuã‚’é–‰ã˜ã¦å‰Šé™¤
 				manualMenu_->OnClose();
 				DeleteGO(manualMenu_);
 				manualMenu_ = nullptr;
@@ -95,25 +96,25 @@ void TitleScene::Update()
 			}
 		}
 	}
-	// ƒAƒ[ƒhiÀÑjƒƒjƒ…[‘€ì’†
+	// ã‚¢ãƒ¯ãƒ¼ãƒ‰ï¼ˆå®Ÿç¸¾ï¼‰ãƒ¡ãƒ‹ãƒ¥ãƒ¼æ“ä½œä¸­
 	else if (state_ == TitleSceneState::AwardMenu)
 	{
-		// Bƒ{ƒ^ƒ“‚Åƒ^ƒCƒgƒ‹ƒƒjƒ…[‚É–ß‚é
+		// Bãƒœã‚¿ãƒ³ã§ã‚¿ã‚¤ãƒˆãƒ«ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«æˆ»ã‚‹
 		if (g_pad[0]->IsTrigger(enButtonB))
 		{
 			app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
-			// ó‘Ô‚ğ–ß‚·
+			// çŠ¶æ…‹ã‚’æˆ»ã™
 			state_ = TitleSceneState::TitleMenu;
 
-			// AwardMenu‚ğ•Â‚¶‚Äíœ
+			// AwardMenuã‚’é–‰ã˜ã¦å‰Šé™¤
 			if (awardMenu_) {
 				awardMenu_->OnClose();
 				DeleteGO(awardMenu_);
 				awardMenu_ = nullptr;
 			}
 
-			// TitleMenu‚ğÄ“x¶¬
+			// TitleMenuã‚’å†åº¦ç”Ÿæˆ
 			state_ = TitleSceneState::TitleMenu;
 			titleMenu_ = NewGO<app::ui::TitleMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
 			titleMenu_->OpenImmediate();
@@ -124,18 +125,19 @@ void TitleScene::Update()
 
 void TitleScene::ExecuteTitleMenuSelection(int index)
 {
-	if (index == 0) // ƒXƒ^[ƒg
+	auto* sceneParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>();
+	if (index == sceneParam->titleMenuIndexStart)
 	{
 		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 		m_requestSceneId = BattleScene::ID();
 	}
-	else if (index == 1) // ‚ ‚»‚Ñ‚©‚½
+	else if (index == sceneParam->titleMenuIndexManual)
 	{
 		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
 		state_ = TitleSceneState::ManualMenu;
 		isSubMenuJustOpened_ = true;
-		bButtonHoldTime_ = 0.0f;   
+		bButtonHoldTime_ = 0.0f;
 
 		if (titleMenu_)
 		{
@@ -147,7 +149,7 @@ void TitleScene::ExecuteTitleMenuSelection(int index)
 		manualMenu_ = NewGO<app::ui::ManualMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
 		manualMenu_->OnOpen();
 	}
-	else if (index == 2) // ƒAƒ[ƒh
+	else if (index == sceneParam->titleMenuIndexAward)
 	{
 		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 
@@ -163,7 +165,7 @@ void TitleScene::ExecuteTitleMenuSelection(int index)
 		awardMenu_ = NewGO<app::ui::AwardMenu>(static_cast<uint8_t>(ObjectPriority::Pause));
 		awardMenu_->OnOpen();
 	}
-	else if (index == 3) // ‚¨‚í‚è
+	else if (index == sceneParam->titleMenuIndexExit)
 	{
 		app::SoundManager::Get().PlaySE(static_cast<int>(app::SoundKind::Button));
 		exit(0);
@@ -179,7 +181,7 @@ bool TitleScene::RequestScene(uint32_t& id, float& waitTime)
 {
 	if (m_requestSceneId != INVALID_SCENE_ID) {
 		id = m_requestSceneId;
-		waitTime = 3.0f;
+		waitTime = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>()->sceneTransitionWaitTime;
 		return true;
 	}
 	return false;

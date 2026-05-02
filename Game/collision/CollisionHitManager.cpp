@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "CollisionHitManager.h"
 #include "actor/ActorState.h"
 #include "actor/BattleCharacter.h"
@@ -35,54 +35,51 @@ namespace
 	}
 }
 
-
 namespace app
 {
 	namespace collision
 	{
 		CollisionHitManager* CollisionHitManager::instance_ = nullptr;
 
-
 		CollisionHitManager::CollisionHitManager()
 		{
-			/** DEBUG: ƒƒCƒ„[ƒtƒŒ[ƒ€•`‰æ */
+			/** DEBUG: è¡çªæç”»è¨­å®šãªã©ï¼ˆç¾åœ¨ã¯ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆï¼‰ */
 			//PhysicsWorld::Get().EnableDrawDebugWireFrame();
 		}
-
 
 		CollisionHitManager::~CollisionHitManager()
 		{
 
 		}
 
-
 		void CollisionHitManager::Update()
 		{
-			//ƒfƒoƒbƒO—pŒ»İ‚ÌƒqƒbƒgƒyƒA‚Ì”‚ğo—Í
+			// 1ãƒ•ãƒ¬ãƒ¼ãƒ å†…ã§ã®ãƒ’ãƒƒãƒˆãƒšã‚¢ã®æ•°ã‚’å‡ºåŠ›
 			char countBuf[256];
 			sprintf_s(countBuf, "--- Hit Pair Count: %zu ---\n", hitPairList_.size());
 			OutputDebugStringA(countBuf);
 
-			// GhostBody‚Ìƒqƒbƒgˆ—‚Å“¾‚½ƒyƒA‚ğ‚à‚Æ‚Éˆ—
+			// GhostBodyã®ãƒ’ãƒƒãƒˆæƒ…å ±ã‚’å„ãƒšã‚¢ã”ã¨ã«å‡¦ç†
 			{
 				app::memory::StackAllocatorMarker marker;
 				app::memory::StackVector<Pair*>  pipeHitPairList(marker);
 				app::memory::StackVector<Pair*>  eventCharacterPairList(marker);
 				app::memory::StackVector<Pair*>  coinHitPairList(marker);
+
 				for (auto& hitPair : hitPairList_) {
 					char idBuf[256];
 					sprintf_s(idBuf, "Collision! A_ID: %u, B_ID: %u\n", hitPair.a->GetOwnerId(), hitPair.b->GetOwnerId());
 					OutputDebugStringA(idBuf);
 
-					// “yŠÇ‚ÌƒyƒA‚©
+					// åœŸç®¡ã®ãƒšã‚¢
 					if (ContainsPipeGimmickPair(hitPair)) {
 						pipeHitPairList.push_back(&hitPair);
 					}
-					// ƒCƒxƒ“ƒgƒLƒƒƒ‰ƒNƒ^[‚ÌƒyƒA‚©
+					// ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®ãƒšã‚¢
 					if (ContainsEventCharacterPair(hitPair)) {
 						eventCharacterPairList.push_back(&hitPair);
 					}
-					// ƒRƒCƒ“‚ÌƒyƒA‚©
+					// ã‚³ã‚¤ãƒ³ã®ãƒšã‚¢
 					if (ContainsCoinGimmickPair(hitPair)) {
 						coinHitPairList.push_back(&hitPair);
 					}
@@ -101,13 +98,11 @@ namespace app
 			hitPairList_.clear();
 		}
 
-
 		void CollisionHitManager::RegisterHitPair(app::collision::GhostBody* a, app::collision::GhostBody* b)
 		{
-			// ƒqƒbƒgƒyƒA“o˜^
+			// ãƒ’ãƒƒãƒˆãƒšã‚¢ã®ç™»éŒ²
 			hitPairList_.push_back(std::move(Pair(a, b)));
 		}
-
 
 		bool CollisionHitManager::ContainsPipeGimmickPair(const Pair& hitPair)
 		{
@@ -120,7 +115,6 @@ namespace app
 			return true;
 		}
 
-
 		void CollisionHitManager::UpdatePipeGimmickPair(Pair& hitPair)
 		{
 			auto* pipeGimmick = GetHitObject<app::actor::PipeGimmick>(hitPair);
@@ -131,20 +125,13 @@ namespace app
 				return;
 			}
 
+			// ä¸‹å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹å ´åˆã€ãƒ¯ãƒ¼ãƒ—å‡¦ç†
 			if (battleCharacter->GetStateMachine()->IsActionDown()) {
 				const Vector3 startPosition = pipeGimmick->GetMouthPosition();
 				const Vector3 endPosition = app::gimmick::WarpSystem::Get().FindPipe(targetEndpointId)->GetMouthPosition();
 				battleCharacter->GetStateMachine()->SetWarpPosition(startPosition, endPosition);
 			}
-
-			//if (app::battle::BattleManager::IsAvailable()) {
-			//	app::battle::BattleManager::DamageNotify* notify = new app::battle::BattleManager::DamageNotify();
-			//	notify->a = hitPair.a;
-			//	notify->b = hitPair.b;
-			//	app::battle::BattleManager::Get().AddNotify(notify);
-			//}
 		}
-
 
 		bool CollisionHitManager::ContainsEventCharacterPair(const Pair& hitPair)
 		{
@@ -165,7 +152,7 @@ namespace app
 			Vector3 playerPos = battleCharacter->transform.position;
 			Vector3 slimePos = eventCharacter->transform.position;
 
-			//ƒpƒ“ƒ`‚³‚ê‚½‚©‚Ìƒ`ƒFƒbƒN
+			// ãƒ‘ãƒ³ãƒåˆ¤å®šç­‰ã®ãƒã‚§ãƒƒã‚¯
 			app::collision::GhostBody* colliedPlayerBody = nullptr;
 			if (hitPair.a->GetOwnerId() == app::actor::BattleCharacter::ID())
 			{
@@ -176,37 +163,39 @@ namespace app
 				colliedPlayerBody = hitPair.b;
 			}
 
-			//ƒpƒ“ƒ`‚Ì“–‚½‚è”»’è‚Ì
+			// ãƒ‘ãƒ³ãƒãªã©ã®ç‰¹æ®Šéƒ¨ä½ï¼ˆæœ¬ä½“ä»¥å¤–ï¼‰ã®è¡çªåˆ¤å®š
 			if (colliedPlayerBody != nullptr
 				&& colliedPlayerBody != battleCharacter->GetGhostBody())
 			{
 				if (battleCharacter->GetStateMachine()->GetCurrentStateID() == app::actor::PunchCharacterState::ID())
 				{
-					//ƒvƒŒƒCƒ„[‚©‚çƒXƒ‰ƒCƒ€‚Ö‚ÌƒxƒNƒgƒ‹‚ğŒvZ
+					// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã‚¹ãƒ©ã‚¤ãƒ ã¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—
 					Vector3 knockBackDirection = slimePos - playerPos;
 					knockBackDirection.y = 0.0f;
 					knockBackDirection.Normalize();
-					//ƒXƒ‰ƒCƒ€‚ªƒmƒbƒNƒoƒbƒN‚µ‚½
+					// ã‚¹ãƒ©ã‚¤ãƒ ã‚’ãƒãƒƒã‚¯ãƒãƒƒã‚¯ã•ã›ã‚‹
 					eventCharacter->GetStateMachine()->OnKnockBack(knockBackDirection);
 				}
 			}
-			/** ƒvƒŒƒCƒ„[–{‘Ì‚ÌƒS[ƒXƒg‚ÆÕ“Ë‚µ‚½ */
+			/** ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æœ¬ä½“ã®ã‚´ãƒ¼ã‚¹ãƒˆãƒœãƒ‡ã‚£ã¨è¡çªã—ãŸå ´åˆ */
 			else
 			{
-				/** ƒXƒ‰ƒCƒ€‚©‚çƒvƒŒƒCƒ„[‚ÉŒü‚©‚¤ƒxƒNƒgƒ‹ */
+				/** ã‚¹ãƒ©ã‚¤ãƒ ã‹ã‚‰ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‘ãŸãƒ™ã‚¯ãƒˆãƒ« */
 				Vector3 toPlayer = playerPos - slimePos;
 				toPlayer.Normalize();
 				float dot = toPlayer.y;
 
+				// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒä¸Šã«ã„ã‚‹ã‹ã©ã†ã‹
 				bool isAbove = (dot > 0.1f);
 
-				// Player‚ªã‹ó‚É‚¢‚é‚È‚ç
 				if (isAbove)
 				{
+					// è¸ã¿ã¤ã‘ï¼šã‚¹ãƒ©ã‚¤ãƒ æ­»äº¡
 					eventCharacter->GetStateMachine()->OnSquashed();
 				}
 				else
 				{
+					// æ¥è§¦ï¼šãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒãƒƒã‚¯ãƒãƒƒã‚¯
 					battleCharacter->GetStateMachine()->OnKnockBack();
 				}
 			}
@@ -226,26 +215,14 @@ namespace app
 		void CollisionHitManager::UpdateCoinGimmickPair(Pair& hitPair)
 		{
 			auto* battleCharacter = GetHitObject<app::actor::BattleCharacter>(hitPair);
-			auto* coinCharacter = GetHitObject <app::actor::CoinGimmick>(hitPair);
+			auto* coinCharacter = GetHitObject<app::actor::CoinGimmick>(hitPair);
 
-			app::collision::GhostBody* colliedPlayerBody = nullptr;
-			if (hitPair.a->GetOwnerId() == app::actor::BattleCharacter::ID())
-			{
-				colliedPlayerBody = hitPair.a;
-			}
-			else if (hitPair.b->GetOwnerId() == app::actor::BattleCharacter::ID())
-			{
-				colliedPlayerBody = hitPair.b;
-			}
+			if (battleCharacter == nullptr || coinCharacter == nullptr) { return; }
 
-			//“–‚½‚è”»’è‚Ì
-			if (colliedPlayerBody != nullptr
-				&& colliedPlayerBody == battleCharacter->GetGhostBody())
+			// ã‚³ã‚¤ãƒ³ã¯ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æœ¬ä½“ãƒ»ãƒ‘ãƒ³ãƒå•ã‚ãšè§¦ã‚ŒãŸã‚‰å–å¾—
+			if (!coinCharacter->IsDead())
 			{
-				if (!coinCharacter->IsDead())
-				{
-					coinCharacter->DeadAction();
-				}
+				coinCharacter->DeadAction();
 			}
 		}
 	}

@@ -232,6 +232,7 @@
     <ClCompile Include="actor\EventCharacter.cpp" />
     <ClCompile Include="actor\Gimmick.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="core\ParameterLoader.cpp" />
     <ClCompile Include="ui\AwardManager.cpp" />
     <ClCompile Include="ui\AwardMenu.cpp" />
     <ClCompile Include="ui\ManualMenu.cpp" />
@@ -266,7 +267,7 @@
     <ClCompile Include="gimmick\WarpSystem.cpp" />
     <ClCompile Include="ui\SoundOptionMenu.cpp" />
     <ClCompile Include="sound\SoundManager.cpp" />
-    <ClCompile Include="ui\HPBar.cpp" />
+    <ClCompile Include="ui\InGameUi.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Transform.cpp" />
     <ClCompile Include="memory\Allocator.cpp" />
@@ -287,6 +288,7 @@
     <ClCompile Include="ui\Menu.cpp" />
     <ClCompile Include="ui\UIAnimation.cpp" />
     <ClCompile Include="ui\UIParts.cpp" />
+    <ClCompile Include="util\BinaryParameterTest.cpp" />
     <ClCompile Include="util\Curve.cpp" />
     <ClCompile Include="util\util.cpp" />
   </ItemGroup>
@@ -302,6 +304,8 @@
     <ClInclude Include="actor\Gimmick.h" />
     <ClInclude Include="actor\Types.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="core\BinaryParameterLoader.h" />
+    <ClInclude Include="core\ParameterLoader.h" />
     <ClInclude Include="ui\AwardManager.h" />
     <ClInclude Include="ui\AwardMenu.h" />
     <ClInclude Include="ui\ManualMenu.h" />
@@ -338,7 +342,7 @@
     <ClInclude Include="gimmick\WarpSystem.h" />
     <ClInclude Include="ui\SoundOptionMenu.h" />
     <ClInclude Include="sound\SoundManager.h" />
-    <ClInclude Include="ui\HPBar.h" />
+    <ClInclude Include="ui\InGameUI.h" />
     <ClInclude Include="json\json.hpp" />
     <ClInclude Include="math\Transform.h" />
     <ClInclude Include="memory\Allocator.h" />
@@ -360,6 +364,7 @@
     <ClInclude Include="ui\UIAnimationFactory.h" />
     <ClInclude Include="ui\UIAnimationParameter.h" />
     <ClInclude Include="ui\UIParts.h" />
+    <ClInclude Include="util\BinaryParameterTest.h" />
     <ClInclude Include="Util\CRC32.h" />
     <ClInclude Include="util\Curve.h" />
     <ClInclude Include="util\JobSystem.h" />
@@ -372,6 +377,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\ui\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="util\convert_parameters.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,11 +9,14 @@
 #include "BattleScene.h"
 #include "ui/GameOverMenu.h"
 #include "sound/SoundManager.h"
+#include "core/ParameterManager.h"
+
+
+
 
 
 GameOverScene::GameOverScene()
-{
-}
+{}
 
 
 GameOverScene:: ~GameOverScene()
@@ -51,16 +54,16 @@ void GameOverScene::Update()
 
 
 void GameOverScene::Render(RenderContext& rc)
-{
-}
+{}
 
 
 bool GameOverScene::RequestScene(uint32_t& id, float& waitTime)
 {
+	auto* sceneParam = app::core::ParameterManager::Get().GetParameter<app::core::MasterSceneParameter>();
 	if (m_requestSceneId != INVALID_SCENE_ID)
 	{
 		id = m_requestSceneId;
-		waitTime = 3.0f;
+		waitTime = sceneParam->sceneTransitionWaitTime;
 		return true;
 	}
 	return false;
@@ -68,8 +71,7 @@ bool GameOverScene::RequestScene(uint32_t& id, float& waitTime)
 
 
 void GameOverScene::Change()
-{
-}
+{}
 
 
 bool GameOverScene::CanChange() const

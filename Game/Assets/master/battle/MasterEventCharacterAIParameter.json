@@ -1,0 +1,14 @@
+[
+    {
+        "comment": "敵キャラクターAIパラメーター",
+        "knockbackJumpPower": 80.0,
+        "chaseDetectionRange": 200.0,
+        "chaseFieldOfViewDeg": 60.0,
+        "attackRange": 40.0,
+        "chaseRange": 200.0,
+        "chaseAITimerInitial": 5.0,
+        "patrolLeftTurnTime": 2.0,
+        "patrolRightTurnTime": 4.0,
+        "waitTime": 1.0
+    }
+]

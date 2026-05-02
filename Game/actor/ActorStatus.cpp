@@ -27,6 +27,8 @@ namespace app
 			jumpPower_ = parameter->jumpPower;
 			radius_ = parameter->radius;
 			height_ = parameter->height;
+			ghostbodyPosYOffset_ = parameter->ghostbodyPosYOffset;
+			fallDeathThresholdPosY_ = parameter->ghostbodyPosYOffset;
 		}
 
 
@@ -49,7 +51,8 @@ namespace app
 			jumpPower_ = parameter->jumpPower;
 			radius_ = parameter->radius;
 			height_ = parameter->height;
+			ghostbodyPosYOffset_ = parameter->ghostbodyPosYOffset;
+			fallDeathThresholdPosY_ = parameter->ghostbodyPosYOffset;
 		}
-
 	}
 }

@@ -1,0 +1,27 @@
+[
+    {
+        "comment": "インゲームUIのパラメータ",
+        
+        "masterMaxTime": 120.0,
+        "nextStepDelay": 0.5,
+        "awardStepDelay": 1.0,
+        "exitBufferTime": 0.5,
+
+        "coinScoreWeight": 100,
+        "timeBonusRankS": 3000,
+        "timeBonusRankA": 2500,
+        "timeBonusRankB": 2000,
+        "timeBonusRankC": 1000,
+
+        "thresholdTimeRankS": 30.0,
+        "thresholdTimeRankA": 60.0,
+        "thresholdTimeRankB": 90.0,
+        "thresholdTimeRankC": 120.0,
+
+        "SelectionScale": { "x": 1.3, "y": 1.3, "z": 1.0},
+        "DefaultScale": { "x": 1.0, "y": 1.0, "z": 1.0},
+        "SelectionColor": { "x": 1.0, "y": 1.0, "z": 0.0},
+        "DefaultColor": { "x": 1.0, "y": 1.0, "z": 1.0},
+        "BonusTextColor": { "x": 1.0, "y": 1.0, "z": 0.0, "w": 1.0}
+    }
+]

@@ -7,6 +7,8 @@
 #include "Application.h"
 #include "core/Fade.h"
 #include "core/ParameterManager.h"
+#include "core/ParameterLoader.h"
+#include "util/BinaryParameterTest.h"
 #include "camera/CameraManager.h"
 #include "camera/CameraController.h"
 #include "scene/SceneManager.h"
@@ -44,6 +46,7 @@ namespace app
 		app::SoundManager::Finalize();
 		app::core::ParameterManager::Finalize();
 		app::ui::AwardManager::Finalize();
+		app::core::ParameterLoader::UnloadAll();
 
 		app::memory::Allocator::Get().Shutdown();
 	}
@@ -76,6 +79,14 @@ namespace app
 
 		// パラメーター管理生成
 		app::core::ParameterManager::Initialize();
+
+		// バイナリパラメーター読み込み
+		app::core::ParameterLoader::LoadAll();
+
+#ifdef K2_DEBUG
+		// バイナリ読み込みテスト（確認できたらこの3行を削除）
+		BinaryParameterTest::Run(R"(Assets\master\battle)");
+#endif
 		// サウンド管理生成
 		app::SoundManager::Initialize();
 		// Fade処理生成

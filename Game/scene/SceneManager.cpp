@@ -34,7 +34,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::Update()
 {
-	// 1. 通常のシーン更新（遷移リクエストが来ていない時だけ更新する）
+	// 通常のシーン更新（遷移リクエストが来ていない時だけ更新する）
 	if (m_currentScene && nextSceneId_ == INVALID_SCENE_ID) {
 
 		m_currentScene->Update();
@@ -56,10 +56,10 @@ void SceneManager::Update()
 		}
 	}
 
-	// 2. シーン遷移処理中
+	// シーン遷移処理中
 	if (nextSceneId_ != INVALID_SCENE_ID) {
 
-		// ★スライム演出が完了し、画面が真っ黒になったかチェック
+		// スライム演出が完了し、画面が真っ黒になったかチェック
 		if (Fade::Get().IsFadedOut()) {
 
 			// 画面が黒くなったので、ここで初めて古いシーンを削除する
@@ -68,7 +68,7 @@ void SceneManager::Update()
 				m_currentScene = nullptr;
 			}
 
-			// Bロゴが回転している間のロード時間（waitTime）をカウント
+			// Bロゴが回転している間のロード時間をカウント
 			m_elapsedTime += g_gameTime->GetFrameDeltaTime();
 			if (m_elapsedTime >= m_waitTime) {
 
@@ -138,8 +138,8 @@ bool SceneManagerObject::Start()
 //#endif // APP_DEBUG
 
 	/** デバックテスト */
-	SceneManager::Get().CreateScene(TitleScene::ID());
-	//SceneManager::Get().CreateScene(BattleScene::ID());
+	//SceneManager::Get().CreateScene(TitleScene::ID());
+	SceneManager::Get().CreateScene(BattleScene::ID());
 	//SceneManager::Get().CreateScene(GameClearScene::ID());
 	return true;
 }

@@ -56,6 +56,9 @@ namespace app
 			float warpEndScale_ = 0.3f;
 			float warpTimeSeconds_ = 1.0f;
 
+			float ghostbodyPosYOffset_ = 2.0f;
+			float fallDeathThresholdPosY_ = -200.0f;
+
 
 		public:
 			virtual ~CharacterStatus() {}
@@ -90,6 +93,12 @@ namespace app
 				warpEndScale_ = endScale;
 				warpTimeSeconds_ = timeSeconds;
 			}
+
+			inline float GetGhostBodyPosYOffset() const { return ghostbodyPosYOffset_; }
+			inline void SetGhostBodyPosYOffset(const float ghostbodyPosYOffset) { ghostbodyPosYOffset_ = ghostbodyPosYOffset; }
+
+			inline float GetFallDeathThresholdPosY() const { return fallDeathThresholdPosY_; }
+			inline void SetFallDeathThresholdPosY(const float fallDeathThresholdPosY) { fallDeathThresholdPosY_ = fallDeathThresholdPosY; }
 		};
 
 

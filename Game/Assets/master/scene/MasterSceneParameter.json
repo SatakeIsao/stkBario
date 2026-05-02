@@ -1,0 +1,16 @@
+[
+    {
+        "commentScene": "シーン共通",
+        "sceneTransitionWaitTime": 3.0,
+
+        "commentBattleScene": "バトルシーン",
+        "sceneRequestWaitTime": 1.0,
+        
+        "commentTitleScene": "タイトルシーン",
+        "bButtonHoldThreshold": 1.0,
+        "titleMenuIndexStart": 0,
+        "titleMenuIndexManual": 1,
+        "titleMenuIndexAward": 2,
+        "titleMenuIndexExit": 3
+    }
+]
