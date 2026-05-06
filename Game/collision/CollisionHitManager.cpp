@@ -43,7 +43,7 @@ namespace app
 
 		CollisionHitManager::CollisionHitManager()
 		{
-			/** DEBUG: 衝突描画設定など（現在はコメントアウト） */
+			/** DEBUG: 衝突描画 */
 			//PhysicsWorld::Get().EnableDrawDebugWireFrame();
 		}
 

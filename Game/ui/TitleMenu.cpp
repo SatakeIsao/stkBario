@@ -392,7 +392,6 @@ namespace app
 					seq = new app::ui::UIAnimationSequence();
 					seq->Add(Hash32("FadeIn"));
 
-
 					// アニメーションを再生
 					seq->Play(cursol);
 				}

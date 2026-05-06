@@ -39,6 +39,8 @@ namespace
 
 	static const int MAX_HP = 8;
 
+	constexpr float FALL_DEATH_Y = -300.0f;
+
 	// 配置オフセット関連
 	/** コインの配置Y座標オフセット */
 	constexpr float COIN_Y_OFFSET = -20.0f;
@@ -195,19 +197,13 @@ namespace app
 		void BattleManager::Start()
 		{
 			// バイナリパラメーター読み込み
-			app::core::ParameterLoader::LoadAll();
-
-			// デバッグ確認（問題解決後に削除）
-			K2_ASSERT(
-				app::core::ParameterManager::Get().GetParameter<app::core::BattleSequenceParameter>() != nullptr,
-				"BattleSequenceParameter が読み込まれていません"
-			);
-
+			{
+				app::core::ParameterLoader::LoadAll();
+			}
 			//エフェクトマネージャーオブジェクト
 			{
 				effectManagerObject_ = NewGO<EffectManagerObject>(static_cast<uint8_t>(ObjectPriority::Default));
 			}
-
 			// スカイキューブ
 			{
 				skyCube_ = NewGO<nsK2EngineLow::SkyCube>(0, "skycube");
@@ -446,7 +442,7 @@ namespace app
 			}
 			// BGM再生
 			{
-				//app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
+				app::SoundManager::Get().PlayBGM(static_cast<int>(app::SoundKind::Game));
 			}
 			// 称号マネージャー
 			{
@@ -484,7 +480,7 @@ namespace app
 			}
 
 			// シーケンス中は手動ポーズ（メニュー表示）を禁止する
-			app::core::PauseManager::Get().SetCanPause(!isSequence);
+			app::core::PauseManager::Get().SetCanPause(isInputEnabled_ && !isSequence);
 			
 			if (currentPause)
 			{
@@ -496,7 +492,6 @@ namespace app
 
 			if (!isPlayerDead_ && battleCharacter_ != nullptr)
 			{
-				constexpr float FALL_DEATH_Y = -300.0f;
 				if (battleCharacter_->transform.localPosition.y <= FALL_DEATH_Y)
 				{
 					// ゲームオーバーシーケンス起動
@@ -734,8 +729,13 @@ namespace app
 
 			auto gameCamera = gameCameraController_->As<app::camera::GameCamera>();
 			auto cameraData = gameCamera->GetCameraData();
-			cameraSteering_->Update(cameraData, g_gameTime->GetFrameDeltaTime());
-			gameCamera->SetState(cameraData);
+			
+			/** バトルシーケンス終了するまでカメラ操作動かせない */
+			//if (isInputEnabled_)
+			{
+				cameraSteering_->Update(cameraData, g_gameTime->GetFrameDeltaTime());
+				gameCamera->SetState(cameraData);
+			}
 
 			layout_->Update();
 		}
@@ -767,77 +767,5 @@ namespace app
 			if (battleCharacter_) return battleCharacter_->GetCurrentHP();
                 return 0;
 		}
-
-
-		//void BattleManager::LoadParameter()
-		//{
-		//	// バトル共通パラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleParameter>(MASTER_BATTLE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleParameter& p)
-		//		{
-		//			p.battleTime = json["battleTime"].get<float>();
-		//		});
-		//	// ステージ共通パラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterStageParameter>(MASTER_STAGE_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterStageParameter& p)
-		//		{
-		//			p.gravity = json["gravity"].get<float>();
-		//			p.fallLimitY = json["fallLimitY"].get<float>();
-		//			p.friction = json["friction"].get<float>();
-		//			p.warpStartScale = json["warpStartScale"].get<float>();
-		//			p.warpEndScale = json["warpEndScale"].get<float>();
-		//			p.warpTime = json["warpTime"].get<float>();
-		//			p.coinShrinkSpeed = json["coinShrinkSpeed"].get<float>();
-		//			p.coinRotationSpeed = json["coinRotationSpeed"].get<float>();
-		//			p.coinJumpInitVelocityY = json["coinJumpInitVelocityY"].get<float>();
-		//			p.coinCollisionRadius = json["coinCollisionRadius"].get<float>();
-		//			p.coinCollisionHeight = json["coinCollisionHeight"].get<float>();
-		//		});
-		//	// バトルカメラパラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCameraParameter>(MASTER_BATTLE_CAMERA_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCameraParameter& p)
-		//		{
-		//			p.distance = json["distance"].get<float>();
-		//			p.height = json["height"].get<float>();
-		//			p.fov = json["fov"].get<float>();
-		//			p.nearClip = json["nearClip"].get<float>();
-		//			p.farClip = json["farClip"].get<float>();
-		//			p.rotationX = json["rotationX"].get<float>();
-		//			p.rotationY = json["rotationY"].get<float>();
-		//		});
-		//	// バトルキャラクターパラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterBattleCharacterParameter>(MASTER_BATTLE_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterBattleCharacterParameter& p)
-		//		{
-		//			p.moveSpeed = json["moveSpeed"].get<float>();
-		//			p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
-		//			p.jumpPower = json["jumpPower"].get<float>();
-		//			p.radius = json["radius"].get<float>();
-		//			p.height = json["height"].get<float>();
-		//			p.ghostbodyPosYOffset = json["ghostbodyPosYOffset"].get<float>();
-		//			p.collisionRadiusOffset = json["collisionRadiusOffset"].get<float>();
-		//			p.collisionHeightOffset = json["collisionHeightOffset"].get<float>();
-		//		});
-		//	// イベントキャラクターパラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterParameter>(MASTER_EVENT_CHARACTER_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterParameter& p)
-		//		{
-		//			p.moveSpeed = json["moveSpeed"].get<float>();
-		//			p.jumpMoveSpeed = json["jumpMoveSpeed"].get<float>();
-		//			p.jumpPower = json["jumpPower"].get<float>();
-		//			p.radius = json["radius"].get<float>();
-		//			p.height = json["height"].get<float>();
-		//			p.ghostbodyPosYOffset = json["ghostbodyPosYOffset"].get<float>();
-		//			p.fallDeathThresholdPosY = json["fallDeathThresholdPosY"].get<float>();
-		//		});
-		//	// イベントキャラクターAIパラメーター読み込み
-		//	app::core::ParameterManager::Get().LoadParameter<app::core::MasterEventCharacterAIParameter>(MASTER_EVENT_CHARACTER_AI_PARAM_PATH, [](const nlohmann::json& json, app::core::MasterEventCharacterAIParameter& p)
-		//		{
-		//			p.knockbackJumpPower = json["knockbackJumpPower"].get<float>();
-		//			p.chaseDetectionRange = json["chaseDetectionRange"].get<float>();
-		//			p.chaseFieldOfViewDeg = json["chaseFieldOfViewDeg"].get<float>();
-		//			p.attackRange = json["attackRange"].get<float>();
-		//			p.chaseRange = json["chaseRange"].get<float>();
-		//			p.chaseAITimerInitial = json["chaseAITimerInitial"].get<float>();
-		//			p.patrolLeftTurnTime = json["patrolLeftTurnTime"].get<float>();
-		//			p.patrolRightTurnTime = json["patrolRightTurnTime"].get<float>();
-		//			p.waitTime = json["waitTime"].get<float>();
-		//		});
-		//}
-	}	//
+	}
 }
