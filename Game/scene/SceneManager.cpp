@@ -132,8 +132,8 @@ bool SceneManagerObject::Start()
 {
 	// 最初のシーンを設定
 	/** デバックテスト */
-	//SceneManager::Get().CreateScene(TitleScene::ID());
-	SceneManager::Get().CreateScene(BattleScene::ID());
+	SceneManager::Get().CreateScene(TitleScene::ID());
+	// SceneManager::Get().CreateScene(BattleScene::ID());
 	// SceneManager::Get().CreateScene(GameClearScene::ID());
 	return true;
 }
