@@ -394,10 +394,10 @@ namespace app
 			{
 				AwardType randomAward;
 
-				// 1. 解禁済みの称号をランダムに取得する（※1つも無い場合は if の中に入らない）
+				// 解禁済みの称号をランダムに取得する（※1つも無い場合は if の中に入らない）
 				if (app::ui::AwardManager::Get().GetRandomUnlockedAward(randomAward))
 				{
-					// 2. 該当するUIを取得して変数に保持
+					// 該当するUIを取得して変数に保持
 					randomAwardIcon_ = GetRandomAwardUI(randomAward);
 
 					if (randomAwardIcon_)
