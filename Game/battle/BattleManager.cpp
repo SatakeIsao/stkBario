@@ -126,7 +126,6 @@ namespace
 			parameter->animationDataList[static_cast<uint8_t>(app::actor::SlimeAnimationKind::knockBack)].loop = false;
 
 		});
-
 }
 
 
@@ -346,38 +345,6 @@ namespace app
 							testGimmickList_.push_back(stage);
 						}
 					}
-					//if (objData.EqualObjectName(L"PipeGimmick001") == true) {
-					//	app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
-					//	pipeGimmick->transform.localPosition = objData.position;
-					//	pipeGimmick->transform.UpdateTransform();
-					//	pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 0, 1, Vector3::Down);
-					//	pipeGimmickList_.push_back(pipeGimmick);
-					//}
-					//if (objData.EqualObjectName(L"PipeGimmick002") == true) {
-					//	app::actor::PipeGimmick* pipeGimmick = NewGO<app::actor::PipeGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "pipeGimmick");
-					//	pipeGimmick->transform.localPosition = objData.position;
-					//	pipeGimmick->transform.UpdateTransform();
-					//	pipeGimmick->Initialize("Assets/ModelData/clayPipe/ClayPipe.tkm", 0, 1, Vector3::Down);
-					//	pipeGimmickList_.push_back(pipeGimmick);
-					//}
-
-					/** 当たり判定を変更できるようになったら有効 */
-					//if (objData.ForwardMatchName(L"SingleBridge") == true) {
-					//	app::actor::StaticGimmick* stage = NewGO<app::actor::StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "SingleBridge");
-					//	stage->transform.position = (objData.position);
-					//	stage->transform.rotation = (objData.rotation);
-					//	stage->transform.scale = (objData.scale);
-					//	stage->Initialize("Assets/ModelData/stage/SingleBridge.tkm");
-					//	testGimmickList_.push_back(stage);
-					//}
-					//if (objData.ForwardMatchName(L"GreenGroundSlope") == true) {
-					//	app::actor::StaticGimmick* stage = NewGO<app::actor::StaticGimmick>(static_cast<uint8_t>(ObjectPriority::Default), "GreenGroundSlope");
-					//	stage->transform.position = (objData.position);
-					//	stage->transform.rotation = (objData.rotation);
-					//	stage->transform.scale = (objData.scale);
-					//	stage->Initialize("Assets/ModelData/stage/GroundSlope.tkm");
-					//	testGimmickList_.push_back(stage);
-					//}
 					return false;
 				});
 			}

@@ -10,11 +10,6 @@
 namespace
 {
 	static app::ui::UIAnimationSequence* seq = nullptr;
-
-	// ParameterManager から取得するため定数は削除済み
-	// MAX_ROWS / MAX_COLS / DISPLAY_ROW_COUNT / MAX_SCROLL_VAL
-	// TITLE_Y_UP / TITLE_Y_DOWN / COND_Y_UP / COND_Y_DOWN
-	// SELECTION_SCALE / DEFAULT_SCALE / SELECTION_COLOR / DEFAULT_COLOR
 }
 
 namespace app
@@ -38,9 +33,9 @@ namespace app
 		{
 			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
 
-			const int MAX_ROWS = p->maxRows * 8; // maxRows=1 は「1セット=8行」の意
-			const int DISPLAY_ROW_COUNT = static_cast<int>(p->displayRowCount) / 15; // 30→2
-			const float MAX_SCROLL_VAL = p->maxScrollVal / (100.0f / 6.0f); // 100→6
+			const int MAX_ROWS = p->maxRows * 8; // maxRows=1 は「1セット=8行」
+			const int DISPLAY_ROW_COUNT = static_cast<int>(p->displayRowCount) / 15;
+			const float MAX_SCROLL_VAL = p->maxScrollVal / (100.0f / 6.0f);
 
 			/** カーソルの移動（左右） */
 			if (g_pad[0]->IsTrigger(enButtonRight))
@@ -191,10 +186,10 @@ namespace app
 		{
 			auto* p = app::core::ParameterManager::Get().GetParameter<app::core::AwardMenuParameter>();
 
-			const float TITLE_Y_UP = static_cast<float>(p->titleYUp) * 28.0f;  // 5  → 140
-			const float TITLE_Y_DOWN = static_cast<float>(p->titleYDown) * -14.0f; // 10 → -140
-			const float COND_Y_UP = static_cast<float>(p->condYUp) * 4.0f;   // 10 → 40
-			const float COND_Y_DOWN = static_cast<float>(p->condYDown) * -24.0f; // 10 → -240
+			const float TITLE_Y_UP = static_cast<float>(p->titleYUp) * 28.0f;
+			const float TITLE_Y_DOWN = static_cast<float>(p->titleYDown) * -14.0f;
+			const float COND_Y_UP = static_cast<float>(p->condYUp) * 4.0f;
+			const float COND_Y_DOWN = static_cast<float>(p->condYDown) * -24.0f;
 			const int   MAX_ROWS = p->maxRows * 8;
 
 			auto textCond_complete = layout_->GetMenu()->GetUI<UIIcon>(Hash32("textCondition_complete"));
