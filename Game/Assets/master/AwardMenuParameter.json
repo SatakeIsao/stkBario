@@ -31,7 +31,7 @@
         "CondYDown": 10,
         "SelectionScale": { "x": 1.1, "y": 1.1, "z": 1.1},
         "DefaultScale": { "x": 1.0, "y": 1.0, "z": 1.0},
-        "SelectionColor": { "x": 1.1, "y": 1.1, "z": 1.1},
+        "SelectionColor": { "x": 1.0, "y": 1.0, "z": 0.0},
         "DefaultColor": { "x": 1.0, "y": 1.0, "z": 1.0}
     }
 ]
