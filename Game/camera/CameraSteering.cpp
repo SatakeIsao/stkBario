@@ -1,6 +1,7 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "CameraSteering.h"
 #include "actor/Actor.h"
+#include "battle/BattleManager.h"
 
 
 namespace
@@ -20,8 +21,8 @@ namespace app
 			CameraData nextData = data;
 			
 			
-			// —‘z‚ÌƒJƒƒ‰ˆÊ’u‚ğŒvZiƒ^[ƒQƒbƒg‚ÌŒã‚ëEãj
-			// ¦ŠÈˆÕ“I‚ÉZ²è‘O‚Éˆø‚¢‚Ä‚¢‚Ü‚·‚ªA–{—ˆ‚Íƒ^[ƒQƒbƒg‚ÌŒü‚«(Rotation)‚àl—¶‚µ‚Ä‰ñ“]‚³‚¹‚Ü‚·
+			// ç†æƒ³ã®ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’è¨ˆç®—ï¼ˆã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¾Œã‚ãƒ»ä¸Šï¼‰
+			// â€»ç°¡æ˜“çš„ã«Zè»¸æ‰‹å‰ã«å¼•ã„ã¦ã‚‹ãŒã€æœ¬æ¥ã¯ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å‘ã(Rotation)ã‚‚è€ƒæ…®ã—ã¦å›è»¢
 			Vector3 targetPosition = targetCharacter_->transform.position;
 			targetPosition.y += 50.0f;
 			
@@ -30,23 +31,30 @@ namespace app
 			nextData.position = position;
 			nextData.target = targetPosition;
 			
-			// ‰EƒXƒeƒBƒbƒN‚Å‰ñ“]
-			Vector3 rotationVector = Vector3(g_pad[0]->GetRStickXF(), g_pad[0]->GetRStickYF(), 0.0f);
+			// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã§å›è»¢ï¼ˆGOã‚¢ãƒ‹ãƒ¡çµ‚äº†ã¾ã§ç„¡è¦–ï¼‰
+			Vector3 rotationVector = Vector3::Zero;
+			if (!app::battle::BattleManager::IsAvailable()
+				|| app::battle::BattleManager::Get().IsInputEnabled())
+			{
+				rotationVector = Vector3(g_pad[0]->GetRStickXF(), g_pad[0]->GetRStickYF(), 0.0f);
+			}
+
+			//Vector3 rotationVector = Vector3(g_pad[0]->GetRStickXF(), g_pad[0]->GetRStickYF(), 0.0f);
 			if (rotationVector.LengthSq() > MOVE_MIN_FLOAT) {
 				rotationVector.x *= config_.rotationSpeedX;
 				rotationVector.y *= config_.rotationSpeedY;
-				// rotX‚ÅY²‰ñ“]
+				// rotXã§Yè»¸å›è»¢
 				Quaternion yRotation;
 				yRotation.SetRotationY(-rotationVector.x);
 				yRotation.Apply(toVector_);
-				// rotY‚ÅXZ²‰ñ“]
+				// rotYã§XZè»¸å›è»¢
 				Vector3 nextToVector = toVector_;
 				Quaternion xzRotation;
 				xzRotation.SetRotation(g_camera3D->GetRight(), -rotationVector.y);
 				xzRotation.Apply(nextToVector);
 
-				// toVector_‚ÌY¬•ª‚Åã‰ºŒÀ‚ğƒ`ƒFƒbƒN
-				// ¦distanceŠî€‚Å sin(pitchMin/Max) * distance ‚ªY¬•ª‚ÌŒÀŠE
+				// toVector_ã®Yæˆåˆ†ã§ä¸Šä¸‹é™ã‚’ãƒã‚§ãƒƒã‚¯
+				// â€»distanceåŸºæº–ã§ sin(pitchMin/Max) * distance ãŒYæˆåˆ†ã®é™ç•Œ
 				const float len = toVector_.Length();
 				const float yMin = len * sin(config_.pitchMin);
 				const float yMax = len * sin(config_.pitchMax);
